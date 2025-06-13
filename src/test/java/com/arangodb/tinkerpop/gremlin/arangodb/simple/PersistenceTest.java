@@ -92,7 +92,6 @@ public class PersistenceTest extends AbstractGremlinTest {
         String edgeColName = graphName() + "_" + Edge.DEFAULT_LABEL;
         ArangoCollection col = client().database().collection(edgeColName);
         Map<String, Object> doc = (Map<String, Object>) col.getDocument((String) e.id(), Map.class);
-        System.out.println(doc);
         assertThat(doc)
                 .hasSize(7)
                 .containsEntry("_key", "e")

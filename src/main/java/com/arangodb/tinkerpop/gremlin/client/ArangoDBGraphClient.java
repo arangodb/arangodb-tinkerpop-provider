@@ -58,7 +58,7 @@ public class ArangoDBGraphClient {
                 .db(config.dbName);
     }
 
-    private Module createSerdeModule(ElementIdFactory idFactory) {
+    private com.fasterxml.jackson.databind.Module createSerdeModule(ElementIdFactory idFactory) {
         SimpleModule module = new SimpleModule();
         module.addSerializer(ElementId.class, new JsonSerializer<ElementId>() {
             @Override
@@ -123,7 +123,6 @@ public class ArangoDBGraphClient {
                     .collection(ArangoDBGraph.GRAPH_VARIABLES_COLLECTION)
                     .replaceDocument(document.getKey(), document);
         } catch (ArangoDBException e) {
-            logger.error("Failed to update document", e);
             throw mapException(e);
         }
     }
@@ -211,7 +210,6 @@ public class ArangoDBGraphClient {
         try {
             return db.query(query, type, parameters);
         } catch (ArangoDBException e) {
-            logger.error("Error executing query", e);
             throw mapException(e);
         }
     }
@@ -224,7 +222,6 @@ public class ArangoDBGraphClient {
                     .edgeCollection(edge.collection())
                     .insertEdge(edge.data());
         } catch (ArangoDBException e) {
-            logger.error("Failed to insert edge", e);
             throw mapException(e);
         }
         edge.update(insertEntity);
@@ -240,7 +237,6 @@ public class ArangoDBGraphClient {
             if (e.getErrorNum() == 1202) { // document not found
                 return;
             }
-            logger.error("Failed to delete vertex", e);
             throw mapException(e);
         }
     }
@@ -253,7 +249,6 @@ public class ArangoDBGraphClient {
                     .edgeCollection(edge.collection())
                     .replaceEdge(edge.key(), edge.data());
         } catch (ArangoDBException e) {
-            logger.error("Failed to update edge", e);
             throw mapException(e);
         }
         logger.debug("Edge updated, new rev {}", updateEntity.getRev());
@@ -267,7 +262,6 @@ public class ArangoDBGraphClient {
                     .vertexCollection(id.getCollection())
                     .getVertex(id.getKey(), VertexData.class);
         } catch (ArangoDBException e) {
-            logger.error("Failed to read vertex", e);
             throw mapException(e);
         }
     }
@@ -280,7 +274,6 @@ public class ArangoDBGraphClient {
                     .vertexCollection(vertex.collection())
                     .insertVertex(vertex.data());
         } catch (ArangoDBException e) {
-            logger.error("Failed to insert document", e);
             throw mapException(e);
         }
         vertex.update(vertexEntity);
@@ -296,7 +289,6 @@ public class ArangoDBGraphClient {
             if (e.getErrorNum() == 1202) { // document not found
                 return;
             }
-            logger.error("Failed to delete vertex", e);
             throw mapException(e);
         }
     }
@@ -309,7 +301,6 @@ public class ArangoDBGraphClient {
                     .vertexCollection(vertex.collection())
                     .replaceVertex(vertex.key(), vertex.data());
         } catch (ArangoDBException e) {
-            logger.error("Failed to update document", e);
             throw mapException(e);
         }
         logger.debug("Document updated, new rev {}", vertexEntity.getRev());
