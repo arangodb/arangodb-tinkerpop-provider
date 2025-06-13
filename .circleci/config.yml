@@ -95,7 +95,7 @@ jobs:
         default: 'j21'
       testClass:
         type: 'string'
-        default: '**'
+        default: 'com.arangodb.tinkerpop.gremlin.simple.**'
     executor: <<parameters.jdk>>
     resource_class: 'medium'
     steps:
