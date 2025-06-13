@@ -28,12 +28,10 @@ public class ComplexGraphProvider extends TestGraphProvider {
         if (loadGraphWith != null) {
             switch (loadGraphWith) {
                 case CLASSIC:
-                    System.out.println("CLASSIC");
                     builder.edgeDefinitions(EdgeDef.of("knows").from("vertex").to("vertex"));
                     builder.edgeDefinitions(EdgeDef.of("created").from("vertex").to("vertex"));
                     break;
                 case MODERN:
-                    System.out.println("MODERN");
                     builder.orphanCollections("name");
                     builder.orphanCollections("animal");
                     builder.orphanCollections("dog");
@@ -45,19 +43,16 @@ public class ComplexGraphProvider extends TestGraphProvider {
                     builder.edgeDefinitions(EdgeDef.of("uses").from("person").to("software"));
                     break;
                 case CREW:
-                    System.out.println("CREW");
                     builder.edgeDefinitions(EdgeDef.of("uses").from("person").to("software"));
                     builder.edgeDefinitions(EdgeDef.of("develops").from("person").to("software"));
                     builder.edgeDefinitions(EdgeDef.of("traverses").from("software").to("software"));
                     break;
                 case GRATEFUL:
-                    System.out.println("GRATEFUL");
                     builder.edgeDefinitions(EdgeDef.of("followedBy").from("vertex").to("vertex"));
                     builder.edgeDefinitions(EdgeDef.of("sungBy").from("song").to("artist"));
                     builder.edgeDefinitions(EdgeDef.of("writtenBy").from("song").to("artist"));
                     break;
                 case SINK:
-                    System.out.println("SINK");
                     builder.edgeDefinitions(EdgeDef.of("self").from("loops").to("loops"));
                     builder.edgeDefinitions(EdgeDef.of("link").from("message").to("message"));
                     break;
