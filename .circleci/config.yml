@@ -1,0 +1,213 @@
+version: 2.1
+
+parameters:
+  docker-img:
+    type: 'string'
+    default: ''
+
+commands:
+  timeout:
+    parameters:
+      duration:
+        default: '20m'
+        type: 'string'
+    steps:
+      - run:
+          name: Cancel job after <<parameters.duration>>
+          background: true
+          command: |
+            sleep <<parameters.duration>>
+            echo "Cancelling job as <<parameters.duration>> has elapsed"
+            curl --fail -X POST -H "Circle-Token: ${CIRCLE_TOKEN}" "https://circleci.com/api/v1.1/project/github/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BUILD_NUM}/cancel"
+  start-db:
+    parameters:
+      docker-img:
+        type: 'string'
+        default: 'docker.io/arangodb/arangodb:latest'
+      topology:
+        type: 'string'
+        default: 'single'
+    steps:
+      - run:
+          name: Start Database
+          command: ./docker/start_db.sh
+          environment:
+            DOCKER_IMAGE: <<parameters.docker-img>>
+            STARTER_MODE: <<parameters.topology>>
+            STARTER_DOCKER_IMAGE: 'docker.io/arangodb/arangodb-starter:0.18.5'
+  load_cache:
+    steps:
+      - run:
+          name: Generate Cache Checksum
+          command: find . -name 'pom.xml' | sort | xargs cat > /tmp/maven_cache_seed
+      - restore_cache:
+          key: maven-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/maven_cache_seed" }}
+  store_cache:
+    steps:
+      - save_cache:
+          key: maven-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/maven_cache_seed" }}
+          paths:
+            - ~/.m2/repository
+  config_gpg:
+    steps:
+      - run:
+          name: Configure GPG
+          command: echo $GPG_PRIVATE_KEY | base64 --decode | gpg --batch --no-tty --import --yes
+  deploy:
+    steps:
+      - run:
+          name: Deploy to Apache Maven Central
+          command: mvn -s .circleci/maven-release-settings.xml -Dmaven.test.skip deploy
+  release:
+    steps:
+      - run:
+          name: Release to Apache Maven Central
+          command: mvn -s .circleci/maven-release-settings.xml -Dmaven.test.skip nexus-staging:release
+          environment:
+            MAVEN_OPTS: "--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED --add-opens=java.desktop/java.awt.font=ALL-UNNAMED"
+
+executors:
+  j8:
+    docker:
+      - image: 'cimg/openjdk:8.0'
+  j17:
+    docker:
+      - image: 'cimg/openjdk:17.0'
+  j21:
+    docker:
+      - image: 'cimg/openjdk:21.0'
+  j23:
+    docker:
+      - image: 'cimg/openjdk:23.0'
+
+jobs:
+
+  test:
+    parameters:
+      docker-img:
+        type: 'string'
+        default: 'docker.io/arangodb/arangodb:latest'
+      topology:
+        type: 'string'
+        default: 'single'
+      jdk:
+        type: 'string'
+        default: 'j21'
+      testClass:
+        type: 'string'
+        default: '**'
+    executor: <<parameters.jdk>>
+    resource_class: 'medium'
+    steps:
+      - timeout
+      - checkout
+      - setup_remote_docker
+      - start-db:
+          docker-img: <<parameters.docker-img>>
+          topology: <<parameters.topology>>
+      - load_cache
+      - run:
+          name: mvn dependency:tree
+          command: mvn dependency:tree
+      - run:
+          name: Test
+          command: mvn test -Dtest=<<parameters.testClass>>
+      - store_cache
+
+  deploy:
+    executor: 'j17'
+    steps:
+      - timeout:
+          duration: '30m'
+      - checkout
+      - load_cache
+      - config_gpg
+      - deploy
+      - store_cache
+
+  release:
+    executor: 'j17'
+    steps:
+      - timeout:
+          duration: '30m'
+      - checkout
+      - load_cache
+      - config_gpg
+      - deploy
+      - release
+      - store_cache
+
+workflows:
+  test-adb-version:
+    when:
+      not: <<pipeline.parameters.docker-img>>
+    jobs:
+      - test:
+          name: test-adb-<<matrix.topology>>-<<matrix.docker-img>>
+          matrix:
+            parameters:
+              docker-img:
+                - 'docker.io/arangodb/arangodb:3.12'
+                - 'docker.io/arangodb/enterprise:3.12'
+              topology:
+                - 'single'
+                - 'cluster'
+              testClass:
+                - 'com.arangodb.tinkerpop.gremlin.simple.**'
+                - 'com.arangodb.tinkerpop.gremlin.complex.**'
+
+  test-adb-topology:
+    when: <<pipeline.parameters.docker-img>>
+    jobs:
+      - test:
+          name: test-<<matrix.topology>>
+          matrix:
+            parameters:
+              docker-img:
+                - <<pipeline.parameters.docker-img>>
+              topology:
+                - 'single'
+                - 'cluster'
+
+  test-jdk:
+    when:
+      not: <<pipeline.parameters.docker-img>>
+    jobs:
+      - test:
+          name: test-jdk=<<matrix.jdk>>
+          matrix:
+            parameters:
+              testClass:
+                - 'com.arangodb.tinkerpop.gremlin.simple.**'
+                - 'com.arangodb.tinkerpop.gremlin.complex.**'
+              jdk:
+                - 'j8'
+                - 'j17'
+                - 'j21'
+                - 'j23'
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              only:
+                - main
+
+  deploy:
+    jobs:
+      - deploy:
+          context: java-release
+          filters:
+            tags:
+              only: /^deploy.*/
+            branches:
+              ignore: /.*/
+
+  release:
+    jobs:
+      - release:
+          context: java-release
+          filters:
+            tags:
+              only: /^release.*/
+            branches:
+              ignore: /.*/
