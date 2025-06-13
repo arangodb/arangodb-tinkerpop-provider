@@ -161,24 +161,6 @@
 
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.2.0</version>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                                <configuration>
-                                    <additionalparam>${javadoc.opts}</additionalparam>
-                                    <source>8</source>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>1.6</version>
                         <executions>
@@ -203,6 +185,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.0.0-M3</version>
+                    <configuration>
+                        <argLine>
+                            --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED
+                        </argLine>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -284,7 +271,8 @@
     <scm>
         <url>https://github.com/ArangoDB-Community/arangodb-tinkerpop-provider</url>
         <connection>scm:git:https://github.com/ArangoDB-Community/arangodb-tinkerpop-provider.git</connection>
-        <developerConnection>scm:git:git@github.com:ArangoDB-Community/arangodb-tinkerpop-provider.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:ArangoDB-Community/arangodb-tinkerpop-provider.git
+        </developerConnection>
     </scm>
 
     <organization>
