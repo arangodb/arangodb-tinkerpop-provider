@@ -67,9 +67,6 @@ commands:
             MAVEN_OPTS: "--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED --add-opens=java.desktop/java.awt.font=ALL-UNNAMED"
 
 executors:
-  j8:
-    docker:
-      - image: 'cimg/openjdk:8.0'
   j17:
     docker:
       - image: 'cimg/openjdk:17.0'
@@ -181,7 +178,6 @@ workflows:
                 - 'com.arangodb.tinkerpop.gremlin.simple.**'
                 - 'com.arangodb.tinkerpop.gremlin.complex.**'
               jdk:
-                - 'j8'
                 - 'j17'
                 - 'j21'
                 - 'j23'
