@@ -90,9 +90,9 @@ jobs:
       jdk:
         type: 'string'
         default: 'j21'
-      testClass:
+      graphType:
         type: 'string'
-        default: 'com.arangodb.tinkerpop.gremlin.simple.**'
+        default: 'simple'
     executor: <<parameters.jdk>>
     resource_class: 'medium'
     steps:
@@ -108,7 +108,7 @@ jobs:
           command: mvn dependency:tree
       - run:
           name: Test
-          command: mvn test -Dtest=<<parameters.testClass>>
+          command: mvn test -Dtest.graph.type=<<parameters.graphType>>
       - store_cache
 
   deploy:
@@ -149,9 +149,9 @@ workflows:
               topology:
                 - 'single'
                 - 'cluster'
-              testClass:
-                - 'com.arangodb.tinkerpop.gremlin.simple.**'
-                - 'com.arangodb.tinkerpop.gremlin.complex.**'
+              graphType:
+                - 'simple'
+                - 'complex'
 
   test-adb-topology:
     when: <<pipeline.parameters.docker-img>>
@@ -174,9 +174,9 @@ workflows:
           name: test-jdk=<<matrix.jdk>>
           matrix:
             parameters:
-              testClass:
-                - 'com.arangodb.tinkerpop.gremlin.simple.**'
-                - 'com.arangodb.tinkerpop.gremlin.complex.**'
+              graphType:
+                - 'simple'
+                - 'complex'
               jdk:
                 - 'j17'
                 - 'j21'

@@ -28,7 +28,7 @@ public abstract class TestGraphProvider extends AbstractGraphProvider {
 
     public ArangoDBConfigurationBuilder confBuilder() {
         ArangoDBConfigurationBuilder builder = new ArangoDBConfigurationBuilder()
-                .hosts("127.0.0.1:8529")
+                .hosts("172.28.0.1:8529")
                 .user("root")
                 .password("test")
                 .protocol(Protocol.HTTP2_VPACK)
