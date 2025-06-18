@@ -140,7 +140,7 @@ workflows:
       not: <<pipeline.parameters.docker-img>>
     jobs:
       - test:
-          name: test-adb-<<matrix.topology>>-<<matrix.docker-img>>
+          name: test-adb-<<matrix.topology>>-<<matrix.docker-img>>-<<matrix.graphType>>
           matrix:
             parameters:
               docker-img:
@@ -157,7 +157,7 @@ workflows:
     when: <<pipeline.parameters.docker-img>>
     jobs:
       - test:
-          name: test-<<matrix.topology>>
+          name: test-<<matrix.topology>>-<<matrix.graphType>>
           matrix:
             parameters:
               docker-img:
@@ -171,7 +171,7 @@ workflows:
       not: <<pipeline.parameters.docker-img>>
     jobs:
       - test:
-          name: test-jdk=<<matrix.jdk>>
+          name: test-jdk=<<matrix.jdk>>-<<matrix.graphType>>
           matrix:
             parameters:
               graphType:
