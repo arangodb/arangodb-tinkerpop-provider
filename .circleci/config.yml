@@ -157,7 +157,7 @@ workflows:
     when: <<pipeline.parameters.docker-img>>
     jobs:
       - test:
-          name: test-<<matrix.topology>>-<<matrix.graphType>>
+          name: test-<<matrix.topology>>
           matrix:
             parameters:
               docker-img:
