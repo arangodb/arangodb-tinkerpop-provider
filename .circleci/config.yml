@@ -93,6 +93,9 @@ jobs:
       graphType:
         type: 'string'
         default: 'simple'
+      args:
+        type: 'string'
+        default: ''
     executor: <<parameters.jdk>>
     resource_class: 'medium'
     steps:
@@ -108,7 +111,7 @@ jobs:
           command: mvn dependency:tree
       - run:
           name: Test
-          command: mvn test -Dtest.graph.type=<<parameters.graphType>>
+          command: mvn test -Dtest.graph.type=<<parameters.graphType>> <<parameters.args>>
       - store_cache
 
   deploy:
@@ -138,7 +141,7 @@ workflows:
       not: <<pipeline.parameters.docker-img>>
     jobs:
       - test:
-          name: test-adb-<<matrix.topology>>-<<matrix.docker-img>>-<<matrix.graphType>>
+          name: test-adb-single-<<matrix.docker-img>>-<<matrix.graphType>>
           matrix:
             parameters:
               docker-img:
@@ -146,23 +149,45 @@ workflows:
                 - 'docker.io/arangodb/enterprise:3.12'
               topology:
                 - 'single'
+              graphType:
+                - 'simple'
+                - 'complex'
+      - test:
+          name: test-adb-cluster-<<matrix.docker-img>>-<<matrix.graphType>>
+          matrix:
+            parameters:
+              docker-img:
+                - 'docker.io/arangodb/arangodb:3.12'
+                - 'docker.io/arangodb/enterprise:3.12'
+              topology:
                 - 'cluster'
               graphType:
                 - 'simple'
                 - 'complex'
+              args:
+                - '-Dtest.skipProcessStandardSuite'
 
   test-adb-topology:
     when: <<pipeline.parameters.docker-img>>
     jobs:
       - test:
-          name: test-<<matrix.topology>>
+          name: test-single
           matrix:
             parameters:
               docker-img:
                 - <<pipeline.parameters.docker-img>>
               topology:
                 - 'single'
+      - test:
+          name: test-cluster
+          matrix:
+            parameters:
+              docker-img:
+                - <<pipeline.parameters.docker-img>>
+              topology:
                 - 'cluster'
+              args:
+                - '-Dtest.skipProcessStandardSuite'
 
   test-jdk:
     when:
