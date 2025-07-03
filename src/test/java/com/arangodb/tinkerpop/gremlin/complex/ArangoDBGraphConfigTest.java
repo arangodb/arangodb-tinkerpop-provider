@@ -40,7 +40,7 @@ public class ArangoDBGraphConfigTest extends AbstractTest {
                 .get(as(InstanceOfAssertFactories.list(HostDescription.class)))
                 .hasSize(1)
                 .anySatisfy(host -> {
-                    assertThat(host.getHost()).isEqualTo("127.0.0.1");
+                    assertThat(host.getHost()).isEqualTo("172.28.0.1");
                     assertThat(host.getPort()).isEqualTo(8529);
                 });
         assertThat(conf.driverConfig.getPassword()).isPresent().get().isEqualTo("test");

@@ -29,11 +29,12 @@ public abstract class AbstractTest {
             graph.close();
             client.clear(graph.name());
         }
+        client.shutdown();
     }
 
     protected ArangoDBConfigurationBuilder confBuilder() {
         return new ArangoDBConfigurationBuilder()
-                .hosts("127.0.0.1:8529")
+                .hosts("172.28.0.1:8529")
                 .user("root")
                 .password("test")
                 .protocol(Protocol.HTTP2_VPACK)

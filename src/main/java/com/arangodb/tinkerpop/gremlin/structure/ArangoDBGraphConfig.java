@@ -8,10 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -248,6 +245,18 @@ public class ArangoDBGraphConfig {
         @Override
         public String toString() {
             return collection + ":[" + String.join(",", from) + "]->[" + String.join(",", to) + "]";
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof EdgeDef)) return false;
+            EdgeDef edgeDef = (EdgeDef) o;
+            return Objects.equals(collection, edgeDef.collection) && Objects.equals(from, edgeDef.from) && Objects.equals(to, edgeDef.to);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(collection, from, to);
         }
     }
 
