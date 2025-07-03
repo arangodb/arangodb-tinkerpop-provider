@@ -18,8 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.Equator;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Property;
 
@@ -39,23 +38,9 @@ public class ArangoDBUtil {
         Set<ArangoDBGraphConfig.EdgeDef> dbDefs = info.getEdgeDefinitions().stream()
                 .map(ArangoDBGraphConfig.EdgeDef::of)
                 .collect(Collectors.toSet());
-        if (!CollectionUtils.isEqualCollection(dbDefs, config.edgeDefinitions, new EdgeDefEquator())) {
+        if (!dbDefs.equals(config.edgeDefinitions)) {
             throw new IllegalStateException("Edge definitions do not match. From DB: "
                     + dbDefs + ", From config: " + config.edgeDefinitions);
-        }
-    }
-
-    private static class EdgeDefEquator implements Equator<ArangoDBGraphConfig.EdgeDef> {
-        @Override
-        public boolean equate(ArangoDBGraphConfig.EdgeDef a, ArangoDBGraphConfig.EdgeDef b) {
-            return a.getCollection().equals(b.getCollection()) &&
-                    CollectionUtils.isEqualCollection(a.getFrom(), b.getFrom()) &&
-                    CollectionUtils.isEqualCollection(a.getTo(), b.getTo());
-        }
-
-        @Override
-        public int hash(ArangoDBGraphConfig.EdgeDef o) {
-            return Objects.hash(o.getCollection(), new HashSet<>(o.getFrom()), new HashSet<>(o.getTo()));
         }
     }
 
