@@ -51,6 +51,7 @@ public abstract class TestGraphProvider extends AbstractGraphProvider {
     public void clear(Graph graph, Configuration configuration) throws Exception {
         TestGraphClient client = new TestGraphClient(configuration);
         client.clear(new ArangoDBGraphConfig(configuration).graphName);
+        client.shutdown();
         if (graph != null) {
             graph.close();
         }

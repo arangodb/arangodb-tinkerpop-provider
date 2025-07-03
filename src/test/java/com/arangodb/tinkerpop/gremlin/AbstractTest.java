@@ -29,6 +29,7 @@ public abstract class AbstractTest {
             graph.close();
             client.clear(graph.name());
         }
+        client.shutdown();
     }
 
     protected ArangoDBConfigurationBuilder confBuilder() {
