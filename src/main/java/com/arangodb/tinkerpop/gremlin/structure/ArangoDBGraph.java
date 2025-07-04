@@ -54,7 +54,7 @@ public class ArangoDBGraph implements Graph {
     protected ArangoDBGraph(Configuration cfg) {
         LOGGER.debug("Creating new ArangoDB Graph from configuration");
         config = new ArangoDBGraphConfig(cfg);
-        idFactory = new ElementIdFactory(config);
+        idFactory = ElementIdFactory.create(config);
         client = new ArangoDBGraphClient(config, idFactory, this);
 
         ArangoGraph graph = client.getArangoGraph();

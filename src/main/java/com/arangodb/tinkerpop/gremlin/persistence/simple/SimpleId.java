@@ -1,13 +1,15 @@
-package com.arangodb.tinkerpop.gremlin.persistence;
+package com.arangodb.tinkerpop.gremlin.persistence.simple;
 
-class SimpleId extends ElementId {
+import com.arangodb.tinkerpop.gremlin.persistence.ElementId;
 
-    SimpleId(String prefix, String collection, String key) {
+public class SimpleId extends ElementId {
+
+    public SimpleId(String prefix, String collection, String key) {
         super(prefix, collection, key);
     }
 
     @Override
-    public SimpleId withKey(String newKey) {
+    protected SimpleId withKey(String newKey) {
         ElementId.validateIdParts(newKey);
         return new SimpleId(prefix, collection, newKey);
     }

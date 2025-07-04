@@ -8,7 +8,7 @@ public abstract class ElementId {
     protected final String collection;
     protected final String key;
 
-    static void validateIdParts(String... names) {
+    public static void validateIdParts(String... names) {
         for (String name : names) {
             if (name == null)
                 continue;
@@ -21,13 +21,13 @@ public abstract class ElementId {
         }
     }
 
-    ElementId(String prefix, String collection, String key) {
+    protected ElementId(String prefix, String collection, String key) {
         this.prefix = prefix;
         this.collection = collection;
         this.key = key;
     }
 
-    abstract ElementId withKey(String newKey);
+    protected abstract ElementId withKey(String newKey);
 
     public abstract String getLabel();
 

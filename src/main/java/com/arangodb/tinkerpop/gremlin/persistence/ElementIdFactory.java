@@ -1,7 +1,8 @@
 package com.arangodb.tinkerpop.gremlin.persistence;
 
+import com.arangodb.tinkerpop.gremlin.persistence.complex.ComplexElementIdFactory;
+import com.arangodb.tinkerpop.gremlin.persistence.simple.SimpleElementIdFactory;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
-import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig.GraphType;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -14,14 +15,29 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 
-public class ElementIdFactory {
-    private final String prefix;
-    private final GraphType graphType;
+public abstract class ElementIdFactory {
+    protected final String prefix;
 
-    public ElementIdFactory(ArangoDBGraphConfig config) {
-        this.prefix = config.graphName;
-        this.graphType = config.graphType;
+    public static ElementIdFactory create(ArangoDBGraphConfig config) {
+        switch (config.graphType) {
+            case SIMPLE:
+                return new SimpleElementIdFactory(config.graphName);
+            case COMPLEX:
+                return new ComplexElementIdFactory(config.graphName);
+            default:
+                throw new IllegalArgumentException("Unsupported graph type: " + config.graphType);
+        }
     }
+
+    protected ElementIdFactory(String prefix) {
+        this.prefix = prefix;
+    }
+
+    protected abstract String inferCollection(final String collection, final String label, final String defaultLabel);
+
+    protected abstract void validateId(String id);
+
+    protected abstract ElementId doCreate(String prefix, String collection, String key);
 
     private String extractKey(final String id) {
         String[] parts = id.split("/");
@@ -34,22 +50,6 @@ public class ElementIdFactory {
             throw new IllegalArgumentException(String.format("key (%s) contains invalid character '/'", id));
         }
         return parts.length == 2 ? parts[0] : null;
-    }
-
-    private String inferCollection(final String collection, final String label, final String defaultLabel) {
-        if (graphType == GraphType.SIMPLE) {
-            return defaultLabel;
-        }
-        if (collection != null) {
-            if (label != null && !label.equals(collection)) {
-                throw new IllegalArgumentException("Mismatching label: [" + label + "] and collection: [" + collection + "]");
-            }
-            return collection;
-        }
-        if (label != null) {
-            return label;
-        }
-        return defaultLabel;
     }
 
     public ElementId createVertexId(String label, Object[] keyValues) {
@@ -117,33 +117,10 @@ public class ElementIdFactory {
         return of(prefix, inferCollection(extractCollection(id), label, defaultLabel), extractKey(id));
     }
 
-    private void validateId(String id) {
-        switch (graphType) {
-            case SIMPLE:
-                if (id.contains("_")) {
-                    throw new IllegalArgumentException(String.format("id (%s) contains invalid character '_'", id));
-                }
-                if (id.contains("/")) {
-                    throw new IllegalArgumentException(String.format("id (%s) contains invalid character '/'", id));
-                }
-                break;
-            case COMPLEX:
-                if (id.replaceFirst("^" + prefix + "_", "").contains("_")) {
-                    throw new IllegalArgumentException(String.format("id (%s) contains invalid character '_'", id));
-                }
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
     private ElementId of(String prefix, String collection, String key) {
         Objects.requireNonNull(prefix);
         Objects.requireNonNull(collection);
         ElementId.validateIdParts(prefix, collection, key);
-        return graphType == GraphType.SIMPLE ?
-                new SimpleId(prefix, collection, key) :
-                new ArangoId(prefix, collection, key);
+        return doCreate(prefix, collection, key);
     }
-
 }
