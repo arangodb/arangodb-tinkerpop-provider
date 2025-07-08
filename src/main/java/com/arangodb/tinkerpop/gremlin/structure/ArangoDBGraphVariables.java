@@ -9,15 +9,14 @@
 package com.arangodb.tinkerpop.gremlin.structure;
 
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.arangodb.tinkerpop.gremlin.PackageVersion;
 import com.arangodb.tinkerpop.gremlin.persistence.VariablesData;
 import com.arangodb.tinkerpop.gremlin.utils.ArangoDBUtil;
 import org.apache.tinkerpop.gremlin.structure.Graph;
-import org.apache.tinkerpop.gremlin.structure.util.GraphVariableHelper;
 import org.apache.tinkerpop.gremlin.structure.util.StringFactory;
 
 
@@ -35,8 +34,8 @@ public class ArangoDBGraphVariables implements Graph.Variables {
         return data.getVersion();
     }
 
-    void updateVersion(String version) {
-        data.setVersion(version);
+    void updateVersion() {
+        data.setVersion(PackageVersion.VERSION);
         update();
     }
 
@@ -55,8 +54,7 @@ public class ArangoDBGraphVariables implements Graph.Variables {
 
     @Override
     public void set(String key, Object value) {
-        GraphVariableHelper.validateVariable(key, value);
-        ArangoDBUtil.validateVariableValue(value);
+        ArangoDBUtil.validateVariable(key, value);
         data.put(key, value);
         update();
     }

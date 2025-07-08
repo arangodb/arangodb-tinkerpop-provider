@@ -8,7 +8,6 @@
 
 package com.arangodb.tinkerpop.gremlin.client;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,13 +19,11 @@ import com.arangodb.model.*;
 import com.arangodb.serde.jackson.JacksonMapperProvider;
 import com.arangodb.serde.jackson.JacksonSerde;
 import com.arangodb.tinkerpop.gremlin.persistence.*;
+import com.arangodb.tinkerpop.gremlin.persistence.serde.SerdeModule;
 import com.arangodb.tinkerpop.gremlin.structure.*;
 import com.arangodb.tinkerpop.gremlin.utils.AqlDeserializer;
 import com.arangodb.util.RawBytes;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalInterruptedException;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils;
@@ -48,36 +45,15 @@ public class ArangoDBGraphClient {
         this.config = config;
         Protocol protocol = config.driverConfig.getProtocol()
                 .orElse(ArangoDefaults.DEFAULT_PROTOCOL);
-        ObjectMapper mapper = JacksonMapperProvider.of(ContentTypeFactory.of(protocol))
-                .registerModule(createSerdeModule(idFactory));
+        ObjectMapper mapper = JacksonMapperProvider
+                .of(ContentTypeFactory.of(protocol))
+                .registerModule(new SerdeModule(idFactory));
         aqlDeserializer = new AqlDeserializer(graph, mapper);
         db = new ArangoDB.Builder()
                 .loadProperties(config.driverConfig)
                 .serde(JacksonSerde.create(mapper))
                 .build()
                 .db(config.dbName);
-    }
-
-    private com.fasterxml.jackson.databind.Module createSerdeModule(ElementIdFactory idFactory) {
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(ElementId.class, new JsonSerializer<ElementId>() {
-            @Override
-            public void serialize(ElementId value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-                String json = value.toJson();
-                if (json == null) {
-                    gen.writeNull();
-                } else {
-                    gen.writeString(json);
-                }
-            }
-        });
-        module.addDeserializer(ElementId.class, new JsonDeserializer<ElementId>() {
-            @Override
-            public ElementId deserialize(JsonParser p, DeserializationContext ctx) throws IOException {
-                return idFactory.parseId(p.getText());
-            }
-        });
-        return module;
     }
 
     public void shutdown() {
@@ -234,7 +210,8 @@ public class ArangoDBGraphClient {
                     .edgeCollection(edge.collection())
                     .deleteEdge(edge.key());
         } catch (ArangoDBException e) {
-            if (e.getErrorNum() == 1202) { // document not found
+            Integer errNum = e.getErrorNum();
+            if (errNum != null && errNum == 1202) { // document not found
                 return;
             }
             throw mapException(e);
@@ -286,7 +263,8 @@ public class ArangoDBGraphClient {
                     .vertexCollection(vertex.collection())
                     .deleteVertex(vertex.key());
         } catch (ArangoDBException e) {
-            if (e.getErrorNum() == 1202) { // document not found
+            Integer errNum = e.getErrorNum();
+            if (errNum != null && errNum == 1202) { // document not found
                 return;
             }
             throw mapException(e);
@@ -324,7 +302,8 @@ public class ArangoDBGraphClient {
             ie.initCause(ex);
             return ie;
         }
-        if (ex.getErrorNum() == 1210) {
+        Integer errNum = ex.getErrorNum();
+        if (errNum != null && errNum == 1210) {
             return new IllegalArgumentException("Document with id already exists", ex);
         }
         return ex;

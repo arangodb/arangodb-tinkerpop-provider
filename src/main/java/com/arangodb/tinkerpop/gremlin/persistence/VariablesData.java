@@ -12,7 +12,7 @@ public class VariablesData extends PropertiesContainer<Object> {
     private String version;
 
     @JsonCreator
-    public VariablesData(@Key String key, @JsonProperty("version") String version) {
+    public VariablesData(@Key String key, @JsonProperty("_version") String version) {
         this.key = key;
         this.version = version;
     }
@@ -22,6 +22,7 @@ public class VariablesData extends PropertiesContainer<Object> {
         return key;
     }
 
+    @JsonProperty("_version")
     public String getVersion() {
         return version;
     }

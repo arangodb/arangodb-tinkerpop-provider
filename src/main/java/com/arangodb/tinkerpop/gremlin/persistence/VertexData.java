@@ -25,12 +25,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.*;
 
+import static com.arangodb.tinkerpop.gremlin.utils.ReservedFields.LABEL;
+
 public class VertexData extends PropertiesContainer<VertexPropertyData> implements PersistentData {
 
     @Id
     private ElementId id;
 
-    @JsonProperty
+    @JsonProperty(LABEL)
     private String label;
 
     @Key
@@ -42,6 +44,9 @@ public class VertexData extends PropertiesContainer<VertexPropertyData> implemen
         data.label = label;
         data.key = id.getKey();
         return data;
+    }
+
+    private VertexData() {
     }
 
     @Override

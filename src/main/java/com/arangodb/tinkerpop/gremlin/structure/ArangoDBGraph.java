@@ -70,7 +70,7 @@ public class ArangoDBGraph implements Graph {
                 .orElseGet(() -> client.insertGraphVariables(new VariablesData(name(), PackageVersion.VERSION)));
         ArangoDBGraphVariables variables = new ArangoDBGraphVariables(this, variablesData);
         ArangoDBUtil.checkVersion(variables.getVersion());
-        variables.updateVersion(PackageVersion.VERSION);
+        variables.updateVersion();
     }
 
     public Set<String> edgeCollections() {
@@ -90,8 +90,10 @@ public class ArangoDBGraph implements Graph {
         ElementHelper.legalPropertyKeyValueArray(keyValues);
         String label = ElementHelper.getLabelValue(keyValues).orElse(null);
         ElementId id = idFactory.createVertexId(label, keyValues);
-        for (int i = 1; i < keyValues.length; i = i + 2) {
-            ArangoDBUtil.validatePropertyValue(keyValues[i]);
+        for (int i = 0; i < keyValues.length; i = i + 2) {
+            if (keyValues[i] instanceof String) {
+                ArangoDBUtil.validateProperty((String) keyValues[i], keyValues[i + 1]);
+            }
         }
         ArangoDBVertex vertex = ArangoDBVertex.of(label, id, this);
         if (!config.vertices.contains(vertex.collection())) {

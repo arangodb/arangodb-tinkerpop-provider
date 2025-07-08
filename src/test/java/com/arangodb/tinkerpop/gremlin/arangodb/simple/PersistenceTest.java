@@ -36,10 +36,7 @@ public class PersistenceTest extends AbstractGremlinTest {
                 .containsEntry("_id", GRAPH_VARIABLES_COLLECTION + "/" + graphName())
                 .containsEntry("_key", graphName())
                 .containsKey("_rev")
-                .containsEntry("version", PackageVersion.VERSION)
-                .containsKey("properties");
-        assertThat((Map<String, Object>) doc.get("properties"))
-                .hasSize(1)
+                .containsEntry("_version", PackageVersion.VERSION)
                 .containsEntry("key", "value");
     }
 
@@ -57,27 +54,20 @@ public class PersistenceTest extends AbstractGremlinTest {
         ArangoCollection col = client().database().collection(colName);
         Map<String, Object> doc = (Map<String, Object>) col.getDocument((String) v.id(), Map.class);
         assertThat(doc)
-                .hasSize(5)
+                .hasSize(6)
                 .containsEntry("_key", "foo")
                 .containsEntry("_id", colName + "/foo")
                 .containsKey("_rev")
-                .containsEntry("label", "bar")
-                .containsKey("properties");
+                .containsEntry("_label", "bar")
+                .containsEntry("key", "value");
 
-        Map<String, Object> vertexProperties = (Map<String, Object>) doc.get("properties");
-        assertThat(vertexProperties)
+        Map<String, Map<String, Object>> meta = (Map<String, Map<String, Object>>) doc.get("_meta");
+        assertThat(meta)
                 .hasSize(1)
                 .containsKey("key");
 
-        Map<String, Object> vertexProperty = (Map<String, Object>) vertexProperties.get("key");
-        assertThat(vertexProperty)
-                .hasSize(2)
-                .containsEntry("value", "value")
-                .containsKey("properties");
-
-        Map<String, Object> metaProperties = (Map<String, Object>) vertexProperty.get("properties");
-        assertThat(metaProperties)
-                .hasSize(1)
+        Map<String, Object> fooMeta = meta.get("key");
+        assertThat(fooMeta)
                 .containsEntry("meta", "metaValue");
     }
 
@@ -99,12 +89,7 @@ public class PersistenceTest extends AbstractGremlinTest {
                 .containsKey("_rev")
                 .containsEntry("_from", vertexColName + "/a")
                 .containsEntry("_to", vertexColName + "/b")
-                .containsEntry("label", "foo")
-                .containsKey("properties");
-
-        Map<String, Object> props = (Map<String, Object>) doc.get("properties");
-        assertThat(props)
-                .hasSize(1)
+                .containsEntry("_label", "foo")
                 .containsEntry("key", "value");
     }
 }

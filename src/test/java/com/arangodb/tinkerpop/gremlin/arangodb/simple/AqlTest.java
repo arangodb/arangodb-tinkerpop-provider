@@ -32,7 +32,7 @@ public class AqlTest extends AbstractGremlinTest {
     @LoadGraphWith(LoadGraphWith.GraphData.MODERN)
     public void shouldExecuteAqlWithArgs() {
         this.graph.addVertex("name", "marko");
-        String query = "FOR d IN @@vCol FILTER d.properties.name.value == @name RETURN d";
+        String query = "FOR d IN @@vCol FILTER d.name == @name RETURN d";
         Map<String, Object> bindings = new HashMap<>();
         bindings.put("@vCol", vertexCollection());
         bindings.put("name", "marko");
@@ -49,7 +49,7 @@ public class AqlTest extends AbstractGremlinTest {
     public void shouldExecuteAqlAndBackToGremlin() {
         this.graph.addVertex("name", "marko", "age", 29, "color", "red");
         this.graph.addVertex("name", "marko", "age", 30, "color", "yellow");
-        String query = "FOR d IN @@vCol FILTER d.properties.name.value == @name RETURN d";
+        String query = "FOR d IN @@vCol FILTER d.name == @name RETURN d";
         Map<String, Object> bindings = new HashMap<>();
         bindings.put("@vCol", vertexCollection());
         bindings.put("name", "marko");
@@ -107,9 +107,9 @@ public class AqlTest extends AbstractGremlinTest {
                         graph().aql("" +
                                         "FOR start IN standard_vertex" +
                                         "    FOR b, e1 IN 1..1 INBOUND start GRAPH standard" +
-                                        "        FILTER e1.label == 'sungBy'" +
+                                        "        FILTER e1._label == 'sungBy'" +
                                         "        FOR a, e2 IN 1..1 OUTBOUND b GRAPH standard" +
-                                        "            FILTER e2.label == 'writtenBy'" +
+                                        "            FILTER e2._label == 'writtenBy'" +
                                         "            FILTER a == start" +
                                         "            RETURN {a, b}")
                                 .select("a", "b").by("name")
@@ -119,9 +119,9 @@ public class AqlTest extends AbstractGremlinTest {
                         sungAndWrittenBySame,
                         graph().aql("" +
                                         "FOR e1 IN standard_edge" +
-                                        "    FILTER e1.label == \"sungBy\"" +
+                                        "    FILTER e1._label == \"sungBy\"" +
                                         "    FOR e2 IN standard_edge" +
-                                        "        FILTER e2.label == \"writtenBy\"" +
+                                        "        FILTER e2._label == \"writtenBy\"" +
                                         "        FILTER e1._from == e2._from" +
                                         "        FILTER e1._to == e2._to" +
                                         "        RETURN {a: DOCUMENT(e1._to), b: DOCUMENT(e1._from)}")
@@ -133,8 +133,8 @@ public class AqlTest extends AbstractGremlinTest {
                         graph().aql("" +
                                         "FOR start IN standard_vertex" +
                                         "    FOR a, e, p IN 2..2 OUTBOUND start GRAPH standard" +
-                                        "        FILTER p.edges[0].label == 'followedBy'" +
-                                        "        FILTER p.edges[1].label == 'followedBy'" +
+                                        "        FILTER p.edges[0]._label == 'followedBy'" +
+                                        "        FILTER p.edges[1]._label == 'followedBy'" +
                                         "        FILTER a == start" +
                                         "        RETURN {a: p.vertices[0], b: p.vertices[1]}")
                                 .select("a", "b").by("name")
@@ -144,9 +144,9 @@ public class AqlTest extends AbstractGremlinTest {
                         followEachOther,
                         graph().aql("" +
                                         "FOR e1 IN standard_edge" +
-                                        "    FILTER e1.label == 'followedBy'" +
+                                        "    FILTER e1._label == 'followedBy'" +
                                         "    FOR e2 IN standard_edge" +
-                                        "        FILTER e2.label == 'followedBy'" +
+                                        "        FILTER e2._label == 'followedBy'" +
                                         "        FILTER e1._to == e2._from" +
                                         "        FILTER e1._from == e2._to" +
                                         "        RETURN {a: DOCUMENT(e1._from), b: DOCUMENT(e1._to)}")
@@ -159,14 +159,14 @@ public class AqlTest extends AbstractGremlinTest {
                                         "FOR start IN standard_vertex" +
                                         "  LET outCount = (" +
                                         "    FOR a, e IN 1..1 OUTBOUND start GRAPH standard" +
-                                        "      FILTER e.label == 'followedBy'" +
+                                        "      FILTER e._label == 'followedBy'" +
                                         "      COLLECT WITH COUNT INTO c" +
                                         "      RETURN c" +
                                         "  )[0]" +
                                         "  FILTER outCount > 10" +
                                         "  LET inCount = (" +
                                         "    FOR a, e IN 1..1 INBOUND start GRAPH standard" +
-                                        "      FILTER e.label == 'followedBy'" +
+                                        "      FILTER e._label == 'followedBy'" +
                                         "      COLLECT WITH COUNT INTO c" +
                                         "      RETURN c" +
                                         "  )[0]" +
@@ -182,7 +182,7 @@ public class AqlTest extends AbstractGremlinTest {
                                         "FOR start IN standard_vertex" +
                                         "  LET outCount = (" +
                                         "    FOR e IN standard_edge" +
-                                        "      FILTER e.label == 'followedBy'" +
+                                        "      FILTER e._label == 'followedBy'" +
                                         "      FILTER e._from == start._id" +
                                         "      COLLECT WITH COUNT INTO c" +
                                         "      RETURN c" +
@@ -190,7 +190,7 @@ public class AqlTest extends AbstractGremlinTest {
                                         "  FILTER outCount > 10" +
                                         "  LET inCount = (" +
                                         "    FOR e IN standard_edge" +
-                                        "      FILTER e.label == 'followedBy'" +
+                                        "      FILTER e._label == 'followedBy'" +
                                         "      FILTER e._to == start._id      " +
                                         "      COLLECT WITH COUNT INTO c" +
                                         "      RETURN c" +
