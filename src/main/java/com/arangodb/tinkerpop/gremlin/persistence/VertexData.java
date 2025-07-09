@@ -23,29 +23,17 @@ import java.util.*;
 
 public class VertexData extends PropertiesContainer<VertexPropertyData> implements PersistentData {
 
-    private ElementId id;
+    private final ElementId id;
     private final String label;
-    private String key;
 
     public VertexData(String label, ElementId id) {
         this.id = id;
         this.label = label;
-        this.key = id.getKey();
     }
 
     @Override
     public ElementId elementId() {
         return id;
-    }
-
-    @Override
-    public void setId(ElementId id) {
-        this.id = id;
-    }
-
-    @Override
-    public void setKey(String key) {
-        this.key = key;
     }
 
     @Override
@@ -58,7 +46,6 @@ public class VertexData extends PropertiesContainer<VertexPropertyData> implemen
         return "VertexData{" +
                 "id=" + id +
                 ", label='" + label + '\'' +
-                ", key='" + key + '\'' +
                 ", super=" + super.toString() +
                 '}';
     }
@@ -68,11 +55,11 @@ public class VertexData extends PropertiesContainer<VertexPropertyData> implemen
         if (!(o instanceof VertexData)) return false;
         if (!super.equals(o)) return false;
         VertexData that = (VertexData) o;
-        return Objects.equals(id, that.id) && Objects.equals(label, that.label) && Objects.equals(key, that.key);
+        return Objects.equals(id, that.id) && Objects.equals(label, that.label);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), id, label, key);
+        return Objects.hash(super.hashCode(), id, label);
     }
 }

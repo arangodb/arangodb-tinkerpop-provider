@@ -19,25 +19,11 @@
 
 package com.arangodb.tinkerpop.gremlin.persistence;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.Map;
 import java.util.Objects;
 
 public final class VertexPropertyData extends PropertiesContainer<Object> {
 
     private final Object value;
-
-    @JsonCreator
-    public VertexPropertyData(
-            @JsonProperty("value") Object value,
-            @JsonProperty("properties") Map<String, Object> properties) {
-        this(value);
-        if (properties != null) {
-            properties.forEach(this::put);
-        }
-    }
 
     public VertexPropertyData(Object value) {
         this.value = value;

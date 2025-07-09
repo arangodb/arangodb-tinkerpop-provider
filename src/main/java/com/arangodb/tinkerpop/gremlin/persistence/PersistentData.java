@@ -25,10 +25,6 @@ public interface PersistentData {
 
     ElementId elementId();
 
-    void setId(ElementId id);
-
-    void setKey(String key);
-
     default String id() {
         return elementId().getId();
     }
@@ -44,9 +40,7 @@ public interface PersistentData {
     }
 
     default void update(DocumentEntity entity) {
-        String k = entity.getKey();
-        setKey(k);
-        setId(elementId().withKey(k));
+        elementId().setKey(entity.getKey());
     }
 
 }

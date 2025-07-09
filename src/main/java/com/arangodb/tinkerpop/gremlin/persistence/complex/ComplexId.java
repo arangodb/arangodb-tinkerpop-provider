@@ -9,12 +9,6 @@ public class ComplexId extends ElementId {
     }
 
     @Override
-    protected ComplexId withKey(String newKey) {
-        ElementId.validateIdParts(newKey);
-        return new ComplexId(prefix, collection, newKey);
-    }
-
-    @Override
     public String getLabel() {
         return collection;
     }

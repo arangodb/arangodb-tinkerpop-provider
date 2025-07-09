@@ -23,16 +23,14 @@ import java.util.*;
 
 public class EdgeData extends PropertiesContainer<Object> implements PersistentData {
 
-    private ElementId id;
+    private final ElementId id;
     private final String label;
-    private String key;
     private final ElementId from;
     private final ElementId to;
 
     public EdgeData(String label, ElementId id, ElementId from, ElementId to) {
         this.id = id;
         this.label = label != null ? label : id.getLabel();
-        this.key = id.getKey();
         this.from = from;
         this.to = to;
     }
@@ -40,16 +38,6 @@ public class EdgeData extends PropertiesContainer<Object> implements PersistentD
     @Override
     public ElementId elementId() {
         return id;
-    }
-
-    @Override
-    public void setId(ElementId id) {
-        this.id = id;
-    }
-
-    @Override
-    public void setKey(String key) {
-        this.key = key;
     }
 
     @Override
@@ -71,7 +59,6 @@ public class EdgeData extends PropertiesContainer<Object> implements PersistentD
                 "from=" + from +
                 ", id=" + id +
                 ", label='" + label + '\'' +
-                ", key='" + key + '\'' +
                 ", to=" + to +
                 ", super=" + super.toString() +
                 '}';
@@ -82,11 +69,11 @@ public class EdgeData extends PropertiesContainer<Object> implements PersistentD
         if (!(o instanceof EdgeData)) return false;
         if (!super.equals(o)) return false;
         EdgeData edgeData = (EdgeData) o;
-        return Objects.equals(id, edgeData.id) && Objects.equals(label, edgeData.label) && Objects.equals(key, edgeData.key) && Objects.equals(from, edgeData.from) && Objects.equals(to, edgeData.to);
+        return Objects.equals(id, edgeData.id) && Objects.equals(label, edgeData.label) && Objects.equals(from, edgeData.from) && Objects.equals(to, edgeData.to);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), id, label, key, from, to);
+        return Objects.hash(super.hashCode(), id, label, from, to);
     }
 }

@@ -9,12 +9,6 @@ public class SimpleId extends ElementId {
     }
 
     @Override
-    protected SimpleId withKey(String newKey) {
-        ElementId.validateIdParts(newKey);
-        return new SimpleId(prefix, collection, newKey);
-    }
-
-    @Override
     public String getLabel() {
         return null;
     }
