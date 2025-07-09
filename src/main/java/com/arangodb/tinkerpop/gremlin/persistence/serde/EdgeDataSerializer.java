@@ -19,8 +19,8 @@ public class EdgeDataSerializer extends JsonSerializer<EdgeData> {
             gen.writeStringField(Fields.KEY, data.getKey());
         }
         gen.writeStringField(LABEL, data.getLabel());
-        gen.writeStringField(FROM, data.getFrom().toJson());
-        gen.writeStringField(TO, data.getTo().toJson());
+        gen.writeObjectField(FROM, data.getFrom());
+        gen.writeObjectField(TO, data.getTo());
 
         for (Map.Entry<String, Object> entry : data.getProperties().entrySet()) {
             String k = entry.getKey();

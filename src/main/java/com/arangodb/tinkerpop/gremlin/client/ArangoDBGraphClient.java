@@ -132,7 +132,7 @@ public class ArangoDBGraphClient {
             List<ElementId> prunedIds = ids.stream()
                     .filter(it -> colNames.contains(it.getCollection()))
                     .collect(Collectors.toList());
-            return executeAqlQuery(ArangoDBQueryBuilder.readDocumentsByIds(prunedIds), clazz);
+            return executeAqlQuery("FOR d IN DOCUMENT(@ids) RETURN d", clazz, Collections.singletonMap("ids", prunedIds));
         }
     }
 
@@ -286,14 +286,26 @@ public class ArangoDBGraphClient {
 
     public Iterator<VertexData> getVertexNeighbors(ElementId vertexId, Set<String> edgeCollections, Direction direction, String[] labels) {
         logger.debug("Get vertex {}:{} Neighbors, in {}, from collections {}", vertexId, direction, config.graphName, edgeCollections);
-        String query = ArangoDBQueryBuilder.readVertexNeighbors(config.graphName, vertexId, edgeCollections, direction, labels);
-        return executeAqlQuery(query, VertexData.class);
+        String query = ArangoDBQueryBuilder.readVertexNeighbors(config.graphName, direction, labels);
+        Map<String, Object> params = new HashMap<>();
+        params.put("vertexId", vertexId);
+        params.put("edgeCollections", edgeCollections);
+        if (labels.length > 0) {
+            params.put("labels", labels);
+        }
+        return executeAqlQuery(query, VertexData.class, params);
     }
 
     public Iterator<EdgeData> getVertexEdges(ElementId vertexId, Set<String> edgeCollections, Direction direction, String[] labels) {
         logger.debug("Get vertex {}:{} Edges, in {}, from collections {}", vertexId, direction, config.graphName, edgeCollections);
-        String query = ArangoDBQueryBuilder.readVertexEdges(config.graphName, vertexId, edgeCollections, direction, labels);
-        return executeAqlQuery(query, EdgeData.class);
+        String query = ArangoDBQueryBuilder.readVertexEdges(config.graphName, direction, labels);
+        Map<String, Object> params = new HashMap<>();
+        params.put("vertexId", vertexId);
+        params.put("edgeCollections", edgeCollections);
+        if (labels.length > 0) {
+            params.put("labels", labels);
+        }
+        return executeAqlQuery(query, EdgeData.class, params);
     }
 
     private RuntimeException mapException(ArangoDBException ex) {
