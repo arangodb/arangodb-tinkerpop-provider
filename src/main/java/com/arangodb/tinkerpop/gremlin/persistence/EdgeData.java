@@ -19,49 +19,22 @@
 
 package com.arangodb.tinkerpop.gremlin.persistence;
 
-import com.arangodb.serde.jackson.From;
-import com.arangodb.serde.jackson.Id;
-import com.arangodb.serde.jackson.Key;
-import com.arangodb.serde.jackson.To;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.*;
-
-import static com.arangodb.tinkerpop.gremlin.utils.ReservedFields.LABEL;
 
 public class EdgeData extends PropertiesContainer<Object> implements PersistentData {
 
-    @Id
     private ElementId id;
-
-    @JsonProperty(LABEL)
-    private String label;
-
-    @Key
+    private final String label;
     private String key;
+    private final ElementId from;
+    private final ElementId to;
 
-    @From
-    private ElementId from;
-
-    @To
-    private ElementId to;
-
-    public static EdgeData of(
-            String label,
-            ElementId id,
-            ElementId from,
-            ElementId to
-    ) {
-        EdgeData data = new EdgeData();
-        data.id = id;
-        data.label = label != null ? label : id.getLabel();
-        data.key = id.getKey();
-        data.from = from;
-        data.to = to;
-        return data;
-    }
-
-    public EdgeData() {
+    public EdgeData(String label, ElementId id, ElementId from, ElementId to) {
+        this.id = id;
+        this.label = label != null ? label : id.getLabel();
+        this.key = id.getKey();
+        this.from = from;
+        this.to = to;
     }
 
     @Override
@@ -88,18 +61,8 @@ public class EdgeData extends PropertiesContainer<Object> implements PersistentD
         return from;
     }
 
-    @SuppressWarnings("unused")
-    public void setFrom(ElementId from) {
-        this.from = from;
-    }
-
     public ElementId getTo() {
         return to;
-    }
-
-    @SuppressWarnings("unused")
-    public void setTo(ElementId to) {
-        this.to = to;
     }
 
     @Override

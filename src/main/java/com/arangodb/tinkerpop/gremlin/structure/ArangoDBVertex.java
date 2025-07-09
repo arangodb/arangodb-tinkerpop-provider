@@ -36,7 +36,7 @@ public class ArangoDBVertex extends ArangoDBElement<VertexPropertyData, VertexDa
 
     static ArangoDBVertex of(String label, ElementId id, ArangoDBGraph graph) {
         String inferredLabel = label != null ? label : Optional.ofNullable(id.getLabel()).orElse(Vertex.DEFAULT_LABEL);
-        return new ArangoDBVertex(graph, VertexData.of(inferredLabel, id));
+        return new ArangoDBVertex(graph, new VertexData(inferredLabel, id));
     }
 
     public ArangoDBVertex(ArangoDBGraph graph, VertexData data) {

@@ -9,8 +9,8 @@ import java.io.IOException;
 
 public class ElementIdSerializer extends JsonSerializer<ElementId> {
     @Override
-    public void serialize(ElementId value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        String json = value.toJson();
+    public void serialize(ElementId data, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        String json = data.toJson();
         if (json == null) {
             gen.writeNull();
         } else {

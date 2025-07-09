@@ -35,6 +35,7 @@ public class ArangoDBGraphVariables implements Graph.Variables {
     }
 
     void updateVersion() {
+        ArangoDBUtil.checkVersion(getVersion());
         data.setVersion(PackageVersion.VERSION);
         update();
     }

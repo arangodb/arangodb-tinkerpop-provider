@@ -2,6 +2,7 @@ package com.arangodb.tinkerpop.gremlin.persistence.serde;
 
 import com.arangodb.tinkerpop.gremlin.persistence.VertexData;
 import com.arangodb.tinkerpop.gremlin.persistence.VertexPropertyData;
+import com.arangodb.tinkerpop.gremlin.utils.Fields;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -10,41 +11,34 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.arangodb.tinkerpop.gremlin.utils.ReservedFields.LABEL;
+import static com.arangodb.tinkerpop.gremlin.utils.Fields.LABEL;
 
 class VertexDataSerializer extends JsonSerializer<VertexData> {
     @Override
-    public void serialize(VertexData value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+    public void serialize(VertexData data, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         gen.writeStartObject();
-        if (value.id() != null) {
-            gen.writeObjectField("_id", value.id());
+        if (data.getKey() != null) {
+            gen.writeStringField(Fields.KEY, data.getKey());
         }
-        if (value.getKey() != null) {
-            gen.writeStringField("_key", value.getKey());
-        }
-        gen.writeStringField(LABEL, value.getLabel());
+        gen.writeStringField(LABEL, data.getLabel());
 
-        Map<String, Map<String, Object>> metaProperties = new HashMap<>();
+        Map<String, Map<String, Object>> meta = new HashMap<>();
 
-        if (!value.getProperties().isEmpty()) {
-            for (Map.Entry<String, VertexPropertyData> entry : value.getProperties().entrySet()) {
-                String key = entry.getKey();
-                VertexPropertyData property = entry.getValue();
-                gen.writeObjectField(key, property.getValue());
-                if (!property.getProperties().isEmpty()) {
-                    metaProperties.put(key, property.getProperties());
-                }
+        for (Map.Entry<String, VertexPropertyData> entry : data.getProperties().entrySet()) {
+            String key = entry.getKey();
+            VertexPropertyData property = entry.getValue();
+            gen.writeObjectField(key, property.getValue());
+            if (!property.getProperties().isEmpty()) {
+                meta.put(key, property.getProperties());
             }
         }
 
-        if (!metaProperties.isEmpty()) {
-            gen.writeObjectFieldStart("_meta");
-            for (Map.Entry<String, Map<String, Object>> entry : metaProperties.entrySet()) {
-                gen.writeObjectField(entry.getKey(), entry.getValue());
-            }
-            gen.writeEndObject();
+        gen.writeObjectFieldStart(Fields.META);
+        for (Map.Entry<String, Map<String, Object>> entry : meta.entrySet()) {
+            gen.writeObjectField(entry.getKey(), entry.getValue());
         }
 
+        gen.writeEndObject();
         gen.writeEndObject();
     }
 }

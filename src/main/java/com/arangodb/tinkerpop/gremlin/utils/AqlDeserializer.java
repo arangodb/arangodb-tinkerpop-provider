@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static com.arangodb.tinkerpop.gremlin.utils.ReservedFields.LABEL;
+import static com.arangodb.tinkerpop.gremlin.utils.Fields.LABEL;
 
 public class AqlDeserializer {
     private final ArangoDBGraph graph;
@@ -59,15 +59,15 @@ public class AqlDeserializer {
     }
 
     private boolean isVertex(JsonNode node) {
-        return node.has("_key")
-                && node.has("_id")
-                && node.has("_rev")
+        return node.has(Fields.KEY)
+                && node.has(Fields.ID)
+                && node.has(Fields.REV)
                 && node.has(LABEL);
     }
 
     private boolean isEdge(JsonNode node) {
         return isVertex(node)
-                && node.has("_from")
-                && node.has("_to");
+                && node.has(Fields.FROM)
+                && node.has(Fields.TO);
     }
 }

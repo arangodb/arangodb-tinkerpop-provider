@@ -32,7 +32,7 @@ public class ArangoDBEdge extends ArangoDBSimpleElement<EdgeData> implements Edg
 
     static ArangoDBEdge of(String label, ElementId id, ElementId outVertexId, ElementId inVertexId, ArangoDBGraph graph) {
         String inferredLabel = label != null ? label : Optional.ofNullable(id.getLabel()).orElse(Edge.DEFAULT_LABEL);
-        return new ArangoDBEdge(graph, EdgeData.of(inferredLabel, id, outVertexId, inVertexId));
+        return new ArangoDBEdge(graph, new EdgeData(inferredLabel, id, outVertexId, inVertexId));
     }
 
     public ArangoDBEdge(ArangoDBGraph graph, EdgeData data) {

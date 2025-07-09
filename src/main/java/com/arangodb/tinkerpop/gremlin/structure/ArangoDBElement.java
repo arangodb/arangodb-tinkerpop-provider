@@ -20,7 +20,6 @@
 package com.arangodb.tinkerpop.gremlin.structure;
 
 import com.arangodb.tinkerpop.gremlin.persistence.PropertiesContainer;
-import com.arangodb.tinkerpop.gremlin.utils.ReservedFields;
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Property;
@@ -79,8 +78,7 @@ public abstract class ArangoDBElement<P, D extends PropertiesContainer<P>> imple
         Stream<String> ups;
         if (propertyKeys == null || propertyKeys.length == 0) {
             ups = data.keySet().stream()
-                    .filter(key -> !Graph.Hidden.isHidden(key))
-                    .filter(key -> !ReservedFields.isReserved(key));
+                    .filter(key -> !Graph.Hidden.isHidden(key));
         } else {
             ups = Arrays.stream(propertyKeys)
                     .filter(data::containsKey);

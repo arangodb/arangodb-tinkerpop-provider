@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import com.arangodb.tinkerpop.gremlin.persistence.ElementId;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 
-import static com.arangodb.tinkerpop.gremlin.utils.ReservedFields.LABEL;
+import static com.arangodb.tinkerpop.gremlin.utils.Fields.LABEL;
 
 
 public class ArangoDBQueryBuilder {

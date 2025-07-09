@@ -19,34 +19,18 @@
 
 package com.arangodb.tinkerpop.gremlin.persistence;
 
-import com.arangodb.serde.jackson.Id;
-import com.arangodb.serde.jackson.Key;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.*;
-
-import static com.arangodb.tinkerpop.gremlin.utils.ReservedFields.LABEL;
 
 public class VertexData extends PropertiesContainer<VertexPropertyData> implements PersistentData {
 
-    @Id
     private ElementId id;
-
-    @JsonProperty(LABEL)
-    private String label;
-
-    @Key
+    private final String label;
     private String key;
 
-    public static VertexData of(String label, ElementId id) {
-        VertexData data = new VertexData();
-        data.id = id;
-        data.label = label;
-        data.key = id.getKey();
-        return data;
-    }
-
-    private VertexData() {
+    public VertexData(String label, ElementId id) {
+        this.id = id;
+        this.label = label;
+        this.key = id.getKey();
     }
 
     @Override

@@ -68,9 +68,7 @@ public class ArangoDBGraph implements Graph {
         VariablesData variablesData = Optional
                 .ofNullable(client.getGraphVariables())
                 .orElseGet(() -> client.insertGraphVariables(new VariablesData(name(), PackageVersion.VERSION)));
-        ArangoDBGraphVariables variables = new ArangoDBGraphVariables(this, variablesData);
-        ArangoDBUtil.checkVersion(variables.getVersion());
-        variables.updateVersion();
+        new ArangoDBGraphVariables(this, variablesData).updateVersion();
     }
 
     public Set<String> edgeCollections() {

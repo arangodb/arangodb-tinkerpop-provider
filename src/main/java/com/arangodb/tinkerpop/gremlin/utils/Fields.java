@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ReservedFields {
+public class Fields {
     public static final String ID = "_id";
     public static final String KEY = "_key";
     public static final String REV = "_rev";
@@ -22,6 +22,6 @@ public class ReservedFields {
         return ALL.contains(key);
     }
 
-    private ReservedFields() {
+    private Fields() {
     }
 }
