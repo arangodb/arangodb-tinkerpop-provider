@@ -80,10 +80,11 @@ public class ArangoDBVertex extends ArangoDBElement<VertexPropertyData, VertexDa
 
         ElementHelper.legalPropertyKeyValueArray(keyValues);
         ElementHelper.validateLabel(label);
-        ElementId id = graph.getIdFactory().createEdgeId(label, keyValues);
+        Object id = ElementHelper.getIdValue(keyValues).orElse(null);
+        ElementId elementId = graph.getIdFactory().createEdgeId(label, id);
         ElementId outVertexId = graph.getIdFactory().parseVertexId(id());
         ElementId inVertexId = graph.getIdFactory().parseVertexId(vertex.id());
-        ArangoDBEdge edge = ArangoDBEdge.of(label, id, outVertexId, inVertexId, graph);
+        ArangoDBEdge edge = ArangoDBEdge.of(label, elementId, outVertexId, inVertexId, graph);
         if (!graph.edgeCollections().contains(edge.collection())) {
             throw new IllegalArgumentException(String.format("Edge collection (%s) not in graph (%s).", edge.collection(), graph.name()));
         }

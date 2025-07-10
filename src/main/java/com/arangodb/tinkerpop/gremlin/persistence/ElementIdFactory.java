@@ -6,12 +6,10 @@ import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.apache.tinkerpop.gremlin.structure.util.ElementHelper;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -52,12 +50,12 @@ public abstract class ElementIdFactory {
         return parts.length == 2 ? parts[0] : null;
     }
 
-    public ElementId createVertexId(String label, Object[] keyValues) {
-        return createId(label, Vertex.DEFAULT_LABEL, keyValues);
+    public ElementId createVertexId(String label, Object id) {
+        return createId(label, Vertex.DEFAULT_LABEL, id);
     }
 
-    public ElementId createEdgeId(String label, Object[] keyValues) {
-        return createId(label, Edge.DEFAULT_LABEL, keyValues);
+    public ElementId createEdgeId(String label, Object id) {
+        return createId(label, Edge.DEFAULT_LABEL, id);
     }
 
     public ElementId parseVertexId(Object id) {
@@ -104,15 +102,16 @@ public abstract class ElementIdFactory {
         return of(prefix, collection, key);
     }
 
-    private ElementId createId(String label, String defaultLabel, Object[] keyValues) {
-        Optional<Object> optionalId = ElementHelper.getIdValue(keyValues);
-        if (!optionalId.isPresent()) {
+    private ElementId createId(String label, String defaultLabel, Object nullableId) {
+        if (nullableId == null) {
             return of(prefix, inferCollection(null, label, defaultLabel), null);
         }
-        String id = optionalId
-                .filter(String.class::isInstance)
-                .map(Object::toString)
-                .orElseThrow(Vertex.Exceptions::userSuppliedIdsOfThisTypeNotSupported);
+
+        if (!(nullableId instanceof String)) {
+            throw new UnsupportedOperationException("Vertex / Edge does not support user supplied identifiers of this type");
+        }
+
+        String id = (String) nullableId;
         validateId(id);
         return of(prefix, inferCollection(extractCollection(id), label, defaultLabel), extractKey(id));
     }

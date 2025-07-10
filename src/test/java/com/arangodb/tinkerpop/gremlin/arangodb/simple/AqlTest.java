@@ -6,6 +6,7 @@ import org.apache.tinkerpop.gremlin.AbstractGremlinTest;
 import org.apache.tinkerpop.gremlin.LoadGraphWith;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
+import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.junit.Test;
 
@@ -14,6 +15,8 @@ import java.util.*;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
+
+@SuppressWarnings("resource")
 public class AqlTest extends AbstractGremlinTest {
 
     private ArangoDBGraph graph() {
@@ -36,12 +39,87 @@ public class AqlTest extends AbstractGremlinTest {
         Map<String, Object> bindings = new HashMap<>();
         bindings.put("@vCol", vertexCollection());
         bindings.put("name", "marko");
-        Iterator<String> result = this.graph().aql(query, bindings).values("name");
+        Iterator<String> result = graph().aql(query, bindings).values("name");
         assertThat(result)
                 .isNotNull()
                 .hasNext()
                 .toIterable().first()
                 .isEqualTo("marko");
+    }
+
+    @Test
+    public void shouldReadSimpleValue() {
+        String result = graph().<String>aql(
+                "RETURN \"hello\""
+        ).next();
+        assertThat(result).isEqualTo("hello");
+    }
+
+    @Test
+    public void shouldReadVertex() {
+        Vertex v = graph.addVertex("name", "marko");
+        List<Vertex> result = graph().<Vertex>aql(
+                "RETURN DOCUMENT(@id)",
+                Collections.singletonMap("id", graph().elementId(v))
+        ).toList();
+        assertThat(result)
+                .containsExactly(v);
+    }
+
+    @Test
+    public void shouldReadNestedVertices() {
+        Vertex a = graph.addVertex("name", "marko");
+        Vertex b = graph.addVertex("name", "vadas");
+        Map<String, Object> params = new HashMap<>();
+        params.put("a", graph().elementId(a));
+        params.put("b", graph().elementId(b));
+        Map<String, Vertex> result = graph().<Map<String, Vertex>>aql(
+                "RETURN {a: DOCUMENT(@a), b: DOCUMENT(@b)}",
+                params
+        ).next();
+        assertThat(result)
+                .containsEntry("a", a)
+                .containsEntry("b", b);
+    }
+
+    @Test
+    public void shouldReadArrayOfVertices() {
+        Vertex a = graph.addVertex("name", "marko");
+        Vertex b = graph.addVertex("name", "vadas");
+        Map<String, Object> params = new HashMap<>();
+        params.put("a", graph().elementId(a));
+        params.put("b", graph().elementId(b));
+        List<Vertex> result = graph().<List<Vertex>>aql(
+                "RETURN [DOCUMENT(@a), DOCUMENT(@b)]",
+                params
+        ).next();
+        assertThat(result)
+                .containsExactly(a, b);
+    }
+
+    @Test
+    public void shouldReadVertices() {
+        Vertex a = graph.addVertex("name", "marko");
+        Vertex b = graph.addVertex("name", "vadas");
+        List<Vertex> result = graph().<Vertex>aql(
+                "FOR d IN DOCUMENT(@ids) RETURN d",
+                Collections.singletonMap("ids", Arrays.asList(graph().elementId(a), graph().elementId(b)))
+        ).toList();
+        assertThat(result)
+                .containsExactly(a, b);
+    }
+
+    @Test
+    public void shouldReadEdge() {
+        Vertex a = graph.addVertex("name", "marko");
+        Vertex b = graph.addVertex("name", "vadas");
+        Edge e = b.addEdge("knows", a);
+        List<Edge> result = graph().<Edge>aql(
+                "RETURN DOCUMENT(@id)",
+                Collections.singletonMap("id", graph().elementId(e))
+        ).toList();
+        assertThat(result)
+                .containsExactly(e);
     }
 
     @Test
@@ -53,7 +131,7 @@ public class AqlTest extends AbstractGremlinTest {
         Map<String, Object> bindings = new HashMap<>();
         bindings.put("@vCol", vertexCollection());
         bindings.put("name", "marko");
-        Traversal<?, ?> result = this.graph().aql(query, bindings).has("age", 29).values("color");
+        Traversal<?, ?> result = graph().aql(query, bindings).has("age", 29).values("color");
         assertThat(result)
                 .isNotNull()
                 .hasNext()
@@ -71,7 +149,7 @@ public class AqlTest extends AbstractGremlinTest {
         Map<String, Object> bindings = new HashMap<>();
         bindings.put("@vCol", vertexCollection());
         bindings.put("ids", Arrays.asList(v1.id(), v2.id()));
-        List<Object> result = this.graph().aql(query, bindings).id().toList();
+        List<Object> result = graph().aql(query, bindings).id().toList();
         assertThat(result)
                 .hasSize(2)
                 .contains(v1.id(), v2.id());
