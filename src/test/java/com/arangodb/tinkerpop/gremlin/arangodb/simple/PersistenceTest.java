@@ -4,6 +4,7 @@ import com.arangodb.ArangoCollection;
 import com.arangodb.tinkerpop.gremlin.PackageVersion;
 import com.arangodb.tinkerpop.gremlin.TestGraphClient;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph;
+import com.arangodb.tinkerpop.gremlin.utils.Fields;
 import org.apache.tinkerpop.gremlin.AbstractGremlinTest;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.T;
@@ -33,13 +34,10 @@ public class PersistenceTest extends AbstractGremlinTest {
         Map<String, Object> doc = (Map<String, Object>) col.getDocument(graphName(), Map.class);
         assertThat(doc)
                 .hasSize(5)
-                .containsEntry("_id", GRAPH_VARIABLES_COLLECTION + "/" + graphName())
-                .containsEntry("_key", graphName())
-                .containsKey("_rev")
-                .containsEntry("version", PackageVersion.VERSION)
-                .containsKey("properties");
-        assertThat((Map<String, Object>) doc.get("properties"))
-                .hasSize(1)
+                .containsEntry(Fields.ID, GRAPH_VARIABLES_COLLECTION + "/" + graphName())
+                .containsEntry(Fields.KEY, graphName())
+                .containsKey(Fields.REV)
+                .containsEntry(Fields.VERSION, PackageVersion.VERSION)
                 .containsEntry("key", "value");
     }
 
@@ -57,27 +55,20 @@ public class PersistenceTest extends AbstractGremlinTest {
         ArangoCollection col = client().database().collection(colName);
         Map<String, Object> doc = (Map<String, Object>) col.getDocument((String) v.id(), Map.class);
         assertThat(doc)
-                .hasSize(5)
-                .containsEntry("_key", "foo")
-                .containsEntry("_id", colName + "/foo")
-                .containsKey("_rev")
-                .containsEntry("label", "bar")
-                .containsKey("properties");
+                .hasSize(6)
+                .containsEntry(Fields.KEY, "foo")
+                .containsEntry(Fields.ID, colName + "/foo")
+                .containsKey(Fields.REV)
+                .containsEntry(Fields.LABEL, "bar")
+                .containsEntry("key", "value");
 
-        Map<String, Object> vertexProperties = (Map<String, Object>) doc.get("properties");
-        assertThat(vertexProperties)
+        Map<String, Map<String, Object>> meta = (Map<String, Map<String, Object>>) doc.get(Fields.META);
+        assertThat(meta)
                 .hasSize(1)
                 .containsKey("key");
 
-        Map<String, Object> vertexProperty = (Map<String, Object>) vertexProperties.get("key");
-        assertThat(vertexProperty)
-                .hasSize(2)
-                .containsEntry("value", "value")
-                .containsKey("properties");
-
-        Map<String, Object> metaProperties = (Map<String, Object>) vertexProperty.get("properties");
-        assertThat(metaProperties)
-                .hasSize(1)
+        Map<String, Object> fooMeta = meta.get("key");
+        assertThat(fooMeta)
                 .containsEntry("meta", "metaValue");
     }
 
@@ -94,17 +85,12 @@ public class PersistenceTest extends AbstractGremlinTest {
         Map<String, Object> doc = (Map<String, Object>) col.getDocument((String) e.id(), Map.class);
         assertThat(doc)
                 .hasSize(7)
-                .containsEntry("_key", "e")
-                .containsEntry("_id", edgeColName + "/e")
-                .containsKey("_rev")
-                .containsEntry("_from", vertexColName + "/a")
-                .containsEntry("_to", vertexColName + "/b")
-                .containsEntry("label", "foo")
-                .containsKey("properties");
-
-        Map<String, Object> props = (Map<String, Object>) doc.get("properties");
-        assertThat(props)
-                .hasSize(1)
+                .containsEntry(Fields.KEY, "e")
+                .containsEntry(Fields.ID, edgeColName + "/e")
+                .containsKey(Fields.REV)
+                .containsEntry(Fields.FROM, vertexColName + "/a")
+                .containsEntry(Fields.TO, vertexColName + "/b")
+                .containsEntry(Fields.LABEL, "foo")
                 .containsEntry("key", "value");
     }
 }

@@ -54,7 +54,7 @@ public class ArangoDBGraph implements Graph {
     protected ArangoDBGraph(Configuration cfg) {
         LOGGER.debug("Creating new ArangoDB Graph from configuration");
         config = new ArangoDBGraphConfig(cfg);
-        idFactory = new ElementIdFactory(config);
+        idFactory = ElementIdFactory.create(config);
         client = new ArangoDBGraphClient(config, idFactory, this);
 
         ArangoGraph graph = client.getArangoGraph();
@@ -68,9 +68,7 @@ public class ArangoDBGraph implements Graph {
         VariablesData variablesData = Optional
                 .ofNullable(client.getGraphVariables())
                 .orElseGet(() -> client.insertGraphVariables(new VariablesData(name(), PackageVersion.VERSION)));
-        ArangoDBGraphVariables variables = new ArangoDBGraphVariables(this, variablesData);
-        ArangoDBUtil.checkVersion(variables.getVersion());
-        variables.updateVersion(PackageVersion.VERSION);
+        new ArangoDBGraphVariables(this, variablesData).updateVersion();
     }
 
     public Set<String> edgeCollections() {
@@ -89,11 +87,14 @@ public class ArangoDBGraph implements Graph {
     public Vertex addVertex(Object... keyValues) {
         ElementHelper.legalPropertyKeyValueArray(keyValues);
         String label = ElementHelper.getLabelValue(keyValues).orElse(null);
-        ElementId id = idFactory.createVertexId(label, keyValues);
-        for (int i = 1; i < keyValues.length; i = i + 2) {
-            ArangoDBUtil.validatePropertyValue(keyValues[i]);
+        Object id = ElementHelper.getIdValue(keyValues).orElse(null);
+        ElementId elementId = idFactory.createVertexId(label, id);
+        for (int i = 0; i < keyValues.length; i = i + 2) {
+            if (keyValues[i] instanceof String) {
+                ArangoDBUtil.validateProperty((String) keyValues[i], keyValues[i + 1]);
+            }
         }
-        ArangoDBVertex vertex = ArangoDBVertex.of(label, id, this);
+        ArangoDBVertex vertex = ArangoDBVertex.of(label, elementId, this);
         if (!config.vertices.contains(vertex.collection())) {
             throw new IllegalArgumentException(String.format("Vertex collection (%s) not in graph (%s).", vertex.collection(), name()));
         }
@@ -151,6 +152,26 @@ public class ArangoDBGraph implements Graph {
         return idFactory;
     }
 
+    /**
+     * Create the {@link ElementId} for a persistent element.
+     * The returned elementId can be used to reference the related ArangoDB document in AQL queries.
+     *
+     * @param element a persistent element (Edge or Vertex)
+     * @return elementId
+     */
+    public ElementId elementId(Element element) {
+        Objects.requireNonNull(element);
+        if (element instanceof ArangoDBPersistentElement) {
+            return ((ArangoDBPersistentElement) element).elementId();
+        } else if (element instanceof Vertex) {
+            return idFactory.createVertexId(element.label(), element.id());
+        } else if (element instanceof Edge) {
+            return idFactory.createEdgeId(element.label(), element.id());
+        } else {
+            throw new IllegalArgumentException("Unsupported element type: " + element.getClass().getName());
+        }
+    }
+
     public String name() {
         return config.graphName;
     }
@@ -176,7 +197,7 @@ public class ArangoDBGraph implements Graph {
      * @param query the AQL query to execute
      * @return a fluent Gremlin traversal
      */
-    public <S, E> GraphTraversal<S, E> aql(final String query) {
+    public <E> GraphTraversal<?, E> aql(final String query) {
         return aql(query, Collections.emptyMap());
     }
 
@@ -187,8 +208,8 @@ public class ArangoDBGraph implements Graph {
      * @param parameters the parameters of the AQL query
      * @return a fluent Gremlin traversal
      */
-    public <S, E> GraphTraversal<S, E> aql(final String query, final Map<String, Object> parameters) {
-        GraphTraversal.Admin<S, E> traversal = new DefaultGraphTraversal<>(this);
+    public <E> GraphTraversal<?, E> aql(final String query, final Map<String, Object> parameters) {
+        GraphTraversal.Admin<?, E> traversal = new DefaultGraphTraversal<>(this);
         traversal.addStep(new AQLStartStep(traversal, query, client.execute(query, parameters)));
         return traversal;
     }

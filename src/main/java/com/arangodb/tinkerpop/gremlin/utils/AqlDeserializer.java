@@ -5,15 +5,16 @@ import com.arangodb.tinkerpop.gremlin.persistence.VertexData;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBEdge;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBVertex;
-import com.arangodb.util.RawBytes;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
+
+import static com.arangodb.tinkerpop.gremlin.utils.Fields.LABEL;
 
 public class AqlDeserializer {
     private final ArangoDBGraph graph;
@@ -24,15 +25,15 @@ public class AqlDeserializer {
         this.mapper = mapper;
     }
 
-    public Object deserialize(RawBytes raw) {
+    public Object deserialize(JsonNode node) {
         try {
-            return deserialize(mapper.readTree(raw.get()));
+            return doDeserialize(node);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Object deserialize(JsonNode node) throws IOException {
+    private Object doDeserialize(JsonNode node) throws IOException {
         if (isEdge(node)) {
             EdgeData data = mapper.readerFor(EdgeData.class).readValue(node);
             return new ArangoDBEdge(graph, data);
@@ -46,8 +47,8 @@ public class AqlDeserializer {
             }
             return out;
         } else if (node.isObject()) {
-            Map<String, Object> out = new LinkedHashMap<>();
-            for (Map.Entry<String, JsonNode> f : IteratorUtils.list(node.fields())) {
+            Map<String, Object> out = new HashMap<>();
+            for (Map.Entry<String, JsonNode> f : node.properties()) {
                 out.put(f.getKey(), deserialize(f.getValue()));
             }
             return out;
@@ -57,18 +58,15 @@ public class AqlDeserializer {
     }
 
     private boolean isVertex(JsonNode node) {
-        return node.has("_key")
-                && node.has("_id")
-                && node.has("_rev")
-                && node.has("label");
+        return node.has(Fields.KEY)
+                && node.has(Fields.ID)
+                && node.has(Fields.REV)
+                && node.has(LABEL);
     }
 
     private boolean isEdge(JsonNode node) {
-        return node.has("_key")
-                && node.has("_id")
-                && node.has("_rev")
-                && node.has("label")
-                && node.has("_from")
-                && node.has("_to");
+        return isVertex(node)
+                && node.has(Fields.FROM)
+                && node.has(Fields.TO);
     }
 }

@@ -1,9 +1,5 @@
 package com.arangodb.tinkerpop.gremlin.persistence;
 
-import com.arangodb.serde.jackson.Key;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Objects;
 
 public class VariablesData extends PropertiesContainer<Object> {
@@ -11,13 +7,11 @@ public class VariablesData extends PropertiesContainer<Object> {
     private final String key;
     private String version;
 
-    @JsonCreator
-    public VariablesData(@Key String key, @JsonProperty("version") String version) {
+    public VariablesData(String key, String version) {
         this.key = key;
         this.version = version;
     }
 
-    @Key
     public String getKey() {
         return key;
     }

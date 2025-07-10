@@ -6,9 +6,9 @@ public abstract class ElementId {
 
     protected final String prefix;
     protected final String collection;
-    protected final String key;
+    protected String key;
 
-    static void validateIdParts(String... names) {
+    public static void validateIdParts(String... names) {
         for (String name : names) {
             if (name == null)
                 continue;
@@ -21,13 +21,11 @@ public abstract class ElementId {
         }
     }
 
-    ElementId(String prefix, String collection, String key) {
+    protected ElementId(String prefix, String collection, String key) {
         this.prefix = prefix;
         this.collection = collection;
         this.key = key;
     }
-
-    abstract ElementId withKey(String newKey);
 
     public abstract String getLabel();
 
@@ -39,6 +37,11 @@ public abstract class ElementId {
 
     public String getKey() {
         return key;
+    }
+
+    public void setKey(String key) {
+        validateIdParts(key);
+        this.key = key;
     }
 
     public String toJson() {

@@ -26,15 +26,20 @@ public class TestGraphClient extends ArangoDBGraphClient {
         try {
             db.collection(ArangoDBGraph.GRAPH_VARIABLES_COLLECTION).deleteDocument(name);
         } catch (ArangoDBException e) {
-            if (e.getErrorNum() != 1202         // document not found
-                    && e.getErrorNum() != 1203  // collection not found
-            ) throw e;
+            Integer errNum = e.getErrorNum();
+            if (errNum == null || (
+                    errNum != 1202              // document not found
+                            && errNum != 1203   // collection not found
+            )) {
+                throw e;
+            }
         }
 
         try {
             db.graph(name).drop(true);
         } catch (ArangoDBException e) {
-            if (e.getErrorNum() != 1924) // graph not found
+            Integer errNum = e.getErrorNum();
+            if (errNum == null || errNum != 1924) // graph not found
                 throw e;
         }
     }

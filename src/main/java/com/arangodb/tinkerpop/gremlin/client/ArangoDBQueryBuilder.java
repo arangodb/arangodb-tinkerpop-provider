@@ -8,13 +8,12 @@
 
 package com.arangodb.tinkerpop.gremlin.client;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.arangodb.tinkerpop.gremlin.persistence.ElementId;
 import org.apache.tinkerpop.gremlin.structure.Direction;
+
+import static com.arangodb.tinkerpop.gremlin.utils.Fields.LABEL;
 
 
 public class ArangoDBQueryBuilder {
@@ -22,47 +21,29 @@ public class ArangoDBQueryBuilder {
     private ArangoDBQueryBuilder() {
     }
 
-    public static String readVertexNeighbors(String graphName, ElementId vertexId, Set<String> edgeCollections, Direction direction, String[] labels) {
-        return oneStepTraversal(graphName, vertexId, edgeCollections, direction, labels)
+    public static String readVertexNeighbors(String graphName, Direction direction, String[] labels) {
+        return oneStepTraversal(graphName, direction, labels)
                 .append(" RETURN v")
                 .toString();
     }
 
-    public static String readVertexEdges(String graphName, ElementId vertexId, Set<String> edgeCollections, Direction direction, String[] labels) {
-        return oneStepTraversal(graphName, vertexId, edgeCollections, direction, labels)
+    public static String readVertexEdges(String graphName, Direction direction, String[] labels) {
+        return oneStepTraversal(graphName, direction, labels)
                 .append(" RETURN e")
                 .toString();
     }
 
-    private static StringBuilder oneStepTraversal(String graphName, ElementId vertexId, Set<String> edgeCollections, Direction direction, String[] labels) {
+    private static StringBuilder oneStepTraversal(String graphName, Direction direction, String[] labels) {
         StringBuilder query = new StringBuilder()
                 .append("FOR v, e IN 1..1 ")
                 .append(toArangoDirection(direction))
-                .append(" ")
-                .append(quote(vertexId.toJson()))
-                .append(" GRAPH ")
+                .append(" @vertexId GRAPH ")
                 .append(escape(graphName))
-                .append(" OPTIONS {edgeCollections: ")
-                .append(edgeCollections.stream()
-                        .map(ArangoDBQueryBuilder::quote)
-                        .collect(Collectors.joining(",", "[", "]")))
-                .append("}");
+                .append(" OPTIONS {edgeCollections: @edgeCollections}");
         if (labels.length > 0) {
-            query
-                    .append(" FILTER e.label IN ")
-                    .append(Arrays.stream(labels)
-                            .map(ArangoDBQueryBuilder::quote)
-                            .collect(Collectors.joining(",", "[", "]")));
+            query.append(" FILTER e." + LABEL + " IN @labels");
         }
         return query;
-    }
-
-    public static String readDocumentsByIds(List<ElementId> ids) {
-        String idsArray = ids.stream()
-                .map(ElementId::toJson)
-                .map(ArangoDBQueryBuilder::quote)
-                .collect(Collectors.joining(",", "[", "]"));
-        return String.format("FOR d IN DOCUMENT(%s) RETURN d", idsArray);
     }
 
     public static String readAllDocuments(Set<String> collections) {
@@ -89,10 +70,6 @@ public class ArangoDBQueryBuilder {
 
     private static String escape(String collection) {
         return String.format("`%s`", collection);
-    }
-
-    private static String quote(String id) {
-        return String.format("\"%s\"", id);
     }
 
     private static String toArangoDirection(final Direction direction) {

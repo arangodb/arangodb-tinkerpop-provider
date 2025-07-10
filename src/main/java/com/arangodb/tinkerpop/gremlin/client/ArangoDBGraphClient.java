@@ -8,7 +8,6 @@
 
 package com.arangodb.tinkerpop.gremlin.client;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,13 +19,10 @@ import com.arangodb.model.*;
 import com.arangodb.serde.jackson.JacksonMapperProvider;
 import com.arangodb.serde.jackson.JacksonSerde;
 import com.arangodb.tinkerpop.gremlin.persistence.*;
+import com.arangodb.tinkerpop.gremlin.persistence.serde.SerdeModule;
 import com.arangodb.tinkerpop.gremlin.structure.*;
 import com.arangodb.tinkerpop.gremlin.utils.AqlDeserializer;
-import com.arangodb.util.RawBytes;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalInterruptedException;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils;
@@ -48,36 +44,15 @@ public class ArangoDBGraphClient {
         this.config = config;
         Protocol protocol = config.driverConfig.getProtocol()
                 .orElse(ArangoDefaults.DEFAULT_PROTOCOL);
-        ObjectMapper mapper = JacksonMapperProvider.of(ContentTypeFactory.of(protocol))
-                .registerModule(createSerdeModule(idFactory));
+        ObjectMapper mapper = JacksonMapperProvider
+                .of(ContentTypeFactory.of(protocol))
+                .registerModule(new SerdeModule(idFactory));
         aqlDeserializer = new AqlDeserializer(graph, mapper);
         db = new ArangoDB.Builder()
                 .loadProperties(config.driverConfig)
                 .serde(JacksonSerde.create(mapper))
                 .build()
                 .db(config.dbName);
-    }
-
-    private com.fasterxml.jackson.databind.Module createSerdeModule(ElementIdFactory idFactory) {
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(ElementId.class, new JsonSerializer<ElementId>() {
-            @Override
-            public void serialize(ElementId value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-                String json = value.toJson();
-                if (json == null) {
-                    gen.writeNull();
-                } else {
-                    gen.writeString(json);
-                }
-            }
-        });
-        module.addDeserializer(ElementId.class, new JsonDeserializer<ElementId>() {
-            @Override
-            public ElementId deserialize(JsonParser p, DeserializationContext ctx) throws IOException {
-                return idFactory.parseId(p.getText());
-            }
-        });
-        return module;
     }
 
     public void shutdown() {
@@ -156,7 +131,7 @@ public class ArangoDBGraphClient {
             List<ElementId> prunedIds = ids.stream()
                     .filter(it -> colNames.contains(it.getCollection()))
                     .collect(Collectors.toList());
-            return executeAqlQuery(ArangoDBQueryBuilder.readDocumentsByIds(prunedIds), clazz);
+            return executeAqlQuery("FOR d IN DOCUMENT(@ids) RETURN d", clazz, Collections.singletonMap("ids", prunedIds));
         }
     }
 
@@ -197,7 +172,7 @@ public class ArangoDBGraphClient {
 
     public Iterator<Object> execute(final String query, final Map<String, Object> parameters) {
         logger.debug("Executing AQL query: {}, with parameters: {}", query, parameters);
-        Iterator<RawBytes> res = executeAqlQuery(query, RawBytes.class, parameters);
+        Iterator<JsonNode> res = executeAqlQuery(query, JsonNode.class, parameters);
         return IteratorUtils.map(res, aqlDeserializer::deserialize);
     }
 
@@ -234,7 +209,8 @@ public class ArangoDBGraphClient {
                     .edgeCollection(edge.collection())
                     .deleteEdge(edge.key());
         } catch (ArangoDBException e) {
-            if (e.getErrorNum() == 1202) { // document not found
+            Integer errNum = e.getErrorNum();
+            if (errNum != null && errNum == 1202) { // document not found
                 return;
             }
             throw mapException(e);
@@ -286,7 +262,8 @@ public class ArangoDBGraphClient {
                     .vertexCollection(vertex.collection())
                     .deleteVertex(vertex.key());
         } catch (ArangoDBException e) {
-            if (e.getErrorNum() == 1202) { // document not found
+            Integer errNum = e.getErrorNum();
+            if (errNum != null && errNum == 1202) { // document not found
                 return;
             }
             throw mapException(e);
@@ -308,14 +285,26 @@ public class ArangoDBGraphClient {
 
     public Iterator<VertexData> getVertexNeighbors(ElementId vertexId, Set<String> edgeCollections, Direction direction, String[] labels) {
         logger.debug("Get vertex {}:{} Neighbors, in {}, from collections {}", vertexId, direction, config.graphName, edgeCollections);
-        String query = ArangoDBQueryBuilder.readVertexNeighbors(config.graphName, vertexId, edgeCollections, direction, labels);
-        return executeAqlQuery(query, VertexData.class);
+        String query = ArangoDBQueryBuilder.readVertexNeighbors(config.graphName, direction, labels);
+        Map<String, Object> params = new HashMap<>();
+        params.put("vertexId", vertexId);
+        params.put("edgeCollections", edgeCollections);
+        if (labels.length > 0) {
+            params.put("labels", labels);
+        }
+        return executeAqlQuery(query, VertexData.class, params);
     }
 
     public Iterator<EdgeData> getVertexEdges(ElementId vertexId, Set<String> edgeCollections, Direction direction, String[] labels) {
         logger.debug("Get vertex {}:{} Edges, in {}, from collections {}", vertexId, direction, config.graphName, edgeCollections);
-        String query = ArangoDBQueryBuilder.readVertexEdges(config.graphName, vertexId, edgeCollections, direction, labels);
-        return executeAqlQuery(query, EdgeData.class);
+        String query = ArangoDBQueryBuilder.readVertexEdges(config.graphName, direction, labels);
+        Map<String, Object> params = new HashMap<>();
+        params.put("vertexId", vertexId);
+        params.put("edgeCollections", edgeCollections);
+        if (labels.length > 0) {
+            params.put("labels", labels);
+        }
+        return executeAqlQuery(query, EdgeData.class, params);
     }
 
     private RuntimeException mapException(ArangoDBException ex) {
@@ -324,7 +313,8 @@ public class ArangoDBGraphClient {
             ie.initCause(ex);
             return ie;
         }
-        if (ex.getErrorNum() == 1210) {
+        Integer errNum = ex.getErrorNum();
+        if (errNum != null && errNum == 1210) {
             return new IllegalArgumentException("Document with id already exists", ex);
         }
         return ex;

@@ -19,15 +19,16 @@
 
 package com.arangodb.tinkerpop.gremlin.persistence;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.*;
 
 
 public abstract class PropertiesContainer<V> {
 
-    @JsonProperty
-    private Map<String, V> properties = new HashMap<>();
+    private final Map<String, V> properties = new HashMap<>();
+
+    public Map<String, V> getProperties() {
+        return properties;
+    }
 
     public Set<String> keySet() {
         return properties.keySet();
@@ -47,6 +48,12 @@ public abstract class PropertiesContainer<V> {
 
     public void put(String key, V value) {
         properties.put(key, value);
+    }
+
+    public void putAll(Map<String, V> map) {
+        if (map != null) {
+            properties.putAll(map);
+        }
     }
 
     public void remove(String key) {
