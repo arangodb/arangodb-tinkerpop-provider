@@ -22,7 +22,6 @@ import com.arangodb.tinkerpop.gremlin.persistence.*;
 import com.arangodb.tinkerpop.gremlin.persistence.serde.SerdeModule;
 import com.arangodb.tinkerpop.gremlin.structure.*;
 import com.arangodb.tinkerpop.gremlin.utils.AqlDeserializer;
-import com.arangodb.util.RawBytes;
 import com.fasterxml.jackson.databind.*;
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalInterruptedException;
 import org.apache.tinkerpop.gremlin.structure.Direction;
@@ -173,7 +172,7 @@ public class ArangoDBGraphClient {
 
     public Iterator<Object> execute(final String query, final Map<String, Object> parameters) {
         logger.debug("Executing AQL query: {}, with parameters: {}", query, parameters);
-        Iterator<RawBytes> res = executeAqlQuery(query, RawBytes.class, parameters);
+        Iterator<JsonNode> res = executeAqlQuery(query, JsonNode.class, parameters);
         return IteratorUtils.map(res, aqlDeserializer::deserialize);
     }
 
