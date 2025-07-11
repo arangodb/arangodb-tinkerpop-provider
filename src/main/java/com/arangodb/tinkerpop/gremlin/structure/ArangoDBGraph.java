@@ -10,6 +10,7 @@ package com.arangodb.tinkerpop.gremlin.structure;
 
 import java.util.*;
 
+import com.arangodb.ArangoDatabase;
 import com.arangodb.tinkerpop.gremlin.PackageVersion;
 import com.arangodb.tinkerpop.gremlin.persistence.ElementId;
 import com.arangodb.tinkerpop.gremlin.persistence.ElementIdFactory;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.arangodb.ArangoGraph;
 import com.arangodb.tinkerpop.gremlin.client.ArangoDBGraphClient;
+import com.arangodb.ArangoDB;
 
 public class ArangoDBGraph implements Graph {
     public static final String GRAPH_VARIABLES_COLLECTION = "TINKERPOP-GRAPH-VARIABLES";
@@ -221,4 +223,30 @@ public class ArangoDBGraph implements Graph {
         return config.graphName + "_" + collectionName;
     }
 
+    /**
+     * Get the underlying ArangoDB driver instance.
+     *
+     * @return ArangoDB driver instance
+     */
+    public ArangoDB getArangoDriver() {
+        return client.getArangoDriver();
+    }
+
+    /**
+     * Get the underlying ArangoDB database instance.
+     *
+     * @return ArangoDatabase instance
+     */
+    public ArangoDatabase getArangoDatabase() {
+        return client.getArangoDatabase();
+    }
+
+    /**
+     * Get the underlying ArangoGraph instance.
+     *
+     * @return ArangoGraph instance
+     */
+    public ArangoGraph getArangoGraph() {
+        return client.getArangoGraph();
+    }
 }
