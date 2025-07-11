@@ -151,14 +151,9 @@ public class ArangoDBGraphClient {
         Set<EdgeDefinition> defs = edgeDefinitions.stream()
                 .map(ArangoDBGraphConfig.EdgeDef::toDbDefinition)
                 .collect(Collectors.toSet());
-        try {
-            logger.debug("Creating graph in database.");
-            db.createGraph(name, defs, new GraphCreateOptions()
-                    .orphanCollections(orphanCollections.toArray(new String[0])));
-        } catch (ArangoDBException e) {
-            logger.debug("Error creating graph in database.", e);
-            throw mapException(e);
-        }
+        logger.debug("Creating graph in database.");
+        db.createGraph(name, defs, new GraphCreateOptions()
+                .orphanCollections(orphanCollections.toArray(new String[0])));
     }
 
     /**

@@ -8,7 +8,6 @@
 
 package com.arangodb.tinkerpop.gremlin.utils;
 
-import com.arangodb.entity.EdgeDefinition;
 import com.arangodb.entity.GraphEntity;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
 import com.arangodb.tinkerpop.gremlin.PackageVersion;
@@ -44,24 +43,6 @@ public class ArangoDBUtil {
             throw new IllegalStateException("Edge definitions do not match. From DB: "
                     + dbDefs + ", From config: " + config.edgeDefinitions);
         }
-    }
-
-    public static String toString(Collection<EdgeDefinition> edgeDefinitions) {
-        return "[" +
-                edgeDefinitions.stream()
-                        .map(ArangoDBUtil::toString)
-                        .collect(Collectors.joining(",")) +
-                "]";
-    }
-
-    public static String toString(EdgeDefinition edgeDefinition) {
-        return "{" +
-                "from:" +
-                String.join(",", edgeDefinition.getFrom()) +
-                "," +
-                "to:" +
-                String.join(",", edgeDefinition.getTo()) +
-                "}";
     }
 
     public static void validateProperty(final String key, final Object value) {
