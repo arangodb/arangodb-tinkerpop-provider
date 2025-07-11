@@ -162,12 +162,30 @@ public class ArangoDBGraphClient {
     }
 
     /**
-     * Get the ArangoGraph that is linked to the client's graph
+     * Get the underlying ArangoGraph instance.
      *
-     * @return the graph or null if the graph was not found
+     * @return ArangoGraph instance
      */
     public ArangoGraph getArangoGraph() {
         return db.graph(config.graphName);
+    }
+
+    /**
+     * Get the underlying ArangoDB database instance.
+     *
+     * @return ArangoDatabase instance
+     */
+    public ArangoDatabase getArangoDatabase() {
+        return db;
+    }
+
+    /**
+     * Get the underlying ArangoDB driver instance.
+     *
+     * @return ArangoDB driver instance
+     */
+    public ArangoDB getArangoDriver() {
+        return db.arango();
     }
 
     public Iterator<Object> execute(final String query, final Map<String, Object> parameters) {
