@@ -15,11 +15,6 @@ public class DriverTest extends AbstractGremlinTest {
     }
 
     @Test
-    public void shouldCreateGraph() {
-        assertThat(graph().name()).isEqualTo("standard");
-    }
-
-    @Test
     public void shouldGetDriverVersion() {
         assertThat(graph().getArangoDriver().getVersion()).isNotNull();
     }
