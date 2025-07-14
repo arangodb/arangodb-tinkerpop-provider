@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractTest {
     protected TestGraphClient client;
-    private final Set<ArangoDBGraph> graphs = ConcurrentHashMap.newKeySet();
     protected final String dbName = getClass().getSimpleName();
+    private final Set<ArangoDBGraph> graphs = ConcurrentHashMap.newKeySet();
 
     @Before
     public void initDB() {
@@ -34,6 +34,7 @@ public abstract class AbstractTest {
 
     protected ArangoDBConfigurationBuilder confBuilder() {
         return new ArangoDBConfigurationBuilder()
+                .enableDataDefinition(true)
                 .hosts("172.28.0.1:8529")
                 .user("root")
                 .password("test")

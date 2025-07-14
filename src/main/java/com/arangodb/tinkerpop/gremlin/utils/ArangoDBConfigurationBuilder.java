@@ -29,12 +29,12 @@ public class ArangoDBConfigurationBuilder {
         config.setProperty(Graph.GRAPH, ArangoDBGraph.class.getCanonicalName());
     }
 
-    private ArangoDBConfigurationBuilder setProperty(final String key, final String value) {
+    private ArangoDBConfigurationBuilder setProperty(final String key, final Object value) {
         config.setProperty(KEY_PREFIX + "." + key, value);
         return this;
     }
 
-    private ArangoDBConfigurationBuilder addProperty(final String key, final String value) {
+    private ArangoDBConfigurationBuilder addProperty(final String key, final Object value) {
         config.addProperty(KEY_PREFIX + "." + key, value);
         return this;
     }
@@ -47,7 +47,7 @@ public class ArangoDBConfigurationBuilder {
      * @param value property value
      * @return this
      */
-    public ArangoDBConfigurationBuilder setDriverProperty(final String key, final String value) {
+    public ArangoDBConfigurationBuilder setDriverProperty(final String key, final Object value) {
         config.setProperty(KEY_PREFIX + "." + KEY_DRIVER_PREFIX + "." + key, value);
         return this;
     }
@@ -61,7 +61,7 @@ public class ArangoDBConfigurationBuilder {
      * @param value property value
      * @return this
      */
-    public ArangoDBConfigurationBuilder addDriverProperty(final String key, final String value) {
+    public ArangoDBConfigurationBuilder addDriverProperty(final String key, final Object value) {
         config.addProperty(KEY_PREFIX + "." + KEY_DRIVER_PREFIX + "." + key, value);
         return this;
     }
@@ -174,6 +174,17 @@ public class ArangoDBConfigurationBuilder {
      */
     public ArangoDBConfigurationBuilder protocol(Protocol protocol) {
         return setDriverProperty(KEY_PROTOCOL, protocol.toString());
+    }
+
+    /**
+     * Enable data definition changes (DDL operations).
+     * Default: {@code false}
+     *
+     * @param enableDataDefinition true to allow data definition changes, false otherwise
+     * @return this
+     */
+    public ArangoDBConfigurationBuilder enableDataDefinition(boolean enableDataDefinition) {
+        return setProperty(KEY_ENABLE_DATA_DEFINITION, enableDataDefinition);
     }
 
     /**

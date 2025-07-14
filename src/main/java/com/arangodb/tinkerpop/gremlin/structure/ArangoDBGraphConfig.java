@@ -26,11 +26,13 @@ public class ArangoDBGraphConfig {
     public static final String KEY_GRAPH_TYPE = "graph.type";
     public static final String KEY_GRAPH_ORPHAN_COLLECTIONS = "graph.orphanCollections";
     public static final String KEY_GRAPH_EDGE_DEFINITIONS = "graph.edgeDefinitions";
+    public static final String KEY_ENABLE_DATA_DEFINITION = "graph.enableDataDefinition";
 
     // default values
     public static final String DEFAULT_DB_NAME = "_system";
     public static final String DEFAULT_GRAPH_NAME = "tinkerpop";
     public static final GraphType DEFAULT_GRAPH_TYPE = GraphType.SIMPLE;
+    public static final boolean DEFAULT_ENABLE_DATA_DEFINITION = false;
 
     public final Configuration configuration;
     public final String dbName;
@@ -42,6 +44,7 @@ public class ArangoDBGraphConfig {
     public final Set<String> vertices;
     public final Set<String> edges;
     public final ArangoConfigProperties driverConfig;
+    public final boolean enableDataDefinition;
 
     public ArangoDBGraphConfig(Configuration configuration) {
         this.configuration = configuration;
@@ -50,11 +53,12 @@ public class ArangoDBGraphConfig {
         graphName = conf.getString(KEY_GRAPH_NAME, DEFAULT_GRAPH_NAME);
         prefix = graphName + "_";
         graphType = conf.getEnum(KEY_GRAPH_TYPE, GraphType.class, DEFAULT_GRAPH_TYPE);
-        orphanCollections = createOrphanCollections(conf.getList(String.class, KEY_GRAPH_ORPHAN_COLLECTIONS, Collections.emptyList()));
-        edgeDefinitions = createEdgeDefinitions(conf.getList(String.class, KEY_GRAPH_EDGE_DEFINITIONS, Collections.emptyList()));
-        vertices = createVertices();
+        orphanCollections = computeOrphanCollections(conf.getList(String.class, KEY_GRAPH_ORPHAN_COLLECTIONS, Collections.emptyList()));
+        edgeDefinitions = computeEdgeDefinitions(conf.getList(String.class, KEY_GRAPH_EDGE_DEFINITIONS, Collections.emptyList()));
+        vertices = computeVertices();
         edges = edgeDefinitions.stream().map(EdgeDef::getCollection).collect(Collectors.toSet());
         driverConfig = ArangoConfigProperties.fromProperties(ConfigurationConverter.getProperties(conf.subset(KEY_DRIVER_PREFIX)), null);
+        enableDataDefinition = conf.getBoolean(KEY_ENABLE_DATA_DEFINITION, DEFAULT_ENABLE_DATA_DEFINITION);
         validate();
     }
 
@@ -72,15 +76,15 @@ public class ArangoDBGraphConfig {
         }
     }
 
-    private Set<String> createOrphanCollections(List<String> orphanCollections) {
+    private Set<String> computeOrphanCollections(List<String> orphanCollections) {
         return orphanCollections.stream()
                 .map(this::prefix)
                 .collect(Collectors.toSet());
     }
 
-    private Set<EdgeDef> createEdgeDefinitions(List<String> edges) {
+    private Set<EdgeDef> computeEdgeDefinitions(List<String> edges) {
         Set<EdgeDef> res = edges.stream()
-                .map(this::createEdgeDefinition)
+                .map(this::computeEdgeDefinition)
                 .collect(groupingBy(EdgeDef::getCollection))
                 .entrySet().stream()
                 .map(it -> {
@@ -99,7 +103,7 @@ public class ArangoDBGraphConfig {
         return res;
     }
 
-    private EdgeDef createEdgeDefinition(String edge) {
+    private EdgeDef computeEdgeDefinition(String edge) {
         // match: e2:[a,b]->[c,d]
         String rePattern = "^(.*):\\[(.*)]->\\[(.*)]$";
         Pattern p = Pattern.compile(rePattern);
@@ -120,7 +124,7 @@ public class ArangoDBGraphConfig {
                 .to(to);
     }
 
-    private Set<String> createVertices() {
+    private Set<String> computeVertices() {
         Set<String> res = edgeDefinitions.stream()
                 .flatMap(it -> Stream.concat(it.getFrom().stream(), it.getTo().stream()))
                 .collect(Collectors.toSet());

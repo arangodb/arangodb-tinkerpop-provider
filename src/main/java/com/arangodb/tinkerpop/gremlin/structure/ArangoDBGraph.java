@@ -63,8 +63,10 @@ public class ArangoDBGraph implements Graph {
         ArangoGraph graph = client.getArangoGraph();
         if (graph.exists()) {
             ArangoDBUtil.checkExistingGraph(graph.getInfo(), config);
-        } else {
+        } else if (config.enableDataDefinition) {
             client.createGraph(name(), config.edgeDefinitions, config.orphanCollections);
+        } else {
+            throw new IllegalStateException("Graph [" + graph.name() + "] not found. To enable creation set: graph.enableDataDefinition=true");
         }
 
         client.ensureVariablesDataCollection();
@@ -207,8 +209,8 @@ public class ArangoDBGraph implements Graph {
     /**
      * Execute the AQL query and get the result set as a {@link GraphTraversal}.
      *
-     * @param query the AQL query to execute
-     * @param options    query options
+     * @param query   the AQL query to execute
+     * @param options query options
      * @return a fluent Gremlin traversal
      */
     public <E> GraphTraversal<?, E> aql(final String query, final AqlQueryOptions options) {
