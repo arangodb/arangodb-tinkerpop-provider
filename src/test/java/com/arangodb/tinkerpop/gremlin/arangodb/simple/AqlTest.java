@@ -1,5 +1,7 @@
 package com.arangodb.tinkerpop.gremlin.arangodb.simple;
 
+import com.arangodb.ArangoDBException;
+import com.arangodb.model.AqlQueryOptions;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.tinkerpop.gremlin.AbstractGremlinTest;
@@ -14,6 +16,7 @@ import java.util.*;
 
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.as;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 
 @SuppressWarnings("resource")
@@ -120,6 +123,25 @@ public class AqlTest extends AbstractGremlinTest {
         ).toList();
         assertThat(result)
                 .containsExactly(e);
+    }
+
+    @Test
+    public void queryOptions() {
+        Throwable thrown = catchThrowable(() -> graph().aql("RETURN 1/0", new AqlQueryOptions().failOnWarning(true)));
+        assertThat(thrown)
+                .isInstanceOf(ArangoDBException.class)
+                .hasMessageContaining("division by zero");
+    }
+
+    @Test
+    public void queryOptionsAndBindVars() {
+        Throwable thrown = catchThrowable(() -> graph().aql(
+                "RETURN @v/0",
+                Collections.singletonMap("v", 1),
+                new AqlQueryOptions().failOnWarning(true)));
+        assertThat(thrown)
+                .isInstanceOf(ArangoDBException.class)
+                .hasMessageContaining("division by zero");
     }
 
     @Test
