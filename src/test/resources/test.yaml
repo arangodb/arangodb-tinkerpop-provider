@@ -6,6 +6,7 @@ gremlin:
         db: ArangoDBGraphConfigTest
         name: g
         type: COMPLEX
+        enableDataDefinition: true
         orphanCollections: [ x, y, z ]
         edgeDefinitions:
           - "e1:[a]->[b]"
