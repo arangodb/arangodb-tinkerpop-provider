@@ -11,6 +11,7 @@ package com.arangodb.tinkerpop.gremlin.structure;
 import java.util.*;
 
 import com.arangodb.ArangoDatabase;
+import com.arangodb.model.AqlQueryOptions;
 import com.arangodb.tinkerpop.gremlin.PackageVersion;
 import com.arangodb.tinkerpop.gremlin.persistence.ElementId;
 import com.arangodb.tinkerpop.gremlin.persistence.ElementIdFactory;
@@ -204,6 +205,17 @@ public class ArangoDBGraph implements Graph {
     }
 
     /**
+     * Execute the AQL query and get the result set as a {@link GraphTraversal}.
+     *
+     * @param query the AQL query to execute
+     * @param options    query options
+     * @return a fluent Gremlin traversal
+     */
+    public <E> GraphTraversal<?, E> aql(final String query, final AqlQueryOptions options) {
+        return aql(query, Collections.emptyMap(), options);
+    }
+
+    /**
      * Execute the AQL query with provided parameters and get the result set as a {@link GraphTraversal}.
      *
      * @param query      the AQL query to execute
@@ -211,8 +223,20 @@ public class ArangoDBGraph implements Graph {
      * @return a fluent Gremlin traversal
      */
     public <E> GraphTraversal<?, E> aql(final String query, final Map<String, Object> parameters) {
+        return aql(query, parameters, new AqlQueryOptions());
+    }
+
+    /**
+     * Execute the AQL query with provided parameters and get the result set as a {@link GraphTraversal}.
+     *
+     * @param query      the AQL query to execute
+     * @param parameters the parameters of the AQL query
+     * @param options    query options
+     * @return a fluent Gremlin traversal
+     */
+    public <E> GraphTraversal<?, E> aql(final String query, final Map<String, Object> parameters, final AqlQueryOptions options) {
         GraphTraversal.Admin<?, E> traversal = new DefaultGraphTraversal<>(this);
-        traversal.addStep(new AQLStartStep(traversal, query, client.execute(query, parameters)));
+        traversal.addStep(new AQLStartStep(traversal, query, client.query(query, parameters, options)));
         return traversal;
     }
 

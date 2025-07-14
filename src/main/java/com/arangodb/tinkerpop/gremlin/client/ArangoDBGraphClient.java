@@ -126,12 +126,12 @@ public class ArangoDBGraphClient {
 
     private <V> ArangoIterable<V> getGraphDocuments(List<ElementId> ids, Set<String> colNames, Class<V> clazz) {
         if (ids.isEmpty()) {
-            return executeAqlQuery(ArangoDBQueryBuilder.readAllDocuments(colNames), clazz);
+            return query(ArangoDBQueryBuilder.readAllDocuments(colNames), clazz, null);
         } else {
             List<ElementId> prunedIds = ids.stream()
                     .filter(it -> colNames.contains(it.getCollection()))
                     .collect(Collectors.toList());
-            return executeAqlQuery("FOR d IN DOCUMENT(@ids) RETURN d", clazz, Collections.singletonMap("ids", prunedIds));
+            return query("FOR d IN DOCUMENT(@ids) RETURN d", clazz, Collections.singletonMap("ids", prunedIds));
         }
     }
 
@@ -183,20 +183,19 @@ public class ArangoDBGraphClient {
         return db.arango();
     }
 
-    public Iterator<Object> execute(final String query, final Map<String, Object> parameters) {
-        logger.debug("Executing AQL query: {}, with parameters: {}", query, parameters);
-        Iterator<JsonNode> res = executeAqlQuery(query, JsonNode.class, parameters);
+    public Iterator<Object> query(final String query, final Map<String, Object> parameters, final AqlQueryOptions options) {
+        Iterator<JsonNode> res = query(query, JsonNode.class, parameters, options);
         return IteratorUtils.map(res, aqlDeserializer::deserialize);
     }
 
-    private <V> ArangoCursor<V> executeAqlQuery(String query, Class<V> type) {
-        return executeAqlQuery(query, type, null);
+    private <V> ArangoCursor<V> query(String query, Class<V> type, Map<String, Object> parameters) {
+        return query(query, type, parameters, new AqlQueryOptions());
     }
 
-    private <V> ArangoCursor<V> executeAqlQuery(String query, Class<V> type, Map<String, Object> parameters) {
-        logger.debug("Executing AQL query: {}", query);
+    private <V> ArangoCursor<V> query(String query, Class<V> type, Map<String, Object> parameters, AqlQueryOptions options) {
+        logger.debug("Executing AQL query: {}, with parameters: {}, with options: {}", query, parameters, options);
         try {
-            return db.query(query, type, parameters);
+            return db.query(query, type, parameters, options);
         } catch (ArangoDBException e) {
             throw mapException(e);
         }
@@ -305,7 +304,7 @@ public class ArangoDBGraphClient {
         if (labels.length > 0) {
             params.put("labels", labels);
         }
-        return executeAqlQuery(query, VertexData.class, params);
+        return query(query, VertexData.class, params);
     }
 
     public Iterator<EdgeData> getVertexEdges(ElementId vertexId, Set<String> edgeCollections, Direction direction, String[] labels) {
@@ -317,7 +316,7 @@ public class ArangoDBGraphClient {
         if (labels.length > 0) {
             params.put("labels", labels);
         }
-        return executeAqlQuery(query, EdgeData.class, params);
+        return query(query, EdgeData.class, params);
     }
 
     private RuntimeException mapException(ArangoDBException ex) {
