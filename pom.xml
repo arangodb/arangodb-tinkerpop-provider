@@ -4,6 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.apache.tinkerpop</groupId>
+        <artifactId>tinkerpop</artifactId>
+        <version>3.7.3</version>
+    </parent>
+
     <groupId>com.arangodb</groupId>
     <artifactId>arangodb-tinkerpop-provider</artifactId>
     <version>0.0.1-SNAPSHOT</version>
@@ -24,7 +30,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <arangodb-java-driver.version>7.20.0</arangodb-java-driver.version>
-        <tinkerpop.version>3.7.3</tinkerpop.version>
         <test.graph.type>simple</test.graph.type>
     </properties>
 
@@ -32,7 +37,7 @@
         <dependency>
             <groupId>org.apache.tinkerpop</groupId>
             <artifactId>gremlin-core</artifactId>
-            <version>${tinkerpop.version}</version>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -52,19 +57,17 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tinkerpop</groupId>
             <artifactId>gremlin-test</artifactId>
-            <version>${tinkerpop.version}</version>
+            <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.18</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -80,16 +83,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>2.0.17</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <developers>
         <developer>
@@ -141,19 +134,6 @@
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>3.3.1</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
                         <version>3.2.8</version>
                         <configuration>
@@ -200,22 +180,6 @@
 
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <version>3.4.2</version>
-                        <configuration>
-                            <archive>
-                                <manifestEntries>
-                                    <Implementation-Title>${project.name}</Implementation-Title>
-                                    <Implementation-Version>${project.version}</Implementation-Version>
-                                    <Automatic-Module-Name>com.arangodb.tinkerpop.gremlin</Automatic-Module-Name>
-                                </manifestEntries>
-                            </archive>
-                            <skipIfEmpty>true</skipIfEmpty>
-                        </configuration>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-assembly-plugin</artifactId>
                         <version>3.7.1</version>
                         <executions>
@@ -242,9 +206,6 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-deploy-plugin</artifactId>
                         <version>3.1.4</version>
-                        <configuration>
-                            <retryFailedDeploymentCount>10</retryFailedDeploymentCount>
-                        </configuration>
                     </plugin>
 
                     <plugin>
@@ -274,6 +235,7 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <compilerArgs>
+                        <arg>-parameters</arg>
                         <arg>-Xlint:unchecked</arg>
                         <arg>-Xlint:deprecation</arg>
                     </compilerArgs>
@@ -289,6 +251,7 @@
                     <argLine>
                         --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED
                     </argLine>
+                    <trimStackTrace>false</trimStackTrace>
                     <includes>
                         <include>com.arangodb.tinkerpop.gremlin.${test.graph.type}.**</include>
                     </includes>
@@ -346,22 +309,25 @@
                 <version>3.6.0</version>
                 <executions>
                     <execution>
-                        <id>enforce</id>
+                        <id>enforce-all</id>
                         <goals>
                             <goal>enforce</goal>
                         </goals>
                         <configuration>
                             <rules>
+                                <dependencyConvergence/>
+                                <requireJavaVersion>
+                                    <version>[1.8,23)</version>
+                                </requireJavaVersion>
                                 <enforceBytecodeVersion>
                                     <scopes>compile</scopes>
                                     <maxJdkVersion>1.8</maxJdkVersion>
                                 </enforceBytecodeVersion>
-                                <dependencyConvergence/>
+                                <requireMavenVersion>
+                                    <version>[3.5.3,)</version>
+                                </requireMavenVersion>
                                 <requirePluginVersions/>
                                 <requireExplicitDependencyScope/>
-                                <requireMavenVersion>
-                                    <version>3.6.3</version>
-                                </requireMavenVersion>
                             </rules>
                         </configuration>
                     </execution>
@@ -394,6 +360,27 @@
                     </ruleSet>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>rat-checks</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>
+                        <include>**.java</include>
+                    </includes>
+                    <licenses>
+                        <license implementation="org.apache.rat.analysis.license.ApacheSoftwareLicense20"/>
+                    </licenses>
+                </configuration>
+            </plugin>
 
         </plugins>
 
@@ -421,6 +408,11 @@
                     <configuration>
                         <encoding>UTF-8</encoding>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.4.2</version>
                 </plugin>
             </plugins>
         </pluginManagement>
