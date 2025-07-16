@@ -1,0 +1,11 @@
+gremlin:
+  graph: "com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph"
+  arangodb:
+    conf:
+      graph:
+        name: modern
+        enableDataDefinition: true
+      driver:
+        hosts: [ "172.28.0.1:8529" ]
+        password: test
+        protocol: HTTP2_VPACK

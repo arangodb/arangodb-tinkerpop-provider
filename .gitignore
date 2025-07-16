@@ -25,6 +25,5 @@ target
 .settings/
 \.DS_Store
 
-/tikerpopTests\.log
 /.flattened-pom.xml
 /file:
