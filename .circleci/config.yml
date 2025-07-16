@@ -58,6 +58,11 @@ commands:
       - run:
           name: Deploy to Apache Maven Central
           command: mvn -s .circleci/maven-release-settings.xml -Dmaven.test.skip deploy
+  install:
+    steps:
+      - run:
+          name: mvn install
+          command: mvn install -DskipTests
   release:
     steps:
       - run:
@@ -113,6 +118,20 @@ jobs:
           name: Test
           command: mvn test -Dtest.graph.type=<<parameters.graphType>> <<parameters.args>>
       - store_cache
+
+  test-console:
+    executor: 'j17'
+    steps:
+      - timeout
+      - checkout
+      - setup_remote_docker
+      - start-db
+      - load_cache
+      - install
+      - store_cache
+      - run:
+          name: Test Gremlin Console
+          command: ./test-console/test.sh
 
   deploy:
     executor: 'j17'
@@ -210,6 +229,13 @@ workflows:
             branches:
               only:
                 - main
+
+  test-console:
+    when:
+      not: <<pipeline.parameters.docker-img>>
+    jobs:
+      - test:
+          name: test-console
 
   deploy:
     jobs:
