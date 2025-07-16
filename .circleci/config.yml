@@ -234,7 +234,7 @@ workflows:
     when:
       not: <<pipeline.parameters.docker-img>>
     jobs:
-      - test:
+      - test-console:
           name: test-console
 
   deploy:
