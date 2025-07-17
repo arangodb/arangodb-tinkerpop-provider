@@ -133,6 +133,20 @@ jobs:
           name: Test Gremlin Console
           command: ./test-console/test.sh
 
+  test-plugin:
+    executor: 'j17'
+    steps:
+      - timeout
+      - checkout
+      - setup_remote_docker
+      - start-db
+      - load_cache
+      - install
+      - store_cache
+      - run:
+          name: Test Gremlin Server Plugin
+          command: ./test-plugin/test.sh
+
   deploy:
     executor: 'j17'
     steps:
@@ -234,8 +248,13 @@ workflows:
     when:
       not: <<pipeline.parameters.docker-img>>
     jobs:
-      - test-console:
-          name: test-console
+      - test-console
+
+  test-plugin:
+    when:
+      not: <<pipeline.parameters.docker-img>>
+    jobs:
+      - test-plugin
 
   deploy:
     jobs:
