@@ -1,4 +1,4 @@
-graph = GraphFactory.open("conf/arangodb.yaml")
+graph = GraphFactory.open("/arangodb/arangodb.yaml")
 graph.io(IoCore.graphson()).readGraph("data/tinkerpop-modern.json")
 g = graph.traversal()
 res = g.V().as("a").out("knows").as("b").select("a", "b").by("name").toList()

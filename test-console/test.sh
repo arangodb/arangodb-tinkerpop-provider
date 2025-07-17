@@ -1,16 +1,24 @@
 #!/bin/bash
 
-LOCATION=$(pwd)/$(dirname "$0")
-TARGET=/opt/gremlin-console
-JAR=$(ls $LOCATION/../target/arangodb-tinkerpop-provider-*-standalone.jar 2>/dev/null | head -n 1)
+docker rm -f tinkerpop-data
+set -e
 
+LOCATION=$(pwd)/$(dirname "$0")
 echo "LOCATION: $LOCATION"
-echo "TARGET: $TARGET"
+
+JAR=$(ls $LOCATION/../target/arangodb-tinkerpop-provider-*-standalone.jar 2>/dev/null | head -n 1)
 echo "JAR: $JAR"
 
+docker create \
+  -v /arangodb \
+  -v /opt/gremlin-console/ext/arangodb-tinkerpop-provider/plugin \
+  --name tinkerpop-data alpine:3 /bin/true
+
+docker cp "$LOCATION"/test.groovy tinkerpop-data:/arangodb
+docker cp $JAR tinkerpop-data:/opt/gremlin-console/ext/arangodb-tinkerpop-provider/plugin
+docker cp "$LOCATION"/arangodb.yaml tinkerpop-data:/arangodb
+
 docker run \
-  -v $LOCATION/test.groovy:$TARGET/test.groovy \
-  -v $LOCATION/arangodb.yaml:$TARGET/conf/arangodb.yaml \
-  -v $JAR:$TARGET/ext/arangodb-tinkerpop-provider/plugin/arangodb-tinkerpop-provider.jar \
+  --volumes-from tinkerpop-data \
   docker.io/tinkerpop/gremlin-console \
-  -e $TARGET/test.groovy
+  -e /arangodb/test.groovy
