@@ -24,11 +24,11 @@ docker run -d \
   --volumes-from tinkerpop-data \
   --entrypoint /tmp/docker/entrypoint.sh \
   --name gremlin-server \
+  --expose 8182 \
+  -p 172.28.0.1:8182:8182 \
   docker.io/tinkerpop/gremlin-server
 
-CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' gremlin-server)
-
-while ! nc -z $CONTAINER_IP 8182; do
+while ! nc -z 172.28.0.1 8182; do
   printf '.'
   sleep 1
 done
