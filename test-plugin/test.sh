@@ -35,9 +35,14 @@ done
 
 echo "Gremlin Server ready!"
 
+## test from gremlin console
 docker run \
   --network arangodb \
   --volumes-from tinkerpop-data \
   --name gremlin-console \
   docker.io/tinkerpop/gremlin-console \
   -e /arangodb/test.groovy
+
+## test from java
+mvn -f $LOCATION/java-client/pom.xml compile exec:java -Dexec.mainClass="org.example.Main"
+
