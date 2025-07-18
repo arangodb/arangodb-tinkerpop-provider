@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        Cluster cluster = Cluster.build().addContactPoint("gremlin-server").create();
+        Cluster cluster = Cluster.build().addContactPoint("172.28.0.1").create();
         Client client = cluster.connect();
         try {
             GraphTraversalSource g = AnonymousTraversalSource.traversal().withRemote(DriverRemoteConnection.using(client, "g"));
