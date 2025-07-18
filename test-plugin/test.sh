@@ -37,9 +37,9 @@ echo "Gremlin Server ready!"
 
 ## test from gremlin console
 docker run \
-  --network arangodb \
   --volumes-from tinkerpop-data \
   --name gremlin-console \
+  --add-host=gremlin-server:172.28.0.1 \
   docker.io/tinkerpop/gremlin-console \
   -e /arangodb/test.groovy
 
