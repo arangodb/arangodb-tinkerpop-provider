@@ -27,6 +27,9 @@ commands:
       topology:
         type: 'string'
         default: 'single'
+      ssl:
+        type: 'string'
+        default: 'false'
     steps:
       - run:
           name: Start Database
@@ -35,6 +38,7 @@ commands:
             DOCKER_IMAGE: <<parameters.docker-img>>
             STARTER_MODE: <<parameters.topology>>
             STARTER_DOCKER_IMAGE: 'docker.io/arangodb/arangodb-starter:0.18.5'
+            SSL: <<parameters.ssl>>
   load_cache:
     steps:
       - run:
@@ -89,6 +93,9 @@ jobs:
       topology:
         type: 'string'
         default: 'single'
+      ssl:
+        type: 'string'
+        default: 'false'
       jdk:
         type: 'string'
         default: 'j21'
@@ -107,6 +114,7 @@ jobs:
       - start-db:
           docker-img: <<parameters.docker-img>>
           topology: <<parameters.topology>>
+          ssl: <<parameters.ssl>>
       - load_cache
       - run:
           name: mvn dependency:tree
@@ -196,6 +204,16 @@ workflows:
                 - 'complex'
               args:
                 - '-Dtest.skipProcessStandardSuite'
+      - test:
+          name: test-ssl
+          matrix:
+            parameters:
+              ssl:
+                - 'true'
+              graphType:
+                - 'ssl'
+              args:
+                - '-Dtest.ssl'
 
   test-adb-topology:
     when: <<pipeline.parameters.docker-img>>

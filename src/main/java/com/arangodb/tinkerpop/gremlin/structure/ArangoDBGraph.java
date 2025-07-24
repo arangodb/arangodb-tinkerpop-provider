@@ -68,12 +68,23 @@ public class ArangoDBGraph implements Graph {
         idFactory = ElementIdFactory.create(config);
         client = new ArangoDBGraphClient(config, idFactory, this);
 
+        ArangoDatabase db = client.getArangoDatabase();
+        if (!db.exists()) {
+            if (config.enableDataDefinition) {
+                db.create();
+            } else {
+                client.shutdown();
+                throw new IllegalStateException("Database [" + db.name() + "] not found. To enable creation set: graph.enableDataDefinition=true");
+            }
+        }
+
         ArangoGraph graph = client.getArangoGraph();
         if (graph.exists()) {
             ArangoDBUtil.checkExistingGraph(graph.getInfo(), config);
         } else if (config.enableDataDefinition) {
             client.createGraph(name(), config.edgeDefinitions, config.orphanCollections);
         } else {
+            client.shutdown();
             throw new IllegalStateException("Graph [" + graph.name() + "] not found. To enable creation set: graph.enableDataDefinition=true");
         }
 

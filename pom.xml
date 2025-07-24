@@ -29,7 +29,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <arangodb-java-driver.version>7.20.0</arangodb-java-driver.version>
+        <arangodb-java-driver.version>7.21.0</arangodb-java-driver.version>
         <test.graph.type>simple</test.graph.type>
     </properties>
 

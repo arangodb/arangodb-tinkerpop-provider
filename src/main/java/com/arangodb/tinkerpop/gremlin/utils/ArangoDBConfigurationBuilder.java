@@ -185,6 +185,36 @@ public class ArangoDBConfigurationBuilder {
     }
 
     /**
+     * If set to {@code true} SSL will be used when connecting to an ArangoDB server.
+     *
+     * @param useSsl whether or not use SSL (default: {@code false})
+     * @return this
+     */
+    public ArangoDBConfigurationBuilder useSsl(boolean useSsl) {
+        return setDriverProperty(KEY_USE_SSL, useSsl);
+    }
+
+    /**
+     * Set the SSL certificate value as Base64 encoded String
+     *
+     * @param certValue the SSL certificate value as Base64 encoded String
+     * @return this
+     */
+    public ArangoDBConfigurationBuilder sslCertValue(String certValue) {
+        return setDriverProperty(KEY_SSL_CERT_VALUE, certValue);
+    }
+
+    /**
+     * Set whether hostname verification is enabled
+     *
+     * @param verifyHost {@code true} if enabled
+     * @return this
+     */
+    public ArangoDBConfigurationBuilder verifyHost(Boolean verifyHost) {
+        return setDriverProperty(KEY_VERIFY_HOST, verifyHost);
+    }
+
+    /**
      * Enable data definition changes (DDL operations).
      * Default: {@code false}
      *
