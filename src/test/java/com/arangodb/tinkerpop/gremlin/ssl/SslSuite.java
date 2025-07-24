@@ -16,6 +16,7 @@
 
 package com.arangodb.tinkerpop.gremlin.ssl;
 
+import com.arangodb.tinkerpop.gremlin.arangodb.simple.SslConnectionTest;
 import org.apache.tinkerpop.gremlin.AbstractGremlinSuite;
 import org.apache.tinkerpop.gremlin.process.traversal.TraversalEngine;
 import org.junit.runners.model.InitializationError;

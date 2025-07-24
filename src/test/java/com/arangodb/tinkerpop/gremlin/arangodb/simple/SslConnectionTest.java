@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.arangodb.tinkerpop.gremlin.ssl;
+package com.arangodb.tinkerpop.gremlin.arangodb.simple;
 
 import org.apache.tinkerpop.gremlin.AbstractGremlinTest;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
