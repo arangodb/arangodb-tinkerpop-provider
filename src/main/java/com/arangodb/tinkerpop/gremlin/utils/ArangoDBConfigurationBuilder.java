@@ -16,7 +16,6 @@
 
 package com.arangodb.tinkerpop.gremlin.utils;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.Protocol;
 import com.arangodb.config.ArangoConfigProperties;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
