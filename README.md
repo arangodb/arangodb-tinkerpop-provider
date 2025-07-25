@@ -25,7 +25,7 @@ you can replace the version with the one you need)
     <dependency>
         <groupId>com.arangodb</groupId>
         <artifactId>arangodb-tinkerpop-provider</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.2-SNAPSHOT</version>
     </dependency>
 </dependencies>
 ```
