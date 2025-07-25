@@ -61,24 +61,17 @@ commands:
     steps:
       - run:
           name: Deploy to Apache Maven Central
-          command: mvn -s .circleci/maven-release-settings.xml -Dmaven.test.skip deploy
+          command: mvn -s .circleci/maven-release-settings.xml -Prelease -Dmaven.test.skip deploy
   install:
     steps:
       - run:
           name: mvn install
           command: mvn install -DskipTests
-  release:
-    steps:
-      - run:
-          name: Release to Apache Maven Central
-          command: mvn -s .circleci/maven-release-settings.xml -Dmaven.test.skip nexus-staging:release
-          environment:
-            MAVEN_OPTS: "--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED --add-opens=java.desktop/java.awt.font=ALL-UNNAMED"
 
 executors:
-  j17:
+  j8:
     docker:
-      - image: 'cimg/openjdk:17.0'
+      - image: 'cimg/openjdk:8.0'
   j21:
     docker:
       - image: 'cimg/openjdk:21.0'
@@ -125,7 +118,7 @@ jobs:
       - store_cache
 
   test-console:
-    executor: 'j17'
+    executor: 'j21'
     steps:
       - timeout
       - checkout
@@ -139,7 +132,7 @@ jobs:
           command: ./test-console/test.sh
 
   test-plugin:
-    executor: 'j17'
+    executor: 'j21'
     steps:
       - timeout
       - checkout
@@ -153,24 +146,13 @@ jobs:
           command: ./test-plugin/test.sh
 
   deploy:
-    executor: 'j17'
+    executor: 'j21'
     steps:
       - timeout
       - checkout
       - load_cache
       - config_gpg
       - deploy
-      - store_cache
-
-  release:
-    executor: 'j17'
-    steps:
-      - timeout
-      - checkout
-      - load_cache
-      - config_gpg
-      - deploy
-      - release
       - store_cache
 
 workflows:
@@ -249,7 +231,7 @@ workflows:
                 - 'simple'
                 - 'complex'
               jdk:
-                - 'j17'
+                - 'j8'
                 - 'j21'
           filters:
             tags:
@@ -277,15 +259,5 @@ workflows:
           filters:
             tags:
               only: /^deploy.*/
-            branches:
-              ignore: /.*/
-
-  release:
-    jobs:
-      - release:
-          context: java-release
-          filters:
-            tags:
-              only: /^release.*/
             branches:
               ignore: /.*/

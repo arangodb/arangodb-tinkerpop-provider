@@ -11,7 +11,8 @@ for ArangoDB
 This Provider supports:
 
 * Apache TinkerPop 3.7
-* ArangoDB 3.11+ (via ArangoDB Java Driver 7.18+).
+* ArangoDB 3.12+ (via ArangoDB Java Driver 7.21+).
+* Java 8+
 
 ## Maven
 
@@ -22,9 +23,9 @@ you can replace the version with the one you need)
 
 <dependencies>
     <dependency>
-        <groupId>org.arangodb</groupId>
+        <groupId>com.arangodb</groupId>
         <artifactId>arangodb-tinkerpop-provider</artifactId>
-        <version>2.0.3</version>
+        <version>0.0.2-SNAPSHOT</version>
     </dependency>
 </dependencies>
 ```
@@ -47,6 +48,7 @@ gremlin:
         db: ArangoDBGraphConfigTest
         name: g
         type: COMPLEX
+        enableDataDefinition: true
         orphanCollections: [ x, y, z ]
         edgeDefinitions:
           - "e1:[a]->[b]"

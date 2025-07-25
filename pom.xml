@@ -12,7 +12,7 @@
 
     <groupId>com.arangodb</groupId>
     <artifactId>arangodb-tinkerpop-provider</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>arangodb-tinkerpop-provider</name>
@@ -31,6 +31,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <arangodb-java-driver.version>7.21.0</arangodb-java-driver.version>
         <test.graph.type>simple</test.graph.type>
+        <jpms.argLine/>
     </properties>
 
     <dependencies>
@@ -131,12 +132,12 @@
 
     <profiles>
         <profile>
-            <id>doclint-java8-disable</id>
+            <id>open-modules</id>
             <activation>
-                <jdk>[1.8,)</jdk>
+                <jdk>[9,)</jdk>
             </activation>
             <properties>
-                <javadoc.opts>-Xdoclint:none</javadoc.opts>
+                <jpms.argLine>--add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED</jpms.argLine>
             </properties>
         </profile>
 
@@ -164,23 +165,23 @@
                             </execution>
                         </executions>
                     </plugin>
-
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-deploy-plugin</artifactId>
                         <version>3.1.4</version>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
                     </plugin>
-
                     <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.7.0</version>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.8.0</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <stagingProfileId>84aff6e87e214c</stagingProfileId>
-                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                            <waitUntil>published</waitUntil>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -212,7 +213,7 @@
                 <version>3.5.3</version>
                 <configuration>
                     <!--suppress MavenModelInspection -->
-                    <argLine>${argLine} --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED</argLine>
+                    <argLine>${argLine} ${jpms.argLine}</argLine>
                     <trimStackTrace>false</trimStackTrace>
                     <includes>
                         <include>com.arangodb.tinkerpop.gremlin.${test.graph.type}.**</include>
@@ -453,19 +454,19 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>central-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
         </snapshotRepository>
         <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>central</id>
+            <url>https://central.sonatype.com/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
 
     <repositories>
         <repository>
-            <id>oss.sonatype.org-snapshot</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>central-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
