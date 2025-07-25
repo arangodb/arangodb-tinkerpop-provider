@@ -61,7 +61,7 @@ commands:
     steps:
       - run:
           name: Deploy to Apache Maven Central
-          command: mvn -s .circleci/maven-release-settings.xml -Dmaven.test.skip deploy
+          command: mvn -s .circleci/maven-release-settings.xml -Prelease -Dmaven.test.skip deploy
   install:
     steps:
       - run:
