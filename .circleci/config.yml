@@ -76,9 +76,9 @@ commands:
             MAVEN_OPTS: "--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED --add-opens=java.desktop/java.awt.font=ALL-UNNAMED"
 
 executors:
-  j17:
+  j8:
     docker:
-      - image: 'cimg/openjdk:17.0'
+      - image: 'cimg/openjdk:8.0'
   j21:
     docker:
       - image: 'cimg/openjdk:21.0'
@@ -125,7 +125,7 @@ jobs:
       - store_cache
 
   test-console:
-    executor: 'j17'
+    executor: 'j21'
     steps:
       - timeout
       - checkout
@@ -139,7 +139,7 @@ jobs:
           command: ./test-console/test.sh
 
   test-plugin:
-    executor: 'j17'
+    executor: 'j21'
     steps:
       - timeout
       - checkout
@@ -153,7 +153,7 @@ jobs:
           command: ./test-plugin/test.sh
 
   deploy:
-    executor: 'j17'
+    executor: 'j21'
     steps:
       - timeout
       - checkout
@@ -163,7 +163,7 @@ jobs:
       - store_cache
 
   release:
-    executor: 'j17'
+    executor: 'j21'
     steps:
       - timeout
       - checkout
@@ -249,7 +249,7 @@ workflows:
                 - 'simple'
                 - 'complex'
               jdk:
-                - 'j17'
+                - 'j8'
                 - 'j21'
           filters:
             tags:

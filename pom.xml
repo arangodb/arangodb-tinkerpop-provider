@@ -31,6 +31,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <arangodb-java-driver.version>7.21.0</arangodb-java-driver.version>
         <test.graph.type>simple</test.graph.type>
+        <jpms.argLine/>
     </properties>
 
     <dependencies>
@@ -131,12 +132,12 @@
 
     <profiles>
         <profile>
-            <id>doclint-java8-disable</id>
+            <id>open-modules</id>
             <activation>
-                <jdk>[1.8,)</jdk>
+                <jdk>[9,)</jdk>
             </activation>
             <properties>
-                <javadoc.opts>-Xdoclint:none</javadoc.opts>
+                <jpms.argLine>--add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED</jpms.argLine>
             </properties>
         </profile>
 
@@ -212,7 +213,7 @@
                 <version>3.5.3</version>
                 <configuration>
                     <!--suppress MavenModelInspection -->
-                    <argLine>${argLine} --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED</argLine>
+                    <argLine>${argLine} ${jpms.argLine}</argLine>
                     <trimStackTrace>false</trimStackTrace>
                     <includes>
                         <include>com.arangodb.tinkerpop.gremlin.${test.graph.type}.**</include>
