@@ -48,7 +48,7 @@ public class Main {
         System.out.println("Cleaning up existing database:");
         {
             ArangoDatabase db = new ArangoDB.Builder()
-                    .host("127.0.0.1", 8529)
+                    .host("172.28.0.1", 8529)
                     .password("test")
                     .build()
                     .db(DB_NAME);
@@ -61,7 +61,7 @@ public class Main {
 
         // create Tinkerpop graph backed by ArangoDB
         Configuration conf = new ArangoDBConfigurationBuilder()
-                .hosts("127.0.0.1:8529")
+                .hosts("172.28.0.1:8529")
                 .user("root")
                 .password("test")
                 .database(DB_NAME)
