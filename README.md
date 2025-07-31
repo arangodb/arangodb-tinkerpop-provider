@@ -54,7 +54,7 @@ gremlin:
           - "e1:[a]->[b]"
           - "e2:[b,c]->[e,f]"
       driver:
-        hosts: [ "127.0.0.1:8529" ]
+        hosts: [ "172.28.0.1:8529" ]
         password: test
 ```
 

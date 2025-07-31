@@ -117,6 +117,21 @@ jobs:
           command: mvn test -Dtest.graph.type=<<parameters.graphType>> <<parameters.args>>
       - store_cache
 
+  test-demo:
+    executor: 'j21'
+    steps:
+      - timeout
+      - checkout
+      - setup_remote_docker
+      - start-db
+      - load_cache
+      - install
+      - run:
+          name: Run demo
+          command: mvn compile exec:java -Dexec.mainClass="org.example.Main"
+          working_directory: demo
+      - store_cache
+
   test-console:
     executor: 'j21'
     steps:
@@ -251,6 +266,12 @@ workflows:
       not: <<pipeline.parameters.docker-img>>
     jobs:
       - test-plugin
+
+  test-demo:
+    when:
+      not: <<pipeline.parameters.docker-img>>
+    jobs:
+      - test-demo
 
   deploy:
     jobs:
