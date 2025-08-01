@@ -36,6 +36,7 @@
         <sonar.java.spotbugs.reportPaths>target/spotbugsXml.xml</sonar.java.spotbugs.reportPaths>
         <sonar.coverage.jacoco.xmlReportPaths>site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <jpms.argLine/>
+        <argLine/>
     </properties>
 
     <dependencies>
