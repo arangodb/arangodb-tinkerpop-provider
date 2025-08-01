@@ -92,7 +92,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.19.0</version>
+                <version>2.19.2</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -291,8 +291,21 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.6.1</version>
                 <executions>
+                    <execution>
+                        <id>enforce-maven-version</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>[3.6.3,)</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>enforce-all</id>
                         <goals>
@@ -308,9 +321,6 @@
                                     <scopes>compile</scopes>
                                     <maxJdkVersion>1.8</maxJdkVersion>
                                 </enforceBytecodeVersion>
-                                <requireMavenVersion>
-                                    <version>[3.5.3,)</version>
-                                </requireMavenVersion>
                                 <requirePluginVersions/>
                                 <requireExplicitDependencyScope/>
                             </rules>
@@ -371,7 +381,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.7.1</version>
+                <version>1.7.2</version>
                 <configuration>
                     <flattenMode>oss</flattenMode>
                 </configuration>
