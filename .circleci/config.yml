@@ -117,6 +117,27 @@ jobs:
           command: mvn test -Dtest.graph.type=<<parameters.graphType>> <<parameters.args>>
       - store_cache
 
+  sonar:
+    executor: 'j21'
+    steps:
+      - timeout
+      - checkout
+      - setup_remote_docker
+      - start-db
+      - load_cache
+      - restore_cache:
+          name: Restore Sonar cache
+          key: sonar-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/maven_cache_seed" }}
+      - run:
+          name: Analyze
+          command: mvn verify -Dtest.graph.type=simple org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=arangodb_arangodb-tinkerpop-provider
+      - save_cache:
+          name: Save Sonar cache
+          key: sonar-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/maven_cache_seed" }}
+          paths:
+            - ~/.sonar/cache
+      - store_cache
+
   test-demo:
     executor: 'j21'
     steps:
@@ -211,6 +232,13 @@ workflows:
                 - 'ssl'
               args:
                 - '-Dtest.ssl'
+
+  sonar:
+    when:
+      not: <<pipeline.parameters.docker-img>>
+    jobs:
+      - sonar:
+          name: sonar
 
   test-adb-topology:
     when: <<pipeline.parameters.docker-img>>
