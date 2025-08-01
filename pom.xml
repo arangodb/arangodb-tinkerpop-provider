@@ -34,9 +34,8 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.organization>arangodb-1</sonar.organization>
         <sonar.java.spotbugs.reportPaths>target/spotbugsXml.xml</sonar.java.spotbugs.reportPaths>
-        <sonar.coverage.jacoco.xmlReportPaths>site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <jpms.argLine/>
-        <argLine/>
     </properties>
 
     <dependencies>
@@ -171,29 +170,6 @@
                         </dependencies>
                         <configuration>
                             <excludeFilterFile>spotbugs/spotbugs-exclude.xml</excludeFilterFile>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.13</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>prepare-agent</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>report</id>
-                                <goals>
-                                    <goal>report</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <formats>
-                                <format>XML</format>
-                            </formats>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -412,6 +388,30 @@
                     <licenses>
                         <license implementation="org.apache.rat.analysis.license.ApacheSoftwareLicense20"/>
                     </licenses>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.13</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <formats>
+                        <format>XML</format>
+                    </formats>
                 </configuration>
             </plugin>
 
