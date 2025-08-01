@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 ArangoDB GmbH, Cologne, Germany
+ * Copyright 2025 ArangoDB GmbH and The University of York
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

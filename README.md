@@ -11,7 +11,7 @@ for ArangoDB
 This Provider supports:
 
 * Apache TinkerPop 3.7
-* ArangoDB 3.12+ (via ArangoDB Java Driver 7.21+).
+* ArangoDB 3.12+ (via ArangoDB Java Driver 7.22+).
 * Java 8+
 
 ## Maven
@@ -149,3 +149,12 @@ TODO
 ## Element IDs
 
 TODO
+
+## Acknowledgments
+
+This repository is based on and extends the original work of the 
+[arangodb-community/arangodb-tinkerpop-provider](https://github.com/arangodb-community/arangodb-tinkerpop-provider) 
+project.
+
+We gratefully acknowledge the efforts of [Horacio Hoyos Rodriguez](https://github.com/arcanefoam) and other contributors 
+of the community repository, see [AUTHORS.md](./AUTHORS.md).

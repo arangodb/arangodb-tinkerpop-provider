@@ -1,5 +1,5 @@
 
-* Michele Rastelli (http://www.arangodb.com)
+* Michele Rastelli (https://github.com/rashtao)
 * Achim Brandt (http://www.triagens.de)
 * Johannes Gocke (http://www.triagens.de)
 * Guido Schwab (http://www.triagens.de)
