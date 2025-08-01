@@ -191,16 +191,16 @@ public class ArangoDBGraphClient {
         return db.arango();
     }
 
-    public Iterator<Object> query(final String query, final Map<String, Object> parameters, final AqlQueryOptions options) {
+    public Iterator<Object> query(final String query, final Map<String, ?> parameters, final AqlQueryOptions options) {
         Iterator<JsonNode> res = query(query, JsonNode.class, parameters, options);
         return IteratorUtils.map(res, aqlDeserializer::deserialize);
     }
 
-    private <V> ArangoCursor<V> query(String query, Class<V> type, Map<String, Object> parameters) {
+    private <V> ArangoCursor<V> query(String query, Class<V> type, Map<String, ?> parameters) {
         return query(query, type, parameters, new AqlQueryOptions());
     }
 
-    private <V> ArangoCursor<V> query(String query, Class<V> type, Map<String, Object> parameters, AqlQueryOptions options) {
+    private <V> ArangoCursor<V> query(String query, Class<V> type, Map<String, ?> parameters, AqlQueryOptions options) {
         logger.debug("Executing AQL query: {}, with parameters: {}, with options: {}", query, parameters, options);
         try {
             return db.query(query, type, parameters, options);

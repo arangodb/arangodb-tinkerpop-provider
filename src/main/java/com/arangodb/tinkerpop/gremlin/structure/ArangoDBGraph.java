@@ -243,7 +243,7 @@ public class ArangoDBGraph implements Graph {
      * @param parameters the parameters of the AQL query
      * @return a fluent Gremlin traversal
      */
-    public <E> GraphTraversal<?, E> aql(final String query, final Map<String, Object> parameters) {
+    public <E> GraphTraversal<?, E> aql(final String query, final Map<String, ?> parameters) {
         return aql(query, parameters, new AqlQueryOptions());
     }
 
@@ -255,7 +255,7 @@ public class ArangoDBGraph implements Graph {
      * @param options    query options
      * @return a fluent Gremlin traversal
      */
-    public <E> GraphTraversal<?, E> aql(final String query, final Map<String, Object> parameters, final AqlQueryOptions options) {
+    public <E> GraphTraversal<?, E> aql(final String query, final Map<String, ?> parameters, final AqlQueryOptions options) {
         GraphTraversal.Admin<?, E> traversal = new DefaultGraphTraversal<>(this);
         traversal.addStep(new AQLStartStep(traversal, query, client.query(query, parameters, options)));
         return traversal;

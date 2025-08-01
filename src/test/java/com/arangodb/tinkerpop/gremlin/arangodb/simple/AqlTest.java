@@ -18,6 +18,7 @@ package com.arangodb.tinkerpop.gremlin.arangodb.simple;
 
 import com.arangodb.ArangoDBException;
 import com.arangodb.model.AqlQueryOptions;
+import com.arangodb.tinkerpop.gremlin.persistence.ElementId;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.tinkerpop.gremlin.AbstractGremlinTest;
@@ -55,7 +56,7 @@ public class AqlTest extends AbstractGremlinTest {
     public void shouldExecuteAqlWithArgs() {
         this.graph.addVertex("name", "marko");
         String query = "FOR d IN @@vCol FILTER d.name == @name RETURN d";
-        Map<String, Object> bindings = new HashMap<>();
+        Map<String, String> bindings = new HashMap<>();
         bindings.put("@vCol", vertexCollection());
         bindings.put("name", "marko");
         Iterator<String> result = graph().aql(query, bindings).values("name");
@@ -89,7 +90,7 @@ public class AqlTest extends AbstractGremlinTest {
     public void shouldReadNestedVertices() {
         Vertex a = graph.addVertex("name", "marko");
         Vertex b = graph.addVertex("name", "vadas");
-        Map<String, Object> params = new HashMap<>();
+        Map<String, ElementId> params = new HashMap<>();
         params.put("a", graph().elementId(a));
         params.put("b", graph().elementId(b));
         Map<String, Vertex> result = graph().<Map<String, Vertex>>aql(
@@ -105,7 +106,7 @@ public class AqlTest extends AbstractGremlinTest {
     public void shouldReadArrayOfVertices() {
         Vertex a = graph.addVertex("name", "marko");
         Vertex b = graph.addVertex("name", "vadas");
-        Map<String, Object> params = new HashMap<>();
+        Map<String, ElementId> params = new HashMap<>();
         params.put("a", graph().elementId(a));
         params.put("b", graph().elementId(b));
         List<Vertex> result = graph().<List<Vertex>>aql(
@@ -166,7 +167,7 @@ public class AqlTest extends AbstractGremlinTest {
         this.graph.addVertex("name", "marko", "age", 29, "color", "red");
         this.graph.addVertex("name", "marko", "age", 30, "color", "yellow");
         String query = "FOR d IN @@vCol FILTER d.name == @name RETURN d";
-        Map<String, Object> bindings = new HashMap<>();
+        Map<String, String> bindings = new HashMap<>();
         bindings.put("@vCol", vertexCollection());
         bindings.put("name", "marko");
         Traversal<?, ?> result = graph().aql(query, bindings).has("age", 29).values("color");
