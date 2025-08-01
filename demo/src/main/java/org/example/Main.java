@@ -219,10 +219,10 @@ public class Main {
                       RETURN d
                     )
                     
-                    FOR v,e,p IN 1..10 OUTBOUND start GRAPH tinkerpop
-                      PRUNE cond = e.dist > 400
+                    FOR v, e, p IN 1..10 OUTBOUND start GRAPH tinkerpop
+                      PRUNE e.dist > 400 || v.code == @target
                       OPTIONS { uniqueVertices: 'path', order: 'bfs' }
-                      FILTER NOT cond
+                      FILTER e.dist <= 400
                       FILTER v.code == @target
                       LIMIT 5
                       RETURN p
@@ -243,11 +243,7 @@ public class Main {
                                 List<Number> distances = (List<Number>) it.get("distances");
                                 StringBuilder sb = new StringBuilder();
                                 for (int i = 0; i < distances.size(); i++) {
-                                    sb
-                                            .append(path.get(i))
-                                            .append(" -(")
-                                            .append(distances.get(i))
-                                            .append(")-> ");
+                                    sb.append(path.get(i)).append(" -(").append(distances.get(i)).append(")-> ");
                                 }
                                 sb.append(path.getLast());
                                 System.out.println("  Path (dist: " + it.get("tot") + "): \t" + sb);
