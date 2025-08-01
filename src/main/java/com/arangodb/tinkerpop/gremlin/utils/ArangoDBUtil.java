@@ -20,6 +20,7 @@ import com.arangodb.entity.GraphEntity;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
 import com.arangodb.tinkerpop.gremlin.PackageVersion;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -89,7 +90,7 @@ public class ArangoDBUtil {
         }
     }
 
-    private static class VersionComparator implements Comparator<String> {
+    private static class VersionComparator implements Comparator<String>, Serializable {
         @Override
         public int compare(String a, String b) {
             Objects.requireNonNull(a);

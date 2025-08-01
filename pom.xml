@@ -31,7 +31,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <arangodb-java-driver.version>7.22.0-SNAPSHOT</arangodb-java-driver.version>
         <test.graph.type>simple</test.graph.type>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.organization>arangodb-1</sonar.organization>
+        <sonar.java.spotbugs.reportPaths>target/spotbugsXml.xml</sonar.java.spotbugs.reportPaths>
+        <sonar.coverage.jacoco.xmlReportPaths>site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <jpms.argLine/>
+        <argLine/>
     </properties>
 
     <dependencies>
@@ -90,7 +95,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.19.0</version>
+                <version>2.19.2</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -139,6 +144,60 @@
             <properties>
                 <jpms.argLine>--add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED</jpms.argLine>
             </properties>
+        </profile>
+
+        <profile>
+            <id>static-code-analysis</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs-maven-plugin</artifactId>
+                        <version>4.9.3.2</version>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.github.spotbugs</groupId>
+                                <artifactId>spotbugs</artifactId>
+                                <version>4.9.3</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <excludeFilterFile>spotbugs/spotbugs-exclude.xml</excludeFilterFile>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>0.8.13</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <formats>
+                                <format>XML</format>
+                            </formats>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
         <profile>
@@ -222,26 +281,6 @@
             </plugin>
 
             <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.13</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <groupId>com.google.code.maven-replacer-plugin</groupId>
                 <artifactId>replacer</artifactId>
                 <version>1.5.3</version>
@@ -289,8 +328,21 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.6.1</version>
                 <executions>
+                    <execution>
+                        <id>enforce-maven-version</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>[3.6.3,)</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>enforce-all</id>
                         <goals>
@@ -306,9 +358,6 @@
                                     <scopes>compile</scopes>
                                     <maxJdkVersion>1.8</maxJdkVersion>
                                 </enforceBytecodeVersion>
-                                <requireMavenVersion>
-                                    <version>[3.5.3,)</version>
-                                </requireMavenVersion>
                                 <requirePluginVersions/>
                                 <requireExplicitDependencyScope/>
                             </rules>
@@ -369,7 +418,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.7.1</version>
+                <version>1.7.2</version>
                 <configuration>
                     <flattenMode>oss</flattenMode>
                 </configuration>
@@ -408,6 +457,12 @@
                         <descriptor>src/assembly/standalone.xml</descriptor>
                     </descriptors>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>5.1.0.4751</version>
             </plugin>
         </plugins>
 
