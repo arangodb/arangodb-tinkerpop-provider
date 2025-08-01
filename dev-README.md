@@ -10,6 +10,6 @@ Check results [here](https://sonarcloud.io/project/overview?id=arangodb_arangodb
 
 ## check dependencies updates
 ```shell
-mvn versions:display-dependency-updates
-mvn versions:display-plugin-updates
+mvn versions:display-dependency-updates -Pstatic-code-analysis -Prelease
+mvn versions:display-plugin-updates -Pstatic-code-analysis -Prelease
 ```
