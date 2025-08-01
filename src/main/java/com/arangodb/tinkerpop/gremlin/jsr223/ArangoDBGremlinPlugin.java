@@ -64,7 +64,7 @@ public class ArangoDBGremlinPlugin extends AbstractGremlinPlugin {
 
     private static final ArangoDBGremlinPlugin INSTANCE = new ArangoDBGremlinPlugin();
 
-    private ArangoDBGremlinPlugin() {
+    public ArangoDBGremlinPlugin() {
         super(NAME, IMPORTS);
     }
 
