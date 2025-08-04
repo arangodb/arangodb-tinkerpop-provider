@@ -163,9 +163,9 @@ public class Main {
                             System.out.println("  Path (" + (path.size() - 1) + " hops): " +
                                     String.join(" -> ", path.objects().stream().map(Object::toString).toList())));
 
-            // Find all airports reachable within 2 hops from London
-            System.out.println("\nCount of the airports reachable within 2 hops from Boston (BOS):");
-            Long count = g.V().has("code", "BOS")
+            // Find all airports reachable within 2 hops from Long Beach
+            System.out.println("\nCount of the airports reachable within 2 hops from Long Beach (LGB):");
+            Long count = g.V().has("code", "LGB")
                     .repeat(__.out().simplePath())
                     .times(2)
                     .dedup()
@@ -210,7 +210,7 @@ public class Main {
                     System.out.println("  Path (dist: " + path.get("dist") + "): \t" + path.get("path")));
 
             // AQL traversal to find paths between two airports with constraints on edges
-            System.out.println("\nFinding path between Boston (BOS) and Atlanta (ATL) with max 400 km flights with AQL query:");
+            System.out.println("\nFinding path between Boston (BOS) and Atlanta (ATL) with flights of max 400 km with AQL query:");
 
             String traversalQuery = """
                     LET start = FIRST(
