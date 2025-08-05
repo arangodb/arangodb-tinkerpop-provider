@@ -1,27 +1,31 @@
 ![ArangoDB-Logo](https://docs.arangodb.com/assets/arangodb_logo_2016_inverted.png)
 
-# arangodb-tinkerpop-provider
+# ArangoDB TinkerPop Provider
 
 An implementation of
 the [Apache TinkerPop OLTP Provider](https://tinkerpop.apache.org/docs/3.7.3/dev/provider) API for ArangoDB.
 
+This provider allows using the standard TinkerPop API with ArangoDB as the backend storage.
+It supports creating, querying, and manipulating graph data using the Gremlin traversal language, while offering the
+possibility to use native AQL (ArangoDB Query Language) for complex queries.
 
 ## Compatibility
 
-This Provider supports:
+This Provider is compatible with:
 
 * Apache TinkerPop 3.7
 * ArangoDB 3.12+
 * ArangoDB Java Driver 7.22+
 * Java 8+
 
+## Installation
 
-## Maven
+### Maven
 
-To add the provider to your project via Maven, you need to add the following dependency (check the latest version 
-[here](https://search.maven.org/artifact/com.arangodb/arangodb-tinkerpop-provider)):
+To add the provider to your project via Maven, include the following dependency (check
+the [latest version here](https://search.maven.org/artifact/com.arangodb/arangodb-tinkerpop-provider)):
 
-```XML
+```xml
 
 <dependencies>
     <dependency>
@@ -32,28 +36,104 @@ To add the provider to your project via Maven, you need to add the following dep
 </dependencies>
 ```
 
+### Gradle
+
+For Gradle projects, add:
+
+```groovy
+implementation 'com.arangodb:arangodb-tinkerpop-provider:x.y.z'
+```
+
+### Gremlin Console
+TODO
+
+### Server Plugin
+TODO
+
+## Quick Start
+
+Here's a simple example to get you started:
+
+```
+// Create a configuration
+Configuration conf = new ArangoDBConfigurationBuilder()
+                .hosts("localhost:8529")
+                .user("root")
+                .password("password")
+                .database("myDatabase")
+                .name("myGraph")
+                .enableDataDefinition(true)  // Allow creating database and graph if they don't exist
+                .build();
+
+// Create the graph
+ArangoDBGraph graph = (ArangoDBGraph) GraphFactory.open(conf);
+
+// Get a traversal source
+GraphTraversalSource g = graph.traversal();
+
+// Add some data
+Vertex person = g.addV("person")
+        .property("name", "John")
+        .property("age", 30)
+        .next();
+
+Vertex software = g.addV("software")
+        .property("name", "GraphApp")
+        .property("lang", "Java")
+        .next();
+
+g.addE("created")
+        .from(person)
+        .to(software)
+        .property("year",2025)
+        .next();
+
+// Query the graph
+List<String> creators = g.V()
+        .hasLabel("software")
+        .has("name", "GraphApp")
+        .in("created")
+        .values("name")
+        .toList();
+
+System.out.println("Creators: " + creators);
+
+// Close the graph when done
+graph.close();
+```
 
 ## Configuration
 
-The graph can be created using the methods `org.apache.tinkerpop.gremlin.structure.util.GraphFactory.open(...)` (see 
-related [javadoc](https://tinkerpop.apache.org/javadocs/3.7.3/full/org/apache/tinkerpop/gremlin/structure/util/GraphFactory.html)).
-These accept a configuration file (e.g. YAML or properties file), a java Map or Apache Commons Configuration object.
+The graph can be created using the methods from `org.apache.tinkerpop.gremlin.structure.util.GraphFactory.open(...)` (
+see [javadoc](https://tinkerpop.apache.org/javadocs/3.7.3/full/org/apache/tinkerpop/gremlin/structure/util/GraphFactory.html)).
+These methods accept a configuration file (e.g. YAML or properties file), a Java Map, or an Apache Commons
+Configuration object.
 
 The property `gremlin.graph` must be set to: `com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph`.
 
-The graph configuration properties related to `ArangoDBGraph` are prefixed with `gremlin.arangodb.conf.graph` and are:
-- `gremlin.arangodb.conf.graph.db`: ArangoDB database name, (default: `_system`)
-- `gremlin.arangodb.conf.graph.name`: ArangoDB graph name, (default: `tinkerpop`)
-- `gremlin.arangodb.conf.graph.enableDataDefinition`: flag to allow data definition changes (default: `false`)
-- `gremlin.arangodb.conf.graph.type`: graph type: `SIMPLE` or `COMPLEX`, (default: `SIMPLE`)
-- `gremlin.arangodb.conf.graph.orphanCollections`: list of orphan collections names
-- `gremlin.arangodb.conf.graph.edgeDefinitions`: list of edge definitions in the format: `edge1:[col1,col2]->[col3,col4]`
+Configuration examples can be found [here](./src/test/java/example).
 
-The driver configuration properties are prefixed with `gremlin.arangodb.conf.driver`.
-All properties keys from `com.arangodb.config.ArangoConfigProperties` are supported as driver properties, see related 
-[documentation](https://docs.arangodb.com/stable/develop/drivers/java/reference-version-7/driver-setup/#config-file-properties).
+### Graph Configuration Properties
 
-Here is an example of the configuration with a YAML file:
+Graph configuration properties are prefixed with `gremlin.arangodb.conf.graph`:
+
+| Property                                           | Description                           | Default     |
+|----------------------------------------------------|---------------------------------------|-------------|
+| `gremlin.arangodb.conf.graph.db`                   | ArangoDB database name                | `_system`   |
+| `gremlin.arangodb.conf.graph.name`                 | ArangoDB graph name                   | `tinkerpop` |
+| `gremlin.arangodb.conf.graph.enableDataDefinition` | Flag to allow data definition changes | `false`     |
+| `gremlin.arangodb.conf.graph.type`                 | Graph type: `SIMPLE` or `COMPLEX`     | `SIMPLE`    |
+| `gremlin.arangodb.conf.graph.orphanCollections`    | List of orphan collections names      | -           |
+| `gremlin.arangodb.conf.graph.edgeDefinitions`      | List of edge definitions              | -           |
+
+### Driver Configuration Properties
+
+Driver configuration properties are prefixed with `gremlin.arangodb.conf.driver`. All properties from
+`com.arangodb.config.ArangoConfigProperties` are supported. See
+the [ArangoDB Java Driver documentation](https://docs.arangodb.com/stable/develop/drivers/java/reference-version-7/driver-setup/#config-file-properties)
+for details.
+
+### YAML Configuration
 
 ```yaml
 gremlin:
@@ -78,13 +158,15 @@ gremlin:
           - "172.28.0.1:8549"
 ```
 
-which can be loaded in this way:
+Loading from a YAML file:
+
 ```java
-    ArangoDBGraph graph = (ArangoDBGraph) GraphFactory.open("<path_to_yaml_file>");
+ArangoDBGraph graph = (ArangoDBGraph) GraphFactory.open("<path_to_yaml_file>");
 ```
 
-Alternatively, the graph configuration can be created programmatically using the help of the configuration builder 
-`com.arangodb.tinkerpop.gremlin.utils.ArangoDBConfigurationBuilder`:
+### Programmatic Configuration
+
+Using the configuration builder:
 
 ```java
 Configuration conf = new ArangoDBConfigurationBuilder()
@@ -92,20 +174,19 @@ Configuration conf = new ArangoDBConfigurationBuilder()
         .user("root")
         .password("test")
         .database("testDb")
+        .name("myGraph")
+        .graphType(GraphType.SIMPLE)
         .enableDataDefinition(true)
         .build();
+
 ArangoDBGraph graph = (ArangoDBGraph) GraphFactory.open(conf);
 ```
 
-Additional configuration examples can be found [here](./src/test/java/example).
-
 ### SSL Configuration
 
-To use TLS-secured connections to ArangoDB, set `gremlin.arangodb.conf.driver.useSsl` to `true` and optionally configure 
-the other driver-related properties, see related
-[documentation](https://docs.arangodb.com/stable/develop/drivers/java/reference-version-7/driver-setup/#config-file-properties. 
-
-For example:
+To use TLS-secured connections to ArangoDB, set `gremlin.arangodb.conf.driver.useSsl` to `true` and configure other
+SSL-related properties as needed (see related
+[documentation](https://docs.arangodb.com/stable/develop/drivers/java/reference-version-7/driver-setup/#config-file-properties):
 
 ```yaml
 gremlin:
@@ -120,44 +201,53 @@ gremlin:
         sslCertValue: "MIIDezCCAmOgAwIBAgIEeDCzXzANBgkqhkiG9w0BAQsFADBuMRAwDgYDVQQGEwdVbmtub3duMRAwDgYDVQQIEwdVbmtub3duMRAwDgYDVQQHEwdVbmtub3duMRAwDgYDVQQKEwdVbmtub3duMRAwDgYDVQQLEwdVbmtub3duMRIwEAYDVQQDEwlsb2NhbGhvc3QwHhcNMjAxMTAxMTg1MTE5WhcNMzAxMDMwMTg1MTE5WjBuMRAwDgYDVQQGEwdVbmtub3duMRAwDgYDVQQIEwdVbmtub3duMRAwDgYDVQQHEwdVbmtub3duMRAwDgYDVQQKEwdVbmtub3duMRAwDgYDVQQLEwdVbmtub3duMRIwEAYDVQQDEwlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC1WiDnd4+uCmMG539ZNZB8NwI0RZF3sUSQGPx3lkqaFTZVEzMZL76HYvdc9Qg7difyKyQ09RLSpMALX9euSseD7bZGnfQH52BnKcT09eQ3wh7aVQ5sN2omygdHLC7X9usntxAfv7NzmvdogNXoJQyY/hSZff7RIqWH8NnAUKkjqOe6Bf5LDbxHKESmrFBxOCOnhcpvZWetwpiRdJVPwUn5P82CAZzfiBfmBZnB7D0l+/6Cv4jMuH26uAIcixnVekBQzl1RgwczuiZf2MGO64vDMMJJWE9ClZF1uQuQrwXF6qwhuP1Hnkii6wNbTtPWlGSkqeutr004+Hzbf8KnRY4PAgMBAAGjITAfMB0GA1UdDgQWBBTBrv9Awynt3C5IbaCNyOW5v4DNkTANBgkqhkiG9w0BAQsFAAOCAQEAIm9rPvDkYpmzpSIhR3VXG9Y71gxRDrqkEeLsMoEyqGnw/zx1bDCNeGg2PncLlW6zTIipEBooixIE9U7KxHgZxBy0Et6EEWvIUmnr6F4F+dbTD050GHlcZ7eOeqYTPYeQC502G1Fo4tdNi4lDP9L9XZpf7Q1QimRH2qaLS03ZFZa2tY7ah/RQqZL8Dkxx8/zc25sgTHVpxoK853glBVBs/ENMiyGJWmAXQayewY3EPt/9wGwV4KmU3dPDleQeXSUGPUISeQxFjy+jCw21pYviWVJTNBA9l5ny3GhEmcnOT/gQHCvVRLyGLMbaMZ4JrPwb+aAtBgrgeiK4xeSMMvrbhw=="
 ```
 
-If no `sslCertValue` configuration parameter is provided, then the default SSL context will be used.
-In such cases, the truststore can be specified, if needed, using system properties `javax.net.ssl.trustStore` and 
-`javax.net.ssl.trustStorePassword`.
+If no `sslCertValue` is provided, the default SSL context will be used. In such case, you can specify the truststore
+using system properties `javax.net.ssl.trustStore` and `javax.net.ssl.trustStorePassword`.
 
-Additional configuration examples can be found [here](./src/test/java/example).
+### Data Definition Management
 
-### enableDataDefinition
+When a graph is instantiated, the provider compares existing data definitions in ArangoDB with the structure expected by
+your configuration. It checks whether:
 
-When a graph is instantiated, the already existing data definitions in ArangoDB are compared with the structure expected
-by the configuration of `gremlin.arangodb.conf.graph`. 
-This checks whether:
-- the database exists
-- the graph exists
-- the graph structure has the same edge definitions and orphan collections
+- The database exists
+- The graph exists
+- The graph structure has the same edge definitions and orphan collections
 
-In case of mismatch, an error is thrown and the graph will not be instantiated.
-In case data definitions in ArangoDB are not present, they can be automatically created by configuring 
-`gremlin.arangodb.conf.graph.enableDataDefinition` flag to `true`. This would allow creating a new database (if not 
-already existing) and a new graph (if not already existing). Existing graphs are never modified.
+If there's a mismatch, an error is thrown and the graph will not be instantiated. To automatically create missing data
+definitions, set `gremlin.arangodb.conf.graph.enableDataDefinition` to `true`. This allows:
 
-Collection names (vertex and edge collections) will be prefixed with the graph name, if they are not already.
+- Creating a new database if it doesn't exist
+- Creating a new graph if it doesn't exist (along with vertex and edge collections)
 
+Existing graphs are never modified automatically.
 
-## Graph Type
+Collection names (vertex and edge collections) will be prefixed with the graph name if they aren't already.
 
-The graph type can be configured with the property `gremlin.arangodb.conf.graph.type` and can be `SIMPLE` or `COMPLEX`.
+## Graph Types
 
-### SIMPLE
+The ArangoDB TinkerPop Provider supports two graph types, which can be configured with the property
+`gremlin.arangodb.conf.graph.type`: `SIMPLE` and `COMPLEX`.
 
-`SIMPLE` graph type is a graph definition that allows only 1 vertex collection and 1 edge collection.
-Collection names are prefixed with the graph name, e.g. `<graphName>_vCol`.
-By default, the vertex collection name is `<graphName>_vertex` and the edge collection name is `<graphName>_edge`.
+### SIMPLE Graph Type
 
-Element ids have no format constrains.
+From an application perspective, this is the most flexible graph type that is backed by 
+an ArangoDB graph composed of only 1 vertex collection and 1 edge definition.
 
-Any label can be used at runtime.
+It has the following advantages:
 
-Here is an example of the configuration for a simple graph:
+- it closely matches the Tinkerpop property graph
+- it is simpler to getting started and run examples
+- it imposes no restrictions about element IDs
+- it supports arbitrary labels, i.e. labels not known at graph construction time
+
+It has the following disadvantages:
+
+- all vertex types will be stored in the same db collection
+- all edges types will be stored in the same db collection
+- it could not leverage the full potential of ArangoDB graph traversal
+- it could require index on `_label` field to improve performances
+
+Example configuration:
 
 ```yaml
 gremlin:
@@ -166,27 +256,43 @@ gremlin:
     conf:
       graph:
         db: "db"
-        name: "graph"
+        name: "myGraph"
         type: SIMPLE
         edgeDefinitions:
           - "e:[v]->[v]"
 ```
 
-### COMPLEX
+If no `edgeDefinitions` are not configured, the default names will be used:
+- `<graphName>_vertex` will be used for the vertex collection
+- `<graphName>_edge` will be used for the edge collection
 
-`COMPLEX` graph type is a graph definition that allows multiple vertex collections and multiple edge collections.
+Using a `SIMPLE` graph configured as in the example above and creating a new element like:
 
-Element ids are strings with the format constraint: `<graph>_<label>/<key>`, where:
-- `<graph>` is the graph name
-- `<label>` is the element label
-- `<key>` is the db document key
+```
+graph.addVertex("person", T.id, "foo");
+```
 
-At runtime, only labels corresponding graph collections can be used i.e., `<graph>_<label>` is a vertex or edge 
-collection of the graph. 
+would result in creating a document in the vertex collection `myGraph_v` with `_id` equals to `myGraph_v/foo`. 
 
-Graph name, label and key must not contain `_`.
+### COMPLEX Graph Type
 
-Here is an example of the configuration for a simple graph:
+The `COMPLEX` graph type is backed by an ArangoDB graph composed potentially of multiple vertex collections and multiple
+edge definitions. It has the following advantages:
+
+- it closely matches the ArangoDB graph structure
+- it allows multiple vertex collections and multiple edge collections
+- it offers the best performances for graph traversals
+- it can match any pre-existing database graph structure
+
+but on the other side has the following constraints:
+ 
+- Element IDs must have the format: `<graph>_<label>/<key>`, where:
+    - `<graph>` is the graph name
+    - `<label>` is the element label
+    - `<key>` is the database document key
+- only labels corresponding to graph collections can be used
+
+Example configuration:
 
 ```yaml
 gremlin:
@@ -195,28 +301,228 @@ gremlin:
     conf:
       graph:
         db: "db"
-        name: "graph"
+        name: "myGraph"
         type: COMPLEX
         edgeDefinitions:
-          - "e1:[v1,v2]->[v3]"
-          - "e2:[v3]->[v5,v1]"
+          - "knows:[person]->[person]"
+          - "created:[person]->[game,software]"
 ```
 
+Using a `SIMPLE` graph configured as in the example above and creating a new element like:
 
-## Naming constraints
+```
+graph.addVertex("person", T.id, "foo");
+```
 
-- element ids must be strings
-- `_` character is used as separator for collection names (e.g. `myGraph_myCol`). Therefore, it is not allowed using `_`
-  in:
-  - graph name (`gremlin.arangodb.conf.graph.type`), 
-  - labels
-  - element ids, in `SIMPLE` graph types
-  - vertex and edge keys, in `COMPLEX` graph types
+would result in creating a document in the vertex collection `myGraph_person` with `_id` equals to `myGraph_person/foo`.
 
 
-## Persistent structure
-TODO
+## Naming Constraints
 
+When using the ArangoDB TinkerPop Provider, be aware of these naming constraints:
+
+- Element IDs must be strings
+- The underscore character (`_`) is used as a separator for collection names (e.g., `myGraph_myCol`). Therefore, it
+  cannot be used in:
+    - graph name (`gremlin.arangodb.conf.graph.name`)
+    - labels
+    - element IDs 
+
+## Persistent Structure
+
+The ArangoDB TinkerPop Provider maps TinkerPop data structures to ArangoDB data as follows:
+
+### Vertices
+
+Vertices are stored as documents in vertex collections. In a `SIMPLE` graph, all vertices are stored in a single
+collection named `<graphName>_vertex`. In a `COMPLEX` graph, vertices are stored in collections named
+`<graphName>_<label>`.
+
+Each vertex document contains:
+
+- standard ArangoDB fields (`_id`, `_key`, `_rev`)
+- the field `_label`
+- vertex properties as document fields
+- meta-properties nested in the nested map `_meta`
+
+For example, the following java code:
+
+```
+graph
+        .addVertex("person")
+        .property("name", "Freddie Mercury")
+        .property("since", 1970);
+```
+
+creates a document like this:
+
+```json
+{
+  "_key": "4856",
+  "_id": "tinkerpop_vertex/4856",
+  "_rev": "_kFqmbXK---",
+  "_label": "person",
+  "name": "Freddie Mercury",
+  "_meta": {
+    "name": {
+      "since": 1970
+    }
+  }
+}
+```
+
+### Edges
+
+Edges are stored as documents in edge collections. In a `SIMPLE` graph, all edges are stored in a single collection
+named `<graphName>_edge`. In a `COMPLEX` graph, edges are stored in collections named `<graphName>_<label>`.
+
+Each edge document contains:
+
+- standard ArangoDB edge fields (`_id`, `_key`, `_rev`, `_from`, `_to`)
+- the field `_label`
+- vertex properties as document fields
+
+For example, the following java code:
+
+```
+Vertex v = graph.addVertex("person");
+v.addEdge("knows", v)
+        .property("since", 1970);
+```
+
+creates a document like this:
+
+```json
+{
+  "_key": "5338",
+  "_id": "tinkerpop_edge/5338",
+  "_from": "tinkerpop_vertex/5335",
+  "_to": "tinkerpop_vertex/5335",
+  "_rev": "_kFq20-u---",
+  "_label": "knows",
+  "since": 1970
+}
+```
+
+## Working with the Graph
+
+Construct the graph:
+
+```
+ArangoDBGraph graph = ArangoDBGraph.open(conf);
+GraphTraversalSource g = graph.traversal();
+```
+
+### Adding Vertices and Edges
+
+```java
+// Add vertices
+Vertex person = g.addV("person")
+                .property("name", "Alice")
+                .property("age", 30)
+                .next();
+
+Vertex software = g.addV("software")
+        .property("name", "GraphDB")
+        .property("lang", "Java")
+        .next();
+
+// Add an edge
+Edge created = g.addE("created")
+        .from(person)
+        .to(software)
+        .property("since", 2023)
+        .next();
+```
+
+### Querying Vertices and Edges
+
+```java
+// Find all people who created software
+List<String> creators = g.V()
+        .hasLabel("software")
+        .has("name", "GraphDB")
+        .in("created")
+        .<String>values("name")
+        .toList();
+
+// Find all software created by Alice
+List<String> aliceSoftware = g.V()
+        .hasLabel("person")
+        .has("name", "Alice")
+        .out("created")
+        .<String>values("name")
+        .toList();
+```
+
+### Updating Properties
+
+```
+// Update a property
+g.V()
+    .hasLabel("person")
+    .has("name","Alice")
+    .property("age",31)
+    .iterate();
+
+// Remove a property
+g.V()
+    .hasLabel("person")
+    .has("name","Alice")
+    .properties("title")
+    .drop()
+    .iterate();
+```
+
+### Removing Elements
+
+```
+// Remove an edge
+g.E()
+    .hasLabel("created")
+    .where(__.outV()
+    .has("name","Alice"))
+    .where(__.inV()
+    .has("name","GraphDB"))
+    .drop()
+    .iterate();
+
+// Remove a vertex (and its incident edges)
+g.V()
+    .hasLabel("person")
+    .has("name","Alice")
+    .drop()
+    .iterate();
+```
+
+### Element IDs
+
+Given a Gremlin element, you can get the corresponding ArangoDB document ID (`_id` field) using the 
+`ArangoDBGraph.elementId(Element)` method:
+
+```java
+Vertex v = graph.addVertex("name", "marko");
+String id = graph.elementId(v);
+```
+
+This is useful when you need to reference the element directly in AQL queries.
+
+### AQL Queries
+
+For complex queries or performance-critical operations, you can use ArangoDB's native query language (AQL) directly:
+
+```java
+List<Vertex> alice = graph
+    .<Vertex>aql("FOR v IN graph_vertex FILTER v.name == @name RETURN v", Map.of("name", "Alice"))
+    .toList();
+
+// Query using document ID
+Vertex v = graph.addVertex("name", "marko");
+String id = graph.elementId(v);
+List<Vertex> result = graph
+    .<Vertex>aql("RETURN DOCUMENT(@id)", Map.of("id", id))
+    .toList();
+```
 
 ## Supported Features
 
@@ -333,47 +639,36 @@ This library supports the following features:
 ```
 
 
-## Usage
+### Logging
 
-The [demo](./demo) project contains usage examples of this library.
-For additional examples please check the [Gremlin tutorial](https://tinkerpop.apache.org/docs/3.7.3/tutorials/getting-started/).
+The library uses `slf4j` API for logging.
+To log requests and responses to and from the database, enable `DEBUG` log level for the logger 
+`com.arangodb.internal.net.Communication`.
 
+## Current Limitations
 
-## Element Ids
+- This library implements the Online Transactional Processing Graph Systems (OLTP) API only. The Online Analytics
+  Processing Graph Systems (OLAP) API is currently not implemented.
+- This library implements the Structure API only. The Process API is currently not implemented. For optimal query
+  performance, it is recommended to use [AQL queries](#aql-queries).
 
-Given a Gremlin element, the corresponding database id (`_id` field in ArangoDB documents) can be computed using
-`com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph.elementId(Element)`, for example:
+## Examples and Demo
 
-```java
-    Vertex v = graph.addVertex("name", "marko");
-    String id = graph.elementId(v);
-```
+The [demo](./demo) project contains comprehensive usage examples of this library.
 
+For additional examples, check
+the [Gremlin tutorial](https://tinkerpop.apache.org/docs/3.7.3/tutorials/getting-started/).
 
-## AQL queries
+## Using from Gremlin Console
+TODO
 
-AQL queries can be executed via `com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph.aql()`, for example:
-```java
-    Vertex v = graph.addVertex("name", "marko");
-    String id = graph.elementId(v);
-    List<Vertex> result = graph
-            .<Vertex>aql("RETURN DOCUMENT(@id)", Map.of("id", id))
-            .toList();
-```
-
-
-## Current limitations
-
-- This library implements Online Transactional Processing Graph Systems (OLTP) API only, the Online Analytics Processing
-  Graph Systems (OLAP) API is currently not implemented.
-- This library implements Structure API only, the Process API is currently not implemented. 
-  To improve query performance, it is currently recommended using [AQL queries](#aql-queries).
-
+## Using as plugin
+TODO
 
 ## Acknowledgments
 
-This repository is based on and extends the original work of the
-[arangodb-community/arangodb-tinkerpop-provider](https://github.com/arangodb-community/arangodb-tinkerpop-provider)
+This repository is based on and extends the original work of
+the [arangodb-community/arangodb-tinkerpop-provider](https://github.com/arangodb-community/arangodb-tinkerpop-provider)
 project.
 
 We gratefully acknowledge the efforts of [Horacio Hoyos Rodriguez](https://github.com/arcanefoam) and other contributors
