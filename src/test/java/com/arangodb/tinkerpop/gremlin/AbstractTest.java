@@ -55,7 +55,7 @@ public abstract class AbstractTest {
                 .user("root")
                 .password("test")
                 .protocol(Protocol.HTTP2_VPACK)
-                .database(dbName);
+                .db(dbName);
     }
 
     @SuppressWarnings("resource")

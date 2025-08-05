@@ -77,7 +77,7 @@ public class AqlTest extends AbstractGremlinTest {
 
     @Test
     public void shouldReadVertex() {
-        Vertex v = graph.addVertex("name", "marko");
+        Vertex v = graph.addVertex();
         List<Vertex> result = graph().<Vertex>aql(
                 "RETURN DOCUMENT(@id)",
                 Collections.singletonMap("id", graph().elementId(v))

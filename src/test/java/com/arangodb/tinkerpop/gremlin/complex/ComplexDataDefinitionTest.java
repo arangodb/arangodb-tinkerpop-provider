@@ -47,7 +47,7 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
     @Test
     public void complexGraphWithoutEdges() {
         Configuration conf = confBuilder()
-                .graph("foo")
+                .name("foo")
                 .orphanCollections("v")
                 .build();
         GraphEntity graphInfo = graphInfo(conf);
@@ -62,7 +62,7 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
     public void complexGraph() {
         String name = "complexGraph";
         Configuration conf = confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("e").from("v").to("v"))
                 .build();
         GraphEntity graphInfo = graphInfo(conf);
@@ -85,7 +85,7 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
     public void complexGraphWithOrphanCollections() {
         String name = "complexGraph";
         Configuration conf = confBuilder()
-                .graph(name)
+                .name(name)
                 .orphanCollections("a")
                 .edgeDefinitions(EdgeDef.of("e").from("v").to("v"))
                 .build();
@@ -111,7 +111,7 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
     public void complexGraphWithManyEdgesCollections() {
         String name = "complexGraph";
         Configuration conf = confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("e").from("v", "a").to("a", "v"))
                 .build();
         GraphEntity graphInfo = graphInfo(conf);
@@ -136,7 +136,7 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
     public void complexGraphWithManyEdgesCollectionsWithSameName() {
         String name = "complexGraph";
         Configuration conf = confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("e").from("v").to("v"))
                 .edgeDefinitions(EdgeDef.of("e").from("a").to("a"))
                 .build();
@@ -162,12 +162,12 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
     public void existingComplexGraphWithManyEdgesCollectionsWithSameNameInDifferentOrder() {
         String name = "complexGraph";
         graphInfo(confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("e").from("a").to("a"))
                 .edgeDefinitions(EdgeDef.of("e").from("v").to("v"))
                 .build());
         Configuration conf = confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("e").from("v").to("v"))
                 .edgeDefinitions(EdgeDef.of("e").from("a").to("a"))
                 .build();
@@ -192,7 +192,7 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
     @Test
     public void complexGraphWithInvalidName() {
         Configuration conf = confBuilder()
-                .graph("foo_bar")
+                .name("foo_bar")
                 .edgeDefinitions(EdgeDef.of("edge").from("vertex").to("vertex"))
                 .build();
         Throwable thrown = catchThrowable(() -> graphInfo(conf));
@@ -208,7 +208,7 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
     @Test
     public void complexGraphWithInvalidVertexName() {
         Configuration conf = confBuilder()
-                .graph("foo")
+                .name("foo")
                 .edgeDefinitions(EdgeDef.of("edge").from("foo_ver_tex").to("foo_vertex"))
                 .build();
         Throwable thrown = catchThrowable(() -> graphInfo(conf));
@@ -224,7 +224,7 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
     @Test
     public void complexGraphWithInvalidEdgeName() {
         Configuration conf = confBuilder()
-                .graph("foo")
+                .name("foo")
                 .edgeDefinitions(EdgeDef.of("foo_ed_ge").from("vertex").to("vertex"))
                 .build();
         Throwable thrown = catchThrowable(() -> graphInfo(conf));
@@ -241,7 +241,7 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
     public void existingComplexGraph() {
         String name = "existingComplexGraph";
         Configuration conf = confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("e").from("v").to("v"))
                 .build();
         graphInfo(conf);
@@ -265,12 +265,12 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
     public void existingComplexGraphWithMoreOrphanCollections() {
         String name = "existingComplexGraph";
         graphInfo(confBuilder()
-                .graph(name)
+                .name(name)
                 .orphanCollections("a")
                 .edgeDefinitions(EdgeDef.of("e").from("v").to("v"))
                 .build());
         Configuration conf = confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("e").from("v").to("v"))
                 .build();
         Throwable thrown = catchThrowable(() -> graphInfo(conf));
@@ -287,11 +287,11 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
     public void existingComplexGraphWithLessOrphanCollections() {
         String name = "existingComplexGraph";
         graphInfo(confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("e").from("v").to("v"))
                 .build());
         Configuration conf = confBuilder()
-                .graph(name)
+                .name(name)
                 .orphanCollections("a")
                 .edgeDefinitions(EdgeDef.of("e").from("v").to("v"))
                 .build();
@@ -309,12 +309,12 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
     public void existingComplexGraphWithMoreEdgeDefinitions() {
         String name = "existingComplexGraph";
         graphInfo(confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("x").from("a").to("b"))
                 .edgeDefinitions(EdgeDef.of("y").from("b").to("a"))
                 .build());
         Configuration conf = confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("x").from("a").to("b"))
                 .build();
         Throwable thrown = catchThrowable(() -> graphInfo(conf));
@@ -331,11 +331,11 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
     public void existingComplexGraphWithLessEdgeDefinitions() {
         String name = "existingComplexGraph";
         graphInfo(confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("x").from("a").to("b"))
                 .build());
         Configuration conf = confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("x").from("a").to("b"))
                 .edgeDefinitions(EdgeDef.of("y").from("b").to("a"))
                 .build();
@@ -353,11 +353,11 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
     public void existingComplexGraphWithMismatchingEdgeDefinitions() {
         String name = "existingComplexGraph";
         graphInfo(confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("x").from("a").to("b"))
                 .build());
         Configuration conf = confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("x").from("b").to("a"))
                 .build();
         Throwable thrown = catchThrowable(() -> graphInfo(conf));

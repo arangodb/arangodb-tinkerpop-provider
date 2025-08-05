@@ -16,13 +16,13 @@
 
 package org.example;
 
-import com.arangodb.ArangoDB;
-import com.arangodb.ArangoDatabase;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph;
 import com.arangodb.tinkerpop.gremlin.utils.ArangoDBConfigurationBuilder;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
+import org.apache.tinkerpop.gremlin.structure.Edge;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 import java.util.List;
 import java.util.Map;
@@ -44,27 +44,12 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Starting ArangoDB TinkerPop Demo with Air Routes Data");
 
-        //region cleanup
-        System.out.println("Cleaning up existing database:");
-        {
-            ArangoDatabase db = new ArangoDB.Builder()
-                    .host("172.28.0.1", 8529)
-                    .password("test")
-                    .build()
-                    .db(DB_NAME);
-            if (db.exists()) {
-                db.drop();
-            }
-            db.arango().shutdown();
-        }
-        //endregion
-
         // create Tinkerpop graph backed by ArangoDB
         Configuration conf = new ArangoDBConfigurationBuilder()
                 .hosts("172.28.0.1:8529")
                 .user("root")
                 .password("test")
-                .database(DB_NAME)
+                .db(DB_NAME)
                 .enableDataDefinition(true)
                 .build();
         ArangoDBGraph graph = ArangoDBGraph.open(conf);
@@ -74,15 +59,93 @@ public class Main {
         System.out.println("Graph Features:");
         System.out.println(graph.features());
 
-        // Import GraphML data
+        //region Import GraphML data
         System.out.println("\nImporting Air Routes data from GraphML file...");
         {
             g.io(Main.GRAPHML_FILE).read().iterate();
             System.out.println("Data import completed.");
         }
+        //endregion
 
-        //region Basic Gremlin Queries
-        System.out.println("\n=== Basic Gremlin Queries ===");
+        //region Basic Operations
+        System.out.println("\n=== Basic Operations ===");
+        {
+            // Add vertices
+            System.out.println("Adding vertices");
+            Vertex v1 = g.addV("person")
+                    .property("name", "marko")
+                    .property("age", 29)
+                    .next();
+            System.out.println("  added vertex: " + v1);
+
+            Vertex v2 = g.addV("software")
+                    .property("name", "lop")
+                    .property("lang", "java")
+                    .next();
+            System.out.println("  added vertex: " + v2);
+
+            // Add edges
+            System.out.println("Adding edges");
+            Edge e1 = g.addE("created")
+                    .from(v1)
+                    .to(v2)
+                    .property("year", 2025)
+                    .next();
+            System.out.println("  added edge: " + e1);
+
+            // Graph traversal
+            System.out.println("Find \"marko\" in the graph");
+            Vertex rv = g.V()
+                    .hasLabel("person")
+                    .has("name", "marko")
+                    .next();
+            System.out.println("  found vertex: " + rv);
+
+            System.out.println("Walk along the \"created\" edges to \"software\" vertices");
+            Edge re = g.V()
+                    .hasLabel("person")
+                    .has("name", "marko")
+                    .outE("created")
+                    .next();
+            System.out.println("  found edge: " + re);
+
+            rv = g.V()
+                    .hasLabel("person")
+                    .has("name", "marko")
+                    .outE("created")
+                    .inV()
+                    .next();
+            System.out.println("  found vertex: " + rv);
+
+            rv = g.V()
+                    .hasLabel("person")
+                    .has("name", "marko")
+                    .out("created")
+                    .next();
+            System.out.println("  found vertex: " + rv);
+
+            System.out.println("Select the \"name\" property of the \"software\" vertices");
+            String name = (String) g.V()
+                    .hasLabel("person")
+                    .has("name", "marko")
+                    .out("created")
+                    .values("name")
+                    .next();
+            System.out.println("  name: " + name);
+
+            System.out.println("Find \"marko\" in the graph using AQL");
+            String query = """
+                    FOR d IN tinkerpop_vertex
+                    FILTER d.name == @name
+                    RETURN d
+                    """;
+            rv = graph.<Vertex>aql(query, Map.of("name", "marko")).next();
+            System.out.println("  found vertex: " + rv);
+        }
+        //endregion
+
+        //region Simple Gremlin Queries
+        System.out.println("\n=== Simple Gremlin Queries ===");
         {
             System.out.println("Counting vertices and edges:");
             long vertexCount = g.V().count().next();
@@ -179,7 +242,7 @@ public class Main {
         System.out.println("\n=== AQL Queries ===");
         {
             // Find weighted k-shortest paths between two airports with an AQL query
-            System.out.println("\nFinding weighted k-shortest paths between Boston (BOS) and San Francisco (SFO) with AQL query:");
+            System.out.println("\nFinding weighted k-shortest paths between Boston (BOS) and Atlanta (ATL) with AQL query:");
 
             String shortestPathQuery = """
                     LET start = FIRST(
@@ -205,7 +268,7 @@ public class Main {
 
             graph.<Map<String, ?>>aql(shortestPathQuery, Map.of(
                     "start", "BOS",
-                    "target", "SFO"
+                    "target", "ATL"
             )).forEachRemaining(path ->
                     System.out.println("  Path (dist: " + path.get("dist") + "): \t" + path.get("path")));
 
