@@ -54,7 +54,7 @@ TODO
 
 Here's a simple example to get you started:
 
-```
+```java
 // Create a configuration
 Configuration conf = new ArangoDBConfigurationBuilder()
                 .hosts("localhost:8529")
@@ -268,7 +268,7 @@ If no `edgeDefinitions` are not configured, the default names will be used:
 
 Using a `SIMPLE` graph configured as in the example above and creating a new element like:
 
-```
+```java
 graph.addVertex("person", T.id, "foo");
 ```
 
@@ -310,7 +310,7 @@ gremlin:
 
 Using a `SIMPLE` graph configured as in the example above and creating a new element like:
 
-```
+```java
 graph.addVertex("person", T.id, "foo");
 ```
 
@@ -347,7 +347,7 @@ Each vertex document contains:
 
 For example, the following java code:
 
-```
+```java
 graph
         .addVertex("person")
         .property("name", "Freddie Mercury")
@@ -384,7 +384,7 @@ Each edge document contains:
 
 For example, the following java code:
 
-```
+```java
 Vertex v = graph.addVertex("person");
 v.addEdge("knows", v)
         .property("since", 1970);
@@ -408,7 +408,7 @@ creates a document like this:
 
 Construct the graph:
 
-```
+```java
 ArangoDBGraph graph = ArangoDBGraph.open(conf);
 GraphTraversalSource g = graph.traversal();
 ```
@@ -457,7 +457,7 @@ List<String> aliceSoftware = g.V()
 
 ### Updating Properties
 
-```
+```java
 // Update a property
 g.V()
     .hasLabel("person")
@@ -476,7 +476,7 @@ g.V()
 
 ### Removing Elements
 
-```
+```java
 // Remove an edge
 g.E()
     .hasLabel("created")
@@ -528,7 +528,7 @@ List<Vertex> result = graph
 
 This library supports the following features:
 
-```
+```text
 > GraphFeatures
 >-- Computer: false
 >-- Persistence: true
