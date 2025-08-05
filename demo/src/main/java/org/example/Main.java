@@ -59,6 +59,14 @@ public class Main {
         System.out.println("Graph Features:");
         System.out.println(graph.features());
 
+        //region Import GraphML data
+        System.out.println("\nImporting Air Routes data from GraphML file...");
+        {
+            g.io(Main.GRAPHML_FILE).read().iterate();
+            System.out.println("Data import completed.");
+        }
+        //endregion
+
         //region Basic Operations
         System.out.println("\n=== Basic Operations ===");
         {
@@ -133,14 +141,6 @@ public class Main {
                     """;
             rv = graph.<Vertex>aql(query, Map.of("name", "marko")).next();
             System.out.println("  found vertex: " + rv);
-        }
-        //endregion
-
-        //region Import GraphML data
-        System.out.println("\nImporting Air Routes data from GraphML file...");
-        {
-            g.io(Main.GRAPHML_FILE).read().iterate();
-            System.out.println("Data import completed.");
         }
         //endregion
 

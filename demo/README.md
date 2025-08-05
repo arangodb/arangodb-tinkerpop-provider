@@ -98,6 +98,27 @@ FEATURES
 (output truncated)
 ```
 
+
+### Import GraphML Data
+
+Next, we import air routes data from a local GraphML file:
+
+[//]: <> (@formatter:off)
+```java
+private static final String GRAPHML_FILE = "src/main/resources/air-routes-small.graphml";
+
+// ...
+
+// Import GraphML data
+System.out.println("\nImporting Air Routes data from GraphML file...");
+{
+    g.io(Main.GRAPHML_FILE).read().iterate();
+    System.out.println("Data import completed.");
+}
+```
+[//]: <> (@formatter:on)
+
+
 ### Basic Operations
 
 Using the Gremlin API, we can create vertices, edges and perform basic queries:
@@ -202,24 +223,6 @@ Find "marko" in the graph using AQL
   found vertex: v[63748]
 ```
 
-### Import GraphML Data
-
-Next, we import air routes data from a local GraphML file:
-
-[//]: <> (@formatter:off)
-```java
-private static final String GRAPHML_FILE = "src/main/resources/air-routes-small.graphml";
-
-// ...
-
-// Import GraphML data
-System.out.println("\nImporting Air Routes data from GraphML file...");
-{
-    g.io(Main.GRAPHML_FILE).read().iterate();
-    System.out.println("Data import completed.");
-}
-```
-[//]: <> (@formatter:on)
 
 ### Basic Gremlin Queries
 
