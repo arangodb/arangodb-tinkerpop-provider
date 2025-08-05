@@ -29,7 +29,7 @@ public class DataDefinitionTest extends AbstractTest {
     public void shouldCreateGraph() {
         ArangoDBGraph g = createGraph(confBuilder()
                 .enableDataDefinition(true)
-                .graph("foo")
+                .name("foo")
                 .build());
         assertThat(g.name()).isEqualTo("foo");
     }
@@ -38,7 +38,7 @@ public class DataDefinitionTest extends AbstractTest {
     public void shouldNotCreateGraphIfDataDefinitionDisabled() {
         Throwable thrown = catchThrowable(() -> createGraph(confBuilder()
                 .enableDataDefinition(false)
-                .graph("foo")
+                .name("foo")
                 .build()));
         assertThat(thrown.getCause().getCause())
                 .isInstanceOf(IllegalStateException.class)

@@ -16,8 +16,6 @@
 
 package org.example;
 
-import com.arangodb.ArangoDB;
-import com.arangodb.ArangoDatabase;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph;
 import com.arangodb.tinkerpop.gremlin.utils.ArangoDBConfigurationBuilder;
 import org.apache.commons.configuration2.Configuration;
@@ -44,27 +42,12 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Starting ArangoDB TinkerPop Demo with Air Routes Data");
 
-        //region cleanup
-        System.out.println("Cleaning up existing database:");
-        {
-            ArangoDatabase db = new ArangoDB.Builder()
-                    .host("172.28.0.1", 8529)
-                    .password("test")
-                    .build()
-                    .db(DB_NAME);
-            if (db.exists()) {
-                db.drop();
-            }
-            db.arango().shutdown();
-        }
-        //endregion
-
         // create Tinkerpop graph backed by ArangoDB
         Configuration conf = new ArangoDBConfigurationBuilder()
                 .hosts("172.28.0.1:8529")
                 .user("root")
                 .password("test")
-                .database(DB_NAME)
+                .db(DB_NAME)
                 .enableDataDefinition(true)
                 .build();
         ArangoDBGraph graph = ArangoDBGraph.open(conf);

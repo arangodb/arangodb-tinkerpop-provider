@@ -49,7 +49,7 @@ public abstract class TestGraphProvider extends AbstractGraphProvider {
                 .user("root")
                 .password("test")
                 .protocol(Protocol.HTTP2_VPACK)
-                .database(dbName);
+                .db(dbName);
         customizeBuilder(builder);
         return builder;
     }
@@ -59,7 +59,7 @@ public abstract class TestGraphProvider extends AbstractGraphProvider {
                                                final String testMethodName,
                                                final Map<String, Object> configurationOverrides,
                                                final LoadGraphWith.GraphData loadGraphWith) {
-        ArangoDBConfigurationBuilder builder = confBuilder().graph(graphName);
+        ArangoDBConfigurationBuilder builder = confBuilder().name(graphName);
         configureDataDefinitions(builder, test, testMethodName, loadGraphWith);
         return builder.build();
     }

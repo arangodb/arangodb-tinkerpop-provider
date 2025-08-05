@@ -80,7 +80,7 @@ public class ArangoDBConfigurationBuilder {
      * @param name the db name
      * @return this
      */
-    public ArangoDBConfigurationBuilder database(String name) {
+    public ArangoDBConfigurationBuilder db(String name) {
         return setProperty(KEY_DB_NAME, name);
     }
 
@@ -90,7 +90,7 @@ public class ArangoDBConfigurationBuilder {
      * @param name the graph name
      * @return this
      */
-    public ArangoDBConfigurationBuilder graph(String name) {
+    public ArangoDBConfigurationBuilder name(String name) {
         return setProperty(KEY_GRAPH_NAME, name);
     }
 

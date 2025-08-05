@@ -52,7 +52,7 @@ public class SimpleDataDefinitionTest extends DataDefinitionTest {
     @Test
     public void simpleGraphWithNonDefaultCollections() {
         Configuration conf = confBuilder()
-                .graph("foo")
+                .name("foo")
                 .edgeDefinitions(EdgeDef.of("edges").from("vertexes").to("vertexes"))
                 .build();
         GraphEntity graphInfo = graphInfo(conf);
@@ -74,7 +74,7 @@ public class SimpleDataDefinitionTest extends DataDefinitionTest {
     @Test
     public void simpleGraphWithInvalidVertexName() {
         Configuration conf = confBuilder()
-                .graph("foo")
+                .name("foo")
                 .edgeDefinitions(EdgeDef.of("edge").from("foo_ver_tex").to("foo_vertex"))
                 .build();
         Throwable thrown = catchThrowable(() -> graphInfo(conf));
@@ -90,7 +90,7 @@ public class SimpleDataDefinitionTest extends DataDefinitionTest {
     @Test
     public void simpleGraphWithInvalidEdgeName() {
         Configuration conf = confBuilder()
-                .graph("foo")
+                .name("foo")
                 .edgeDefinitions(EdgeDef.of("foo_ed_ge").from("vertex").to("vertex"))
                 .build();
         Throwable thrown = catchThrowable(() -> graphInfo(conf));
@@ -107,7 +107,7 @@ public class SimpleDataDefinitionTest extends DataDefinitionTest {
     public void existingSimpleGraph() {
         String name = "existingSimpleGraph";
         Configuration conf = confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("e").from("v").to("v"))
                 .build();
         graphInfo(conf);
@@ -132,12 +132,12 @@ public class SimpleDataDefinitionTest extends DataDefinitionTest {
         String name = "existingSimpleGraph";
         graphInfo(confBuilder()
                 .graphType(ArangoDBGraphConfig.GraphType.COMPLEX)
-                .graph(name)
+                .name(name)
                 .orphanCollections("a")
                 .edgeDefinitions(EdgeDef.of("e").from("v").to("v"))
                 .build());
         Configuration conf = confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("e").from("v").to("v"))
                 .build();
         Throwable thrown = catchThrowable(() -> graphInfo(conf));
@@ -155,10 +155,10 @@ public class SimpleDataDefinitionTest extends DataDefinitionTest {
         String name = "existingSimpleGraph";
         graphInfo(confBuilder()
                 .graphType(ArangoDBGraphConfig.GraphType.COMPLEX)
-                .graph(name)
+                .name(name)
                 .build());
         Configuration conf = confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("e").from("v").to("v"))
                 .build();
         Throwable thrown = catchThrowable(() -> graphInfo(conf));
@@ -176,12 +176,12 @@ public class SimpleDataDefinitionTest extends DataDefinitionTest {
         String name = "existingSimpleGraph";
         graphInfo(confBuilder()
                 .graphType(ArangoDBGraphConfig.GraphType.COMPLEX)
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("x").from("a").to("a"))
                 .edgeDefinitions(EdgeDef.of("y").from("a").to("a"))
                 .build());
         Configuration conf = confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("x").from("a").to("a"))
                 .build();
         Throwable thrown = catchThrowable(() -> graphInfo(conf));
@@ -199,11 +199,11 @@ public class SimpleDataDefinitionTest extends DataDefinitionTest {
         String name = "existingSimpleGraph";
         graphInfo(confBuilder()
                 .graphType(ArangoDBGraphConfig.GraphType.COMPLEX)
-                .graph(name)
+                .name(name)
                 .orphanCollections("a")
                 .build());
         Configuration conf = confBuilder()
-                .graph(name)
+                .name(name)
                 .edgeDefinitions(EdgeDef.of("x").from("a").to("a"))
                 .build();
         Throwable thrown = catchThrowable(() -> graphInfo(conf));

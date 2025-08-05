@@ -1,0 +1,22 @@
+gremlin:
+  graph: "com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph"
+  arangodb:
+    conf:
+      graph:
+        db: "example"
+        name: "yamlConfig"
+        type: COMPLEX
+        enableDataDefinition: true
+        orphanCollections: [ "x", "y", "z" ]
+        edgeDefinitions:
+          - "e1:[a]->[b]"
+          - "e2:[a,b]->[c,d]"
+      driver:
+        user: "root"
+        password: "test"
+        hosts:
+          - "172.28.0.1:8529"
+          - "172.28.0.1:8539"
+          - "172.28.0.1:8549"
+        acquireHostList: true
+        protocol: HTTP2_VPACK
