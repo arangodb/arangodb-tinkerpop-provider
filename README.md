@@ -2,12 +2,18 @@
 
 # ArangoDB TinkerPop Provider
 
-An implementation of the [Apache TinkerPop OLTP Provider](https://tinkerpop.apache.org/docs/3.7.3/dev/provider) API for
+ArangoDB TinkerPop Provider is an implementation of the [Apache TinkerPop OLTP Provider](https://tinkerpop.apache.org/docs/3.7.3/dev/provider) API for
 ArangoDB.
 
-This provider allows using the standard TinkerPop API with ArangoDB as the backend storage. It supports creating,
+It allows using the standard TinkerPop API with ArangoDB as the backend storage. It supports creating,
 querying, and manipulating graph data using the Gremlin traversal language, while offering the possibility to use native
 AQL (ArangoDB Query Language) for complex queries.
+
+- Repository: <https://github.com/arangodb/arangodb-tinkerpop-provider>
+- [Code examples](https://github.com/arangodb/arangodb-tinkerpop-provider/tree/main/src/test/java/example)
+- [Demo](https://github.com/arangodb/arangodb-tinkerpop-provider/tree/main/demo)
+- [JavaDoc](https://www.javadoc.io/doc/com.arangodb/arangodb-tinkerpop-provider/latest/index.html) (generated reference documentation)
+- [ChangeLog](https://github.com/arangodb/arangodb-tinkerpop-provider/blob/main/CHANGELOG.md)
 
 ## Compatibility
 
@@ -350,9 +356,9 @@ edge definitions. It has the following advantages:
 But on the other side has the following constraints:
 
 - Element IDs must have the format: `<graph>_<label>/<key>`, where:
-    - `<graph>` is the graph name
-    - `<label>` is the element label
-    - `<key>` is the database document key
+  - `<graph>` is the graph name
+  - `<label>` is the element label
+  - `<key>` is the database document key
 - Only labels corresponding to graph collections can be used
 
 Example configuration:
@@ -388,9 +394,9 @@ When using the ArangoDB TinkerPop Provider, be aware of these naming constraints
 - Element IDs must be strings
 - The underscore character (`_`) is used as a separator for collection names (e.g., `myGraph_myCol`). Therefore, it
   cannot be used in:
-    - Graph name (`gremlin.arangodb.conf.graph.name`)
-    - Labels
-    - Element IDs
+  - Graph name (`gremlin.arangodb.conf.graph.name`)
+  - Labels
+  - Element IDs
 
 ## Persistent Structure
 
@@ -493,15 +499,15 @@ For complex queries or performance-critical operations, you can use ArangoDB's n
 [//]: <> (@formatter:off)
 ```java
 List<Vertex> alice = graph
-    .<Vertex>aql("FOR v IN graph_vertex FILTER v.name == @name RETURN v", Map.of("name", "Alice"))
-    .toList();
+        .<Vertex>aql("FOR v IN graph_vertex FILTER v.name == @name RETURN v", Map.of("name", "Alice"))
+        .toList();
 
 // Query using document ID
 Vertex v = graph.addVertex("name", "marko");
 String id = graph.elementId(v);
 List<Vertex> result = graph
-    .<Vertex>aql("RETURN DOCUMENT(@id)", Map.of("id", id))
-    .toList();
+        .<Vertex>aql("RETURN DOCUMENT(@id)", Map.of("id", id))
+        .toList();
 ```
 [//]: <> (@formatter:on)
 
