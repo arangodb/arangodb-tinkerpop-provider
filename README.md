@@ -45,15 +45,18 @@ implementation 'com.arangodb:arangodb-tinkerpop-provider:x.y.z'
 ```
 
 ### Gremlin Console
-TODO
+
+TODO (DE-1062)
 
 ### Server Plugin
-TODO
+
+TODO (DE-1061)
 
 ## Quick Start
 
 Here's a simple example to get you started:
 
+[//]: <> (@formatter:off)
 ```java
 // Create a configuration
 Configuration conf = new ArangoDBConfigurationBuilder()
@@ -101,6 +104,7 @@ System.out.println("Creators: " + creators);
 // Close the graph when done
 graph.close();
 ```
+[//]: <> (@formatter:on)
 
 ## Configuration
 
@@ -160,14 +164,17 @@ gremlin:
 
 Loading from a YAML file:
 
+[//]: <> (@formatter:off)
 ```java
 ArangoDBGraph graph = (ArangoDBGraph) GraphFactory.open("<path_to_yaml_file>");
 ```
+[//]: <> (@formatter:on)
 
 ### Programmatic Configuration
 
 Using the configuration builder:
 
+[//]: <> (@formatter:off)
 ```java
 Configuration conf = new ArangoDBConfigurationBuilder()
         .hosts("172.28.0.1:8529")
@@ -181,6 +188,7 @@ Configuration conf = new ArangoDBConfigurationBuilder()
 
 ArangoDBGraph graph = (ArangoDBGraph) GraphFactory.open(conf);
 ```
+[//]: <> (@formatter:on)
 
 ### SSL Configuration
 
@@ -230,7 +238,7 @@ The ArangoDB TinkerPop Provider supports two graph types, which can be configure
 
 ### SIMPLE Graph Type
 
-From an application perspective, this is the most flexible graph type that is backed by 
+From an application perspective, this is the most flexible graph type that is backed by
 an ArangoDB graph composed of only 1 vertex collection and 1 edge definition.
 
 It has the following advantages:
@@ -263,16 +271,19 @@ gremlin:
 ```
 
 If no `edgeDefinitions` are not configured, the default names will be used:
+
 - `<graphName>_vertex` will be used for the vertex collection
 - `<graphName>_edge` will be used for the edge collection
 
 Using a `SIMPLE` graph configured as in the example above and creating a new element like:
 
+[//]: <> (@formatter:off)
 ```java
 graph.addVertex("person", T.id, "foo");
 ```
+[//]: <> (@formatter:on)
 
-would result in creating a document in the vertex collection `myGraph_v` with `_id` equals to `myGraph_v/foo`. 
+would result in creating a document in the vertex collection `myGraph_v` with `_id` equals to `myGraph_v/foo`.
 
 ### COMPLEX Graph Type
 
@@ -285,7 +296,7 @@ edge definitions. It has the following advantages:
 - it can match any pre-existing database graph structure
 
 but on the other side has the following constraints:
- 
+
 - Element IDs must have the format: `<graph>_<label>/<key>`, where:
     - `<graph>` is the graph name
     - `<label>` is the element label
@@ -310,12 +321,13 @@ gremlin:
 
 Using a `SIMPLE` graph configured as in the example above and creating a new element like:
 
+[//]: <> (@formatter:off)
 ```java
 graph.addVertex("person", T.id, "foo");
 ```
+[//]: <> (@formatter:on)
 
 would result in creating a document in the vertex collection `myGraph_person` with `_id` equals to `myGraph_person/foo`.
-
 
 ## Naming Constraints
 
@@ -326,7 +338,7 @@ When using the ArangoDB TinkerPop Provider, be aware of these naming constraints
   cannot be used in:
     - graph name (`gremlin.arangodb.conf.graph.name`)
     - labels
-    - element IDs 
+    - element IDs
 
 ## Persistent Structure
 
@@ -347,12 +359,14 @@ Each vertex document contains:
 
 For example, the following java code:
 
+[//]: <> (@formatter:off)
 ```java
 graph
         .addVertex("person")
         .property("name", "Freddie Mercury")
         .property("since", 1970);
 ```
+[//]: <> (@formatter:on)
 
 creates a document like this:
 
@@ -384,11 +398,13 @@ Each edge document contains:
 
 For example, the following java code:
 
+[//]: <> (@formatter:off)
 ```java
 Vertex v = graph.addVertex("person");
 v.addEdge("knows", v)
         .property("since", 1970);
 ```
+[//]: <> (@formatter:on)
 
 creates a document like this:
 
@@ -408,13 +424,16 @@ creates a document like this:
 
 Construct the graph:
 
+[//]: <> (@formatter:off)
 ```java
 ArangoDBGraph graph = ArangoDBGraph.open(conf);
 GraphTraversalSource g = graph.traversal();
 ```
+[//]: <> (@formatter:on)
 
 ### Adding Vertices and Edges
 
+[//]: <> (@formatter:off)
 ```java
 // Add vertices
 Vertex person = g.addV("person")
@@ -434,9 +453,11 @@ Edge created = g.addE("created")
         .property("since", 2023)
         .next();
 ```
+[//]: <> (@formatter:on)
 
 ### Querying Vertices and Edges
 
+[//]: <> (@formatter:off)
 ```java
 // Find all people who created software
 List<String> creators = g.V()
@@ -454,9 +475,11 @@ List<String> aliceSoftware = g.V()
         .<String>values("name")
         .toList();
 ```
+[//]: <> (@formatter:on)
 
 ### Updating Properties
 
+[//]: <> (@formatter:off)
 ```java
 // Update a property
 g.V()
@@ -473,9 +496,11 @@ g.V()
     .drop()
     .iterate();
 ```
+[//]: <> (@formatter:on)
 
 ### Removing Elements
 
+[//]: <> (@formatter:off)
 ```java
 // Remove an edge
 g.E()
@@ -494,16 +519,19 @@ g.V()
     .drop()
     .iterate();
 ```
+[//]: <> (@formatter:on)
 
 ### Element IDs
 
-Given a Gremlin element, you can get the corresponding ArangoDB document ID (`_id` field) using the 
+Given a Gremlin element, you can get the corresponding ArangoDB document ID (`_id` field) using the
 `ArangoDBGraph.elementId(Element)` method:
 
+[//]: <> (@formatter:off)
 ```java
 Vertex v = graph.addVertex("name", "marko");
 String id = graph.elementId(v);
 ```
+[//]: <> (@formatter:on)
 
 This is useful when you need to reference the element directly in AQL queries.
 
@@ -511,6 +539,7 @@ This is useful when you need to reference the element directly in AQL queries.
 
 For complex queries or performance-critical operations, you can use ArangoDB's native query language (AQL) directly:
 
+[//]: <> (@formatter:off)
 ```java
 List<Vertex> alice = graph
     .<Vertex>aql("FOR v IN graph_vertex FILTER v.name == @name RETURN v", Map.of("name", "Alice"))
@@ -523,6 +552,7 @@ List<Vertex> result = graph
     .<Vertex>aql("RETURN DOCUMENT(@id)", Map.of("id", id))
     .toList();
 ```
+[//]: <> (@formatter:on)
 
 ## Supported Features
 
@@ -638,11 +668,10 @@ This library supports the following features:
 >-- StringArrayValues: true
 ```
 
-
 ### Logging
 
 The library uses `slf4j` API for logging.
-To log requests and responses to and from the database, enable `DEBUG` log level for the logger 
+To log requests and responses to and from the database, enable `DEBUG` log level for the logger
 `com.arangodb.internal.net.Communication`.
 
 ## Current Limitations
@@ -659,11 +688,6 @@ The [demo](./demo) project contains comprehensive usage examples of this library
 For additional examples, check
 the [Gremlin tutorial](https://tinkerpop.apache.org/docs/3.7.3/tutorials/getting-started/).
 
-## Using from Gremlin Console
-TODO
-
-## Using as plugin
-TODO
 
 ## Acknowledgments
 

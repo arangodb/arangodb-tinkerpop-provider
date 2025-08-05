@@ -1,12 +1,13 @@
 # ArangoDB TinkerPop Provider Demo
 
-The ArangoDB TinkerPop Provider allows you to leverage the power of the Gremlin graph traversal language while using 
+The ArangoDB TinkerPop Provider allows you to leverage the power of the Gremlin graph traversal language while using
 ArangoDB as the underlying storage engine.
-This demo shows how to set up a simple graph using a small air routes dataset and perform various queries. 
+This demo shows how to set up a simple graph using a small air routes dataset and perform various queries.
 
 ## Requirements
 
 This demo requires:
+
 - JDK 17 or higher
 - `maven`
 - `docker`
@@ -42,8 +43,10 @@ mvn exec:java -Dexec.mainClass="org.example.Main"
 
 ### Create a TinkerPop Graph
 
-We create a TinkerPop graph backed by ArangoDB using the `ArangoDBConfigurationBuilder` to set up the connection parameters:
+We create a TinkerPop graph backed by ArangoDB using the `ArangoDBConfigurationBuilder` to set up the connection
+parameters:
 
+[//]: <> (@formatter:off)
 ```java
 // create Tinkerpop graph backed by ArangoDB
 Configuration conf = new ArangoDBConfigurationBuilder() (1)
@@ -56,8 +59,10 @@ Configuration conf = new ArangoDBConfigurationBuilder() (1)
 ArangoDBGraph graph = ArangoDBGraph.open(conf);         (4)
 GraphTraversalSource g = graph.traversal();             (5)
 ```
+[//]: <> (@formatter:on)
 
 This code:
+
 1. Creates a configuration using `ArangoDBConfigurationBuilder`
 2. Specifies the ArangoDB host, user credentials and database name
 3. Enables data definition (enables creating database and graph definition)
@@ -68,13 +73,16 @@ This code:
 
 We can check the supported features of the ArangoDB TinkerPop implementation:
 
+[//]: <> (@formatter:off)
 ```java
 // print supported features
 System.out.println("Graph Features:");
 System.out.println(graph.features());
 ```
+[//]: <> (@formatter:on)
 
 **Console Output:**
+
 ```
 Graph Features:
 FEATURES
@@ -94,6 +102,7 @@ FEATURES
 
 Using the Gremlin API, we can create vertices, edges and perform basic queries:
 
+[//]: <> (@formatter:off)
 ```java
 System.out.println("\n=== Basic Operations ===");
 {
@@ -170,8 +179,10 @@ System.out.println("\n=== Basic Operations ===");
     System.out.println("  found vertex: " + rv);
 }
 ```
+[//]: <> (@formatter:on)
 
 **Console Output:**
+
 ```
 === Basic Operations ===
 Adding vertices
@@ -195,6 +206,7 @@ Find "marko" in the graph using AQL
 
 Next, we import air routes data from a local GraphML file:
 
+[//]: <> (@formatter:off)
 ```java
 private static final String GRAPHML_FILE = "src/main/resources/air-routes-small.graphml";
 
@@ -207,11 +219,13 @@ System.out.println("\nImporting Air Routes data from GraphML file...");
     System.out.println("Data import completed.");
 }
 ```
+[//]: <> (@formatter:on)
 
 ### Basic Gremlin Queries
 
 After importing the data, we can run some basic Gremlin queries to explore the graph.
 
+[//]: <> (@formatter:off)
 ```java
 //region Basic Gremlin Queries
 System.out.println("\n=== Basic Gremlin Queries ===");
@@ -242,13 +256,16 @@ System.out.println("\n=== Basic Gremlin Queries ===");
 }
 //endregion
 ```
+[//]: <> (@formatter:on)
 
 This section:
+
 1. Counts the number of vertices and edges in the graph
 2. Lists all vertex and edge labels
 3. Shows a sample of 5 vertices and 5 edges with their properties
 
 **Console Output:**
+
 ```
 === Basic Gremlin Queries ===
 Counting vertices and edges:
@@ -280,6 +297,7 @@ Sample of 5 routes:
 
 The demo then explores the graph:
 
+[//]: <> (@formatter:off)
 ```java
 //region Explore airports and routes
 System.out.println("\n=== Exploring Airports and Routes ===");
@@ -308,12 +326,15 @@ System.out.println("\n=== Exploring Airports and Routes ===");
 }
 //endregion
 ```
+[//]: <> (@formatter:on)
 
 This section:
+
 1. Groups airports by region and counts them, showing the top 5 regions with the most airports
 2. Finds the top 5 airports with the most outgoing routes
 
 **Console Output:**
+
 ```
 === Exploring Airports and Routes ===
 
@@ -336,6 +357,7 @@ Top 5 airports with most outgoing routes:
 
 Next, the demo demonstrates some graph algorithms using Gremlin.
 
+[//]: <> (@formatter:off)
 ```java
 //region Graph Algorithms
 System.out.println("\n=== Graph Algorithms ===");
@@ -377,13 +399,16 @@ System.out.println("\n=== Graph Algorithms ===");
 }
 //endregion
 ```
+[//]: <> (@formatter:on)
 
 This section:
+
 1. Calculates the degree centrality to find the most connected airports
 2. Finds the shortest paths between Boston (BOS) and Atlanta (ATL)
 3. Counts all airports reachable within 2 hops from Long Beach (LGB)
 
 **Console Output:**
+
 ```
 === Graph Algorithms ===
 
@@ -409,6 +434,7 @@ Count of the airports reachable within 2 hops from Long Beach (LGB):
 
 Furthermore, we can execute native AQL queries alongside Gremlin.
 
+[//]: <> (@formatter:off)
 ```java
 //region AQL Queries
 System.out.println("\n=== AQL Queries ===");
@@ -487,12 +513,16 @@ System.out.println("\n=== AQL Queries ===");
 }
 //endregion
 ```
+[//]: <> (@formatter:on)
 
 This section:
+
 1. Executes an AQL query to find weighted k-shortest paths between Boston and San Francisco
-2. Executes an AQL query to find paths between Boston and Atlanta with a constraint that each flight must be at most 400 km
+2. Executes an AQL query to find paths between Boston and Atlanta with a constraint that each flight must be at most 400
+   km
 
 **Console Output:**
+
 ```
 === AQL Queries ===
 
@@ -515,6 +545,8 @@ Finding path between Boston (BOS) and Atlanta (ATL) with max 400 km flights with
 
 Finally, we can close the graph connection:
 
+[//]: <> (@formatter:off)
 ```java
 graph.close();
 ```
+[//]: <> (@formatter:on)
