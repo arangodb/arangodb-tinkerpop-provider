@@ -2,12 +2,12 @@
 
 # ArangoDB TinkerPop Provider
 
-An implementation of
-the [Apache TinkerPop OLTP Provider](https://tinkerpop.apache.org/docs/3.7.3/dev/provider) API for ArangoDB.
+An implementation of the [Apache TinkerPop OLTP Provider](https://tinkerpop.apache.org/docs/3.7.3/dev/provider) API for
+ArangoDB.
 
-This provider allows using the standard TinkerPop API with ArangoDB as the backend storage.
-It supports creating, querying, and manipulating graph data using the Gremlin traversal language, while offering the
-possibility to use native AQL (ArangoDB Query Language) for complex queries.
+This provider allows using the standard TinkerPop API with ArangoDB as the backend storage. It supports creating,
+querying, and manipulating graph data using the Gremlin traversal language, while offering the possibility to use native
+AQL (ArangoDB Query Language) for complex queries.
 
 ## Compatibility
 
@@ -159,9 +159,9 @@ graph.close();
 
 ## Configuration
 
-The graph can be created using the methods from `org.apache.tinkerpop.gremlin.structure.util.GraphFactory.open(...)` (
+The graph can be created using the methods from `org.apache.tinkerpop.gremlin.structure.util.GraphFactory.open(...)`(
 see [javadoc](https://tinkerpop.apache.org/javadocs/3.7.3/full/org/apache/tinkerpop/gremlin/structure/util/GraphFactory.html)).
-These methods accept a configuration file (e.g. YAML or properties file), a Java Map, or an Apache Commons
+These methods accept a configuration file (e.g., YAML or properties file), a Java Map, or an Apache Commons
 Configuration object.
 
 The property `gremlin.graph` must be set to: `com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph`.
@@ -245,7 +245,7 @@ ArangoDBGraph graph = (ArangoDBGraph) GraphFactory.open(conf);
 
 To use TLS-secured connections to ArangoDB, set `gremlin.arangodb.conf.driver.useSsl` to `true` and configure other
 SSL-related properties as needed (see related
-[documentation](https://docs.arangodb.com/stable/develop/drivers/java/reference-version-7/driver-setup/#config-file-properties):
+[documentation](https://docs.arangodb.com/stable/develop/drivers/java/reference-version-7/driver-setup/#config-file-properties)):
 
 ```yaml
 gremlin:
@@ -289,22 +289,22 @@ The ArangoDB TinkerPop Provider supports two graph types, which can be configure
 
 ### SIMPLE Graph Type
 
-From an application perspective, this is the most flexible graph type that is backed by
-an ArangoDB graph composed of only 1 vertex collection and 1 edge definition.
+From an application perspective, this is the most flexible graph type that is backed by an ArangoDB graph composed of
+only 1 vertex collection and 1 edge definition.
 
 It has the following advantages:
 
-- it closely matches the Tinkerpop property graph
-- it is simpler to getting started and run examples
-- it imposes no restrictions about element IDs
-- it supports arbitrary labels, i.e. labels not known at graph construction time
+- It closely matches the Tinkerpop property graph
+- It is simpler to get started and run examples
+- It imposes no restrictions about element IDs
+- It supports arbitrary labels, i.e., labels not known at graph construction time
 
 It has the following disadvantages:
 
-- all vertex types will be stored in the same db collection
-- all edges types will be stored in the same db collection
-- it could not leverage the full potential of ArangoDB graph traversal
-- it could require index on `_label` field to improve performances
+- All vertex types will be stored in the same vertex collection
+- All edge types will be stored in the same edge collection
+- It could not leverage the full potential of ArangoDB graph traversal
+- It could require an index on the `_label` field to improve performance
 
 Example configuration:
 
@@ -321,7 +321,7 @@ gremlin:
           - "e:[v]->[v]"
 ```
 
-If no `edgeDefinitions` are not configured, the default names will be used:
+If `edgeDefinitions` are not configured, the default names will be used:
 
 - `<graphName>_vertex` will be used for the vertex collection
 - `<graphName>_edge` will be used for the edge collection
@@ -341,18 +341,19 @@ would result in creating a document in the vertex collection `myGraph_v` with `_
 The `COMPLEX` graph type is backed by an ArangoDB graph composed potentially of multiple vertex collections and multiple
 edge definitions. It has the following advantages:
 
-- it closely matches the ArangoDB graph structure
-- it allows multiple vertex collections and multiple edge collections
-- it offers the best performances for graph traversals
-- it can match any pre-existing database graph structure
+- It closely matches the ArangoDB graph structure
+- It allows multiple vertex collections and multiple edge collections
+- It partitions the data in a finer way
+- It allows indexing and sharding collections independently
+- It can match pre-existing database graph structures
 
-but on the other side has the following constraints:
+But on the other side has the following constraints:
 
 - Element IDs must have the format: `<graph>_<label>/<key>`, where:
     - `<graph>` is the graph name
     - `<label>` is the element label
     - `<key>` is the database document key
-- only labels corresponding to graph collections can be used
+- Only labels corresponding to graph collections can be used
 
 Example configuration:
 
@@ -370,7 +371,7 @@ gremlin:
           - "created:[person]->[game,software]"
 ```
 
-Using a `SIMPLE` graph configured as in the example above and creating a new element like:
+Using a `COMPLEX` graph configured as in the example above and creating a new element like:
 
 [//]: <> (@formatter:off)
 ```java
@@ -387,9 +388,9 @@ When using the ArangoDB TinkerPop Provider, be aware of these naming constraints
 - Element IDs must be strings
 - The underscore character (`_`) is used as a separator for collection names (e.g., `myGraph_myCol`). Therefore, it
   cannot be used in:
-    - graph name (`gremlin.arangodb.conf.graph.name`)
-    - labels
-    - element IDs
+    - Graph name (`gremlin.arangodb.conf.graph.name`)
+    - Labels
+    - Element IDs
 
 ## Persistent Structure
 
@@ -403,12 +404,12 @@ collection named `<graphName>_vertex`. In a `COMPLEX` graph, vertices are stored
 
 Each vertex document contains:
 
-- standard ArangoDB fields (`_id`, `_key`, `_rev`)
-- the field `_label`
-- vertex properties as document fields
-- meta-properties nested in the nested map `_meta`
+- Standard ArangoDB fields (`_id`, `_key`, `_rev`)
+- The field `_label`
+- Vertex properties as document fields
+- Meta-properties nested in the nested map `_meta`
 
-For example, the following java code:
+For example, the following Java code:
 
 [//]: <> (@formatter:off)
 ```java
@@ -443,11 +444,11 @@ named `<graphName>_edge`. In a `COMPLEX` graph, edges are stored in collections 
 
 Each edge document contains:
 
-- standard ArangoDB edge fields (`_id`, `_key`, `_rev`, `_from`, `_to`)
-- the field `_label`
-- vertex properties as document fields
+- Standard ArangoDB edge fields (`_id`, `_key`, `_rev`, `_from`, `_to`)
+- The field `_label`
+- Edge properties as document fields
 
-For example, the following java code:
+For example, the following Java code:
 
 [//]: <> (@formatter:off)
 ```java
@@ -618,12 +619,6 @@ This library supports the following features:
 >-- StringArrayValues: true
 ```
 
-### Logging
-
-The library uses `slf4j` API for logging.
-To log requests and responses to and from the database, enable `DEBUG` log level for the logger
-`com.arangodb.internal.net.Communication`.
-
 ## Current Limitations
 
 - This library implements the Online Transactional Processing Graph Systems (OLTP) API only. The Online Analytics
@@ -631,13 +626,17 @@ To log requests and responses to and from the database, enable `DEBUG` log level
 - This library implements the Structure API only. The Process API is currently not implemented. For optimal query
   performance, it is recommended to use [AQL queries](#aql-queries).
 
+## Logging
+
+The library uses the `slf4j` API for logging. To log requests and responses to and from the database, enable the `DEBUG`
+log level for the logger `com.arangodb.internal.net.Communication`.
+
 ## Examples and Demo
 
 The [demo](./demo) project contains comprehensive usage examples of this library.
 
 For additional examples, check
 the [Gremlin tutorial](https://tinkerpop.apache.org/docs/3.7.3/tutorials/getting-started/).
-
 
 ## Acknowledgments
 
