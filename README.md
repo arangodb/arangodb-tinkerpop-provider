@@ -60,13 +60,13 @@ Here's a simple example to get you started:
 ```java
 // Create a configuration
 Configuration conf = new ArangoDBConfigurationBuilder()
-                .hosts("localhost:8529")
-                .user("root")
-                .password("password")
-                .database("myDatabase")
-                .name("myGraph")
-                .enableDataDefinition(true)  // Allow creating database and graph if they don't exist
-                .build();
+        .hosts("localhost:8529")
+        .user("root")
+        .password("test")
+        .db("myDatabase")
+        .name("myGraph")
+        .enableDataDefinition(true)  // Allow creating database and graph if they don't exist
+        .build();
 
 // Create the graph
 ArangoDBGraph graph = (ArangoDBGraph) GraphFactory.open(conf);
@@ -76,16 +76,17 @@ GraphTraversalSource g = graph.traversal();
 
 // Add some data
 Vertex person = g.addV("person")
-        .property("name", "John")
+        .property("name", "Alice")
         .property("age", 30)
+        .property("country", "Germany")
         .next();
 
 Vertex software = g.addV("software")
-        .property("name", "GraphApp")
+        .property("name", "JArango")
         .property("lang", "Java")
         .next();
 
-g.addE("created")
+Edge created = g.addE("created")
         .from(person)
         .to(software)
         .property("year",2025)
@@ -94,12 +95,62 @@ g.addE("created")
 // Query the graph
 List<String> creators = g.V()
         .hasLabel("software")
-        .has("name", "GraphApp")
+        .has("name", "JArango")
         .in("created")
-        .values("name")
+        .<String>values("name")
         .toList();
 
 System.out.println("Creators: " + creators);
+
+// Find all software created by Alice
+List<String> aliceSoftware = g.V()
+        .hasLabel("person")
+        .has("name", "Alice")
+        .out("created")
+        .<String>values("name")
+        .toList();
+
+System.out.println("aliceSoftware: " + aliceSoftware);
+
+// Update a property
+g.V()
+    .hasLabel("person")
+    .has("name","Alice")
+    .property("age",31)
+    .iterate();
+
+// Remove a property
+g.V()
+    .hasLabel("person")
+    .has("name","Alice")
+    .properties("country")
+    .drop()
+    .iterate();
+
+Map<?, ?> alice = g.V()
+    .hasLabel("person")
+    .has("name","Alice")
+    .valueMap()
+    .next();
+
+System.out.println("alice: " + alice);
+
+// Remove an edge
+g.E()
+    .hasLabel("created")
+    .where(__.outV()
+    .has("name","Alice"))
+    .where(__.inV()
+    .has("name","JArango"))
+    .drop()
+    .iterate();
+
+// Remove a vertex (and its incident edges)
+g.V()
+    .hasLabel("person")
+    .has("name","Alice")
+    .drop()
+    .iterate();
 
 // Close the graph when done
 graph.close();
@@ -420,108 +471,7 @@ creates a document like this:
 }
 ```
 
-## Working with the Graph
-
-Construct the graph:
-
-[//]: <> (@formatter:off)
-```java
-ArangoDBGraph graph = ArangoDBGraph.open(conf);
-GraphTraversalSource g = graph.traversal();
-```
-[//]: <> (@formatter:on)
-
-### Adding Vertices and Edges
-
-[//]: <> (@formatter:off)
-```java
-// Add vertices
-Vertex person = g.addV("person")
-                .property("name", "Alice")
-                .property("age", 30)
-                .next();
-
-Vertex software = g.addV("software")
-        .property("name", "GraphDB")
-        .property("lang", "Java")
-        .next();
-
-// Add an edge
-Edge created = g.addE("created")
-        .from(person)
-        .to(software)
-        .property("since", 2023)
-        .next();
-```
-[//]: <> (@formatter:on)
-
-### Querying Vertices and Edges
-
-[//]: <> (@formatter:off)
-```java
-// Find all people who created software
-List<String> creators = g.V()
-        .hasLabel("software")
-        .has("name", "GraphDB")
-        .in("created")
-        .<String>values("name")
-        .toList();
-
-// Find all software created by Alice
-List<String> aliceSoftware = g.V()
-        .hasLabel("person")
-        .has("name", "Alice")
-        .out("created")
-        .<String>values("name")
-        .toList();
-```
-[//]: <> (@formatter:on)
-
-### Updating Properties
-
-[//]: <> (@formatter:off)
-```java
-// Update a property
-g.V()
-    .hasLabel("person")
-    .has("name","Alice")
-    .property("age",31)
-    .iterate();
-
-// Remove a property
-g.V()
-    .hasLabel("person")
-    .has("name","Alice")
-    .properties("title")
-    .drop()
-    .iterate();
-```
-[//]: <> (@formatter:on)
-
-### Removing Elements
-
-[//]: <> (@formatter:off)
-```java
-// Remove an edge
-g.E()
-    .hasLabel("created")
-    .where(__.outV()
-    .has("name","Alice"))
-    .where(__.inV()
-    .has("name","GraphDB"))
-    .drop()
-    .iterate();
-
-// Remove a vertex (and its incident edges)
-g.V()
-    .hasLabel("person")
-    .has("name","Alice")
-    .drop()
-    .iterate();
-```
-[//]: <> (@formatter:on)
-
-### Element IDs
+## Element IDs
 
 Given a Gremlin element, you can get the corresponding ArangoDB document ID (`_id` field) using the
 `ArangoDBGraph.elementId(Element)` method:
@@ -535,7 +485,7 @@ String id = graph.elementId(v);
 
 This is useful when you need to reference the element directly in AQL queries.
 
-### AQL Queries
+## AQL Queries
 
 For complex queries or performance-critical operations, you can use ArangoDB's native query language (AQL) directly:
 
