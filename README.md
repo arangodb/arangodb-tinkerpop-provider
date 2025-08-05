@@ -153,6 +153,10 @@ The graph type can be configured with the property `gremlin.arangodb.conf.graph.
 Collection names are prefixed with the graph name, e.g. `<graphName>_vCol`.
 By default, the vertex collection name is `<graphName>_vertex` and the edge collection name is `<graphName>_edge`.
 
+Element ids have no format constrains.
+
+Any label can be used at runtime.
+
 Here is an example of the configuration for a simple graph:
 
 ```yaml
@@ -171,10 +175,14 @@ gremlin:
 ### COMPLEX
 
 `COMPLEX` graph type is a graph definition that allows multiple vertex collections and multiple edge collections.
+
 Element ids are strings with the format constraint: `<graph>_<label>/<key>`, where:
 - `<graph>` is the graph name
 - `<label>` is the element label
 - `<key>` is the db document key
+
+At runtime, only labels corresponding graph collections can be used i.e., `<graph>_<label>` is a vertex or edge 
+collection of the graph. 
 
 Graph name, label and key must not contain `_`.
 
@@ -326,11 +334,32 @@ This library supports the following features:
 
 
 ## Usage
-TODO
+
+The [demo](./demo) project contains usage examples of this library.
+For additional examples please check the [Gremlin tutorial](https://tinkerpop.apache.org/docs/3.7.3/tutorials/getting-started/).
+
+
+## Element Ids
+
+Given a Gremlin element, the corresponding database id (`_id` field in ArangoDB documents) can be computed using
+`com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph.elementId(Element)`, for example:
+
+```java
+    Vertex v = graph.addVertex("name", "marko");
+    String id = graph.elementId(v);
+```
 
 
 ## AQL queries
-TODO
+
+AQL queries can be executed via `com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph.aql()`, for example:
+```java
+    Vertex v = graph.addVertex("name", "marko");
+    String id = graph.elementId(v);
+    List<Vertex> result = graph
+            .<Vertex>aql("RETURN DOCUMENT(@id)", Map.of("id", id))
+            .toList();
+```
 
 
 ## Current limitations
