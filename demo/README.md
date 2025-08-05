@@ -44,7 +44,7 @@ mvn exec:java -Dexec.mainClass="org.example.Main"
 
 We create a TinkerPop graph backed by ArangoDB using the `ArangoDBConfigurationBuilder` to set up the connection parameters:
 
-```
+```java
 // create Tinkerpop graph backed by ArangoDB
 Configuration conf = new ArangoDBConfigurationBuilder() (1)
         .hosts("172.28.0.1:8529")                       (2)
@@ -68,7 +68,7 @@ This code:
 
 We can check the supported features of the ArangoDB TinkerPop implementation:
 
-```
+```java
 // print supported features
 System.out.println("Graph Features:");
 System.out.println(graph.features());
@@ -90,11 +90,112 @@ FEATURES
 (output truncated)
 ```
 
+### Basic Operations
+
+Using the Gremlin API, we can create vertices, edges and perform basic queries:
+
+```java
+System.out.println("\n=== Basic Operations ===");
+{
+    // Add vertices
+    System.out.println("Adding vertices");
+    Vertex v1 = g.addV("person")
+            .property("name", "marko")
+            .property("age", 29)
+            .next();
+    System.out.println("  added vertex: " + v1);
+
+    Vertex v2 = g.addV("software")
+            .property("name", "lop")
+            .property("lang", "java")
+            .next();
+    System.out.println("  added vertex: " + v2);
+
+    // Add edges
+    System.out.println("Adding edges");
+    Edge e1 = g.addE("created")
+            .from(v1)
+            .to(v2)
+            .property("year", 2025)
+            .next();
+    System.out.println("  added edge: " + e1);
+
+    // Graph traversal
+    System.out.println("Find \"marko\" in the graph");
+    Vertex rv = g.V()
+            .hasLabel("person")
+            .has("name", "marko")
+            .next();
+    System.out.println("  found vertex: " + rv);
+
+    System.out.println("Walk along the \"created\" edges to \"software\" vertices");
+    Edge re = g.V()
+            .hasLabel("person")
+            .has("name", "marko")
+            .outE("created")
+            .next();
+    System.out.println("  found edge: " + re);
+
+    rv = g.V()
+            .hasLabel("person")
+            .has("name", "marko")
+            .outE("created")
+            .inV()
+            .next();
+    System.out.println("  found vertex: " + rv);
+
+    rv = g.V()
+            .hasLabel("person")
+            .has("name", "marko")
+            .out("created")
+            .next();
+    System.out.println("  found vertex: " + rv);
+
+    System.out.println("Select the \"name\" property of the \"software\" vertices");
+    String name = (String) g.V()
+            .hasLabel("person")
+            .has("name", "marko")
+            .out("created")
+            .values("name")
+            .next();
+    System.out.println("  name: " + name);
+    
+    System.out.println("Find \"marko\" in the graph using AQL");
+    String query = """
+        FOR d IN tinkerpop_vertex
+        FILTER d.name == @name
+        RETURN d
+        """;
+    rv = graph.<Vertex>aql(query, Map.of("name", "marko")).next();
+    System.out.println("  found vertex: " + rv);
+}
+```
+
+**Console Output:**
+```
+=== Basic Operations ===
+Adding vertices
+  added vertex: v[62484]
+  added vertex: v[62491]
+Adding edges
+  added edge: e[62498][62484-created->62491]
+Find "marko" in the graph
+  found vertex: v[62484]
+Walk along the "created" edges to "software" vertices
+  found edge: e[62498][62484-created->62491]
+  found vertex: v[62491]
+  found vertex: v[62491]
+Select the "name" property of the "software" vertices
+  name: lop
+Find "marko" in the graph using AQL
+  found vertex: v[63748]
+```
+
 ### Import GraphML Data
 
 Next, we import air routes data from a local GraphML file:
 
-```
+```java
 private static final String GRAPHML_FILE = "src/main/resources/air-routes-small.graphml";
 
 // ...
@@ -111,7 +212,7 @@ System.out.println("\nImporting Air Routes data from GraphML file...");
 
 After importing the data, we can run some basic Gremlin queries to explore the graph.
 
-```
+```java
 //region Basic Gremlin Queries
 System.out.println("\n=== Basic Gremlin Queries ===");
 {
@@ -179,7 +280,7 @@ Sample of 5 routes:
 
 The demo then explores the graph:
 
-```
+```java
 //region Explore airports and routes
 System.out.println("\n=== Exploring Airports and Routes ===");
 {
@@ -235,7 +336,7 @@ Top 5 airports with most outgoing routes:
 
 Next, the demo demonstrates some graph algorithms using Gremlin.
 
-```
+```java
 //region Graph Algorithms
 System.out.println("\n=== Graph Algorithms ===");
 {
@@ -308,12 +409,12 @@ Count of the airports reachable within 2 hops from Long Beach (LGB):
 
 Furthermore, we can execute native AQL queries alongside Gremlin.
 
-```
+```java
 //region AQL Queries
 System.out.println("\n=== AQL Queries ===");
 {
     // Find weighted k-shortest paths between two airports with an AQL query (1)
-    System.out.println("\nFinding weighted k-shortest paths between Boston (BOS) and San Francisco (SFO) with AQL query:");
+    System.out.println("\nFinding weighted k-shortest paths between Boston (BOS) and Atlanta (ATL) with AQL query:");
 
     String shortestPathQuery = """
             LET start = FIRST(
@@ -339,7 +440,7 @@ System.out.println("\n=== AQL Queries ===");
 
     graph.<Map<String, ?>>aql(shortestPathQuery, Map.of(
             "start", "BOS",
-            "target", "SFO"
+            "target", "ATL"
     )).forEachRemaining(path ->
             System.out.println("  Path (dist: " + path.get("dist") + "): \t" + path.get("path")));
 
@@ -395,12 +496,12 @@ This section:
 ```
 === AQL Queries ===
 
-Finding weighted k-shortest paths between Boston (BOS) and San Francisco (SFO) with AQL query:
-  Path (dist: 2697):    [BOS, SLC, SFO]
-  Path (dist: 2697):    [BOS, SLC, SNA, SFO]
-  Path (dist: 2699):    [BOS, DTW, SFO]
-  Path (dist: 2700):    [BOS, SFO]
-  Path (dist: 2703):    [BOS, DTW, ORD, SFO]
+Finding weighted k-shortest paths between Boston (BOS) and Atlanta (ATL) with AQL query:
+  Path (dist: 945): 	[BOS, ATL]
+  Path (dist: 945): 	[BOS, LGA, ATL]
+  Path (dist: 945): 	[BOS, LGA, PHL, ATL]
+  Path (dist: 945): 	[BOS, LGA, PHL, DCA, ATL]
+  Path (dist: 945): 	[BOS, LGA, DCA, ATL]
 
 Finding path between Boston (BOS) and Atlanta (ATL) with max 400 km flights with AQL query:
   Path (dist: 979):     BOS -(368)-> BWI -(255)-> RDU -(356)-> ATL
@@ -414,6 +515,6 @@ Finding path between Boston (BOS) and Atlanta (ATL) with max 400 km flights with
 
 Finally, we can close the graph connection:
 
-```
+```java
 graph.close();
 ```
