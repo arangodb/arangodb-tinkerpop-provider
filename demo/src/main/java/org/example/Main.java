@@ -23,6 +23,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSo
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.structure.util.GraphFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class Main {
                 .db(DB_NAME)
                 .enableDataDefinition(true)
                 .build();
-        ArangoDBGraph graph = ArangoDBGraph.open(conf);
+        ArangoDBGraph graph = (ArangoDBGraph) GraphFactory.open(conf);
         GraphTraversalSource g = graph.traversal();
 
         // print supported features
