@@ -63,12 +63,12 @@ public class ArangoDBGraphFeatures implements Graph.Features {
 
         @Override
         public boolean supportsMapValues() {
-            return false;
+            return true;
         }
 
         @Override
         public boolean supportsMixedListValues() {
-            return false;
+            return true;
         }
 
         @Override
@@ -88,7 +88,7 @@ public class ArangoDBGraphFeatures implements Graph.Features {
 
         @Override
         public boolean supportsUniformListValues() {
-            return false;
+            return true;
         }
     }
 

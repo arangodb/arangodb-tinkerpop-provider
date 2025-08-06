@@ -42,9 +42,6 @@ public class DataTypesTest extends AbstractGremlinTest {
     );
 
     private final List<?> unsupportedData = Arrays.asList(
-            Collections.singletonMap("hello", "world"),
-            Collections.singletonList("hello"),
-            Collections.singleton("hello"),
             new Date(),
             new java.sql.Date(new Date().getTime()),
             new Date[]{new Date()},
