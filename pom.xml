@@ -12,7 +12,7 @@
 
     <groupId>com.arangodb</groupId>
     <artifactId>arangodb-tinkerpop-provider</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <packaging>jar</packaging>
 
     <name>arangodb-tinkerpop-provider</name>

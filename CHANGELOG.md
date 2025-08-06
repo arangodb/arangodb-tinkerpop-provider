@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.1] - 2025-08-06
+
+- fixed deserialization of `null` values in AQL results
+
 ## [3.0.0] - 2025-08-06
 
 Since version `3.0.0`, this project has been forked and is officially maintained by ArangoDB.
