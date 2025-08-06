@@ -53,7 +53,7 @@ public class ArangoDBEdge extends ArangoDBSimpleElement<EdgeData> implements Edg
 
     @Override
     protected String stringify() {
-        return "e[" + id() + "][" + data.getTo().getId() + "-" + label() + "->" + data.getFrom().getId() + "]";
+        return "e[" + id() + "][" + data.getFrom().getId() + "-" + label() + "->" + data.getTo().getId() + "]";
     }
 
     @Override
