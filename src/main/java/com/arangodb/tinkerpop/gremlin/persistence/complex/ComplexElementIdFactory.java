@@ -18,16 +18,29 @@ package com.arangodb.tinkerpop.gremlin.persistence.complex;
 
 import com.arangodb.tinkerpop.gremlin.persistence.ElementId;
 import com.arangodb.tinkerpop.gremlin.persistence.ElementIdFactory;
+import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
+import org.apache.tinkerpop.gremlin.structure.Edge;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 
 public class ComplexElementIdFactory extends ElementIdFactory {
 
-    public ComplexElementIdFactory(String prefix) {
-        super(prefix);
+    public ComplexElementIdFactory(ArangoDBGraphConfig config) {
+        super(config);
     }
 
     @Override
-    protected String inferCollection(final String collection, final String label, final String defaultLabel) {
+    protected String defaultVertexCollection() {
+        return Vertex.DEFAULT_LABEL;
+    }
+
+    @Override
+    protected String defaultEdgeCollection() {
+        return Edge.DEFAULT_LABEL;
+    }
+
+    @Override
+    protected String inferCollection(final String collection, final String label, final String defaultCollection) {
         if (collection != null) {
             if (label != null && !label.equals(collection)) {
                 throw new IllegalArgumentException("Mismatching label: [" + label + "] and collection: [" + collection + "]");
@@ -37,12 +50,12 @@ public class ComplexElementIdFactory extends ElementIdFactory {
         if (label != null) {
             return label;
         }
-        return defaultLabel;
+        return defaultCollection;
     }
 
     @Override
     protected void validateId(String id) {
-        if (id.replaceFirst("^" + prefix + "_", "").contains("_")) {
+        if (id.replaceFirst("^" + config.prefix, "").contains("_")) {
             throw new IllegalArgumentException(String.format("id (%s) contains invalid character '_'", id));
         }
     }
