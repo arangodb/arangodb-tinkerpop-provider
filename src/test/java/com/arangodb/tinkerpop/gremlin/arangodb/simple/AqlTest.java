@@ -76,6 +76,14 @@ public class AqlTest extends AbstractGremlinTest {
     }
 
     @Test
+    public void shouldReadNullValue() {
+        String result = graph().<String>aql(
+                "RETURN null"
+        ).next();
+        assertThat(result).isNull();
+    }
+
+    @Test
     public void shouldReadVertex() {
         Vertex v = graph.addVertex();
         List<Vertex> result = graph().<Vertex>aql(

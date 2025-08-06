@@ -50,7 +50,9 @@ public class AqlDeserializer {
     }
 
     private Object doDeserialize(JsonNode node) throws IOException {
-        if (isEdge(node)) {
+        if (node == null) {
+            return null;
+        } else if (isEdge(node)) {
             EdgeData data = mapper.readerFor(EdgeData.class).readValue(node);
             return new ArangoDBEdge(graph, data);
         } else if (isVertex(node)) {
