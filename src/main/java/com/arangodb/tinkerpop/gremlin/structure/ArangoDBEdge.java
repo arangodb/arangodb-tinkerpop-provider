@@ -18,8 +18,8 @@ package com.arangodb.tinkerpop.gremlin.structure;
 
 import com.arangodb.tinkerpop.gremlin.persistence.EdgeData;
 import com.arangodb.tinkerpop.gremlin.persistence.ElementId;
+import com.arangodb.tinkerpop.gremlin.persistence.VertexData;
 import org.apache.tinkerpop.gremlin.structure.*;
-import org.apache.tinkerpop.gremlin.structure.util.StringFactory;
 import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils;
 
 import java.util.*;
@@ -53,17 +53,26 @@ public class ArangoDBEdge extends ArangoDBSimpleElement<EdgeData> implements Edg
 
     @Override
     protected String stringify() {
-        return StringFactory.edgeString(this);
+        return "e[" + id() + "][" + data.getFrom().getId() + "-" + label() + "->" + data.getTo().getId() + "]";
     }
 
     @Override
     public Vertex outVertex() {
-        return new ArangoDBVertex(graph, graph.getClient().readVertex(data.getFrom()));
+        return vertex(data.getFrom());
     }
 
     @Override
     public Vertex inVertex() {
-        return new ArangoDBVertex(graph, graph.getClient().readVertex(data.getTo()));
+        return vertex(data.getTo());
+    }
+
+    private Vertex vertex(ElementId eId) {
+        if (removed()) throw ArangoDBElement.Exceptions.elementAlreadyRemoved(id());
+        VertexData v = graph.getClient().readVertex(eId);
+        if (v == null) {
+            throw ArangoDBElement.Exceptions.elementAlreadyRemoved(eId.getId());
+        }
+        return new ArangoDBVertex(graph, v);
     }
 
     @Override

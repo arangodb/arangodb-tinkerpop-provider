@@ -30,24 +30,28 @@ import java.util.stream.Collectors;
 
 
 public abstract class ElementIdFactory {
-    protected final String prefix;
+    protected final ArangoDBGraphConfig config;
 
     public static ElementIdFactory create(ArangoDBGraphConfig config) {
         switch (config.graphType) {
             case SIMPLE:
-                return new SimpleElementIdFactory(config.graphName);
+                return new SimpleElementIdFactory(config);
             case COMPLEX:
-                return new ComplexElementIdFactory(config.graphName);
+                return new ComplexElementIdFactory(config);
             default:
                 throw new IllegalArgumentException("Unsupported graph type: " + config.graphType);
         }
     }
 
-    protected ElementIdFactory(String prefix) {
-        this.prefix = prefix;
+    protected ElementIdFactory(ArangoDBGraphConfig config) {
+        this.config = config;
     }
 
-    protected abstract String inferCollection(final String collection, final String label, final String defaultLabel);
+    protected abstract String defaultVertexCollection();
+
+    protected abstract String defaultEdgeCollection();
+
+    protected abstract String inferCollection(final String collection, final String label, final String defaultCollection);
 
     protected abstract void validateId(String id);
 
@@ -59,7 +63,7 @@ public abstract class ElementIdFactory {
     }
 
     private String extractCollection(final String id) {
-        String[] parts = id.replaceFirst("^" + prefix + "_", "").split("/");
+        String[] parts = id.replaceFirst("^" + config.prefix, "").split("/");
         if (parts.length > 2) {
             throw new IllegalArgumentException(String.format("key (%s) contains invalid character '/'", id));
         }
@@ -67,16 +71,16 @@ public abstract class ElementIdFactory {
     }
 
     public ElementId createVertexId(String label, Object id) {
-        return createId(label, Vertex.DEFAULT_LABEL, id);
+        return createId(label, id, defaultVertexCollection());
     }
 
     public ElementId createEdgeId(String label, Object id) {
-        return createId(label, Edge.DEFAULT_LABEL, id);
+        return createId(label, id, defaultEdgeCollection());
     }
 
     public ElementId parseVertexId(Object id) {
         if (id instanceof String) {
-            return parseWithDefaultLabel((String) id, Vertex.DEFAULT_LABEL);
+            return parseWithDefaultCollection((String) id, defaultVertexCollection());
         } else if (id instanceof Element) {
             return parseVertexId(((Element) id).id());
         } else {
@@ -92,7 +96,7 @@ public abstract class ElementIdFactory {
 
     public ElementId parseEdgeId(Object id) {
         if (id instanceof String) {
-            return parseWithDefaultLabel((String) id, Edge.DEFAULT_LABEL);
+            return parseWithDefaultCollection((String) id, defaultEdgeCollection());
         } else if (id instanceof Element) {
             return parseEdgeId(((Element) id).id());
         } else {
@@ -109,18 +113,18 @@ public abstract class ElementIdFactory {
     public ElementId parseId(String id) {
         String collection = extractCollection(id);
         String key = extractKey(id);
-        return of(prefix, collection, key);
+        return of(config.graphName, collection, key);
     }
 
-    private ElementId parseWithDefaultLabel(String id, String defaultLabel) {
-        String collection = inferCollection(extractCollection(id), null, defaultLabel);
+    private ElementId parseWithDefaultCollection(String id, String defaultCollection) {
+        String collection = inferCollection(extractCollection(id), null, defaultCollection);
         String key = extractKey(id);
-        return of(prefix, collection, key);
+        return of(config.graphName, collection, key);
     }
 
-    private ElementId createId(String label, String defaultLabel, Object nullableId) {
+    private ElementId createId(String label, Object nullableId, String defaultCollection) {
         if (nullableId == null) {
-            return of(prefix, inferCollection(null, label, defaultLabel), null);
+            return of(config.graphName, inferCollection(null, label, defaultCollection), null);
         }
 
         if (!(nullableId instanceof String)) {
@@ -129,13 +133,13 @@ public abstract class ElementIdFactory {
 
         String id = (String) nullableId;
         validateId(id);
-        return of(prefix, inferCollection(extractCollection(id), label, defaultLabel), extractKey(id));
+        return of(config.graphName, inferCollection(extractCollection(id), label, defaultCollection), extractKey(id));
     }
 
-    private ElementId of(String prefix, String collection, String key) {
-        Objects.requireNonNull(prefix);
+    private ElementId of(String graphName, String collection, String key) {
+        Objects.requireNonNull(graphName);
         Objects.requireNonNull(collection);
-        ElementId.validateIdParts(prefix, collection, key);
-        return doCreate(prefix, collection, key);
+        ElementId.validateIdParts(graphName, collection, key);
+        return doCreate(graphName, collection, key);
     }
 }

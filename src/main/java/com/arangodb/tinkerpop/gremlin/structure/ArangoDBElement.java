@@ -33,6 +33,8 @@ public abstract class ArangoDBElement<P, D extends PropertiesContainer<P>> imple
     private boolean removed = false;
 
     ArangoDBElement(ArangoDBGraph graph, D data) {
+        Objects.requireNonNull(graph);
+        Objects.requireNonNull(data);
         this.graph = graph;
         this.data = data;
     }

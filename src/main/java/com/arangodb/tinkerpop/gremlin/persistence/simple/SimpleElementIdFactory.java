@@ -18,17 +18,35 @@ package com.arangodb.tinkerpop.gremlin.persistence.simple;
 
 import com.arangodb.tinkerpop.gremlin.persistence.ElementId;
 import com.arangodb.tinkerpop.gremlin.persistence.ElementIdFactory;
+import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
 
 
 public class SimpleElementIdFactory extends ElementIdFactory {
 
-    public SimpleElementIdFactory(String prefix) {
-        super(prefix);
+    private final String defaultVertexCollection;
+    private final String defaultEdgeCollection;
+
+    public SimpleElementIdFactory(ArangoDBGraphConfig config) {
+        super(config);
+        defaultVertexCollection = config.vertices.iterator().next()
+                .replaceFirst(config.prefix, "");
+        defaultEdgeCollection = config.edges.iterator().next()
+                .replaceFirst(config.prefix, "");
     }
 
     @Override
-    protected String inferCollection(final String collection, final String label, final String defaultLabel) {
-        return defaultLabel;
+    protected String defaultVertexCollection() {
+        return defaultVertexCollection;
+    }
+
+    @Override
+    protected String defaultEdgeCollection() {
+        return defaultEdgeCollection;
+    }
+
+    @Override
+    protected String inferCollection(final String collection, final String label, final String defaultCollection) {
+        return defaultCollection;
     }
 
     @Override

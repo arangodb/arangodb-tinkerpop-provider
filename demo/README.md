@@ -56,7 +56,7 @@ Configuration conf = new ArangoDBConfigurationBuilder() (1)
         .database(DB_NAME)
         .enableDataDefinition(true)                     (3)
         .build();
-ArangoDBGraph graph = ArangoDBGraph.open(conf);         (4)
+ArangoDBGraph graph = (ArangoDBGraph) GraphFactory.open(conf);  (4)
 GraphTraversalSource g = graph.traversal();             (5)
 ```
 [//]: <> (@formatter:on)
