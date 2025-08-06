@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2025-08-06
+
+Since version `3.0.0`, this project has been forked and is officially maintained by ArangoDB.
+The maven coordinates have been changed to: `com.arangodb:arangodb-tinkerpop-provider:3.0.0`.
+This release introduces major changes in most of the areas of the library, please refer to the 
+[official documentation](https://github.com/arangodb/arangodb-tinkerpop-provider) for details.
+
 ## [2.0.3] - 2020-11-16
 
 ### Fixed
