@@ -81,7 +81,7 @@ public class ArangoDBUtil {
                 value instanceof Integer || value instanceof int[] ||
                 value instanceof Long || value instanceof long[] ||
                 value instanceof String || value instanceof String[] ||
-                value instanceof List || value instanceof Map;
+                value instanceof Collection || value instanceof Map;
     }
 
     public static void checkVersion(String version) {
