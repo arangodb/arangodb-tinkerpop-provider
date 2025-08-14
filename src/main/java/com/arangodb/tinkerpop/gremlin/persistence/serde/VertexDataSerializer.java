@@ -18,6 +18,7 @@ package com.arangodb.tinkerpop.gremlin.persistence.serde;
 
 import com.arangodb.tinkerpop.gremlin.persistence.VertexData;
 import com.arangodb.tinkerpop.gremlin.persistence.VertexPropertyData;
+import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
 import com.arangodb.tinkerpop.gremlin.utils.Fields;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -30,13 +31,22 @@ import java.util.Map;
 import static com.arangodb.tinkerpop.gremlin.utils.Fields.LABEL;
 
 class VertexDataSerializer extends JsonSerializer<VertexData> {
+
+    private final ArangoDBGraphConfig.GraphType type;
+
+    VertexDataSerializer(ArangoDBGraphConfig.GraphType type) {
+        this.type = type;
+    }
+
     @Override
     public void serialize(VertexData data, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         gen.writeStartObject();
         if (data.getKey() != null) {
             gen.writeStringField(Fields.KEY, data.getKey());
         }
-        gen.writeStringField(LABEL, data.getLabel());
+        if (type == ArangoDBGraphConfig.GraphType.SIMPLE) {
+            gen.writeStringField(LABEL, data.getLabel());
+        }
 
         Map<String, Map<String, Object>> meta = new HashMap<>();
 
