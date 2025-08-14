@@ -32,7 +32,7 @@ import java.util.Map;
 import static com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph.GRAPH_VARIABLES_COLLECTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class PersistenceTest extends AbstractGremlinTest {
+public class SimplePersistenceTest extends AbstractGremlinTest {
 
     private TestGraphClient client() {
         return new TestGraphClient(graph.configuration());

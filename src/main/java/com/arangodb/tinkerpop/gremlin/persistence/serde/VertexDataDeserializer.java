@@ -19,6 +19,7 @@ package com.arangodb.tinkerpop.gremlin.persistence.serde;
 import com.arangodb.tinkerpop.gremlin.persistence.ElementId;
 import com.arangodb.tinkerpop.gremlin.persistence.VertexData;
 import com.arangodb.tinkerpop.gremlin.persistence.VertexPropertyData;
+import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
 import com.arangodb.tinkerpop.gremlin.utils.Fields;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
@@ -34,12 +35,24 @@ import java.util.Map;
 import static com.arangodb.tinkerpop.gremlin.utils.Fields.*;
 
 class VertexDataDeserializer extends JsonDeserializer<VertexData> {
+
+    private final ArangoDBGraphConfig.GraphType type;
+
+    VertexDataDeserializer(ArangoDBGraphConfig.GraphType type) {
+        this.type = type;
+    }
+
     @Override
     public VertexData deserialize(JsonParser p, DeserializationContext ctx) throws IOException {
         ObjectCodec c = p.getCodec();
         ObjectNode root = c.readTree(p);
         ElementId id = c.treeToValue(root.get(ID), ElementId.class);
-        String label = root.get(LABEL).asText();
+        String label;
+        if (type == ArangoDBGraphConfig.GraphType.SIMPLE) {
+            label = root.get(LABEL).asText();
+        } else {
+            label = id.getLabel();
+        }
         VertexData data = new VertexData(label, id);
         @SuppressWarnings("unchecked")
         Map<String, Map<String, Object>> meta = root.has(META)

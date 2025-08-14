@@ -19,6 +19,7 @@ package com.arangodb.tinkerpop.gremlin.client;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 
 import static com.arangodb.tinkerpop.gremlin.utils.Fields.LABEL;
@@ -29,19 +30,19 @@ public class ArangoDBQueryBuilder {
     private ArangoDBQueryBuilder() {
     }
 
-    public static String readVertexNeighbors(String graphName, Direction direction, String[] labels) {
-        return oneStepTraversal(graphName, direction, labels)
+    public static String readVertexNeighbors(String graphName, Direction direction, ArangoDBGraphConfig.GraphType type, String[] labels) {
+        return oneStepTraversal(graphName, direction, type, labels)
                 .append(" RETURN v")
                 .toString();
     }
 
-    public static String readVertexEdges(String graphName, Direction direction, String[] labels) {
-        return oneStepTraversal(graphName, direction, labels)
+    public static String readVertexEdges(String graphName, Direction direction, ArangoDBGraphConfig.GraphType type, String[] labels) {
+        return oneStepTraversal(graphName, direction, type, labels)
                 .append(" RETURN e")
                 .toString();
     }
 
-    private static StringBuilder oneStepTraversal(String graphName, Direction direction, String[] labels) {
+    private static StringBuilder oneStepTraversal(String graphName, Direction direction, ArangoDBGraphConfig.GraphType type, String[] labels) {
         StringBuilder query = new StringBuilder()
                 .append("FOR v, e IN 1..1 ")
                 .append(toArangoDirection(direction))
@@ -49,7 +50,11 @@ public class ArangoDBQueryBuilder {
                 .append(escape(graphName))
                 .append(" OPTIONS {edgeCollections: @edgeCollections}");
         if (labels.length > 0) {
-            query.append(" FILTER e." + LABEL + " IN @labels");
+            if (type == ArangoDBGraphConfig.GraphType.SIMPLE) {
+                query.append(" FILTER e." + LABEL + " IN @labels");
+            } else {
+                query.append(" FILTER PARSE_COLLECTION(e) IN @edgeCollections");
+            }
         }
         return query;
     }

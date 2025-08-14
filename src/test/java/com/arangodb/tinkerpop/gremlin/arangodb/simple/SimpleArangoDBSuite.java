@@ -26,7 +26,7 @@ public class SimpleArangoDBSuite extends AbstractGremlinSuite {
     private static final Class<?>[] allTests = new Class<?>[]{
             SimpleElementIdTest.class,
             DataTypesTest.class,
-            PersistenceTest.class,
+            SimplePersistenceTest.class,
             AqlTest.class,
             DriverTest.class
     };

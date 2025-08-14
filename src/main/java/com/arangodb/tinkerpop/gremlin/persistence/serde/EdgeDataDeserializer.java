@@ -18,6 +18,7 @@ package com.arangodb.tinkerpop.gremlin.persistence.serde;
 
 import com.arangodb.tinkerpop.gremlin.persistence.EdgeData;
 import com.arangodb.tinkerpop.gremlin.persistence.ElementId;
+import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
 import com.arangodb.tinkerpop.gremlin.utils.Fields;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
@@ -32,12 +33,24 @@ import java.util.Map;
 import static com.arangodb.tinkerpop.gremlin.utils.Fields.*;
 
 public class EdgeDataDeserializer extends JsonDeserializer<EdgeData> {
+
+    private final ArangoDBGraphConfig.GraphType type;
+
+    public EdgeDataDeserializer(ArangoDBGraphConfig.GraphType type) {
+        this.type = type;
+    }
+
     @Override
     public EdgeData deserialize(JsonParser p, DeserializationContext ctx) throws IOException {
         ObjectCodec c = p.getCodec();
         ObjectNode root = c.readTree(p);
         ElementId id = c.treeToValue(root.get(ID), ElementId.class);
-        String label = root.get(LABEL).asText();
+        String label;
+        if (type == ArangoDBGraphConfig.GraphType.SIMPLE) {
+            label = root.get(LABEL).asText();
+        } else {
+            label = id.getLabel();
+        }
         ElementId from = c.treeToValue(root.get(FROM), ElementId.class);
         ElementId to = c.treeToValue(root.get(TO), ElementId.class);
         EdgeData data = new EdgeData(label, id, from, to);

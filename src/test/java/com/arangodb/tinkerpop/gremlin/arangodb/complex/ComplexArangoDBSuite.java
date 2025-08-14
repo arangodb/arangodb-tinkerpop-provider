@@ -25,6 +25,7 @@ public class ComplexArangoDBSuite extends AbstractGremlinSuite {
 
     private static final Class<?>[] allTests = new Class<?>[]{
             ComplexElementIdTest.class,
+            ComplexPersistenceTest.class
     };
 
     public ComplexArangoDBSuite(final Class<?> klass, final RunnerBuilder builder) throws InitializationError {
