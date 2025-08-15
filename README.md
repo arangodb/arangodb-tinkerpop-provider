@@ -2,7 +2,7 @@
 
 # ArangoDB TinkerPop Provider
 
-ArangoDB TinkerPop Provider is an implementation of the [Apache TinkerPop OLTP Provider](https://tinkerpop.apache.org/docs/3.7.3/dev/provider) API for
+ArangoDB TinkerPop Provider is an implementation of the [Apache TinkerPop OLTP Provider](https://tinkerpop.apache.org/docs/3.7.4/dev/provider) API for
 ArangoDB.
 
 It allows using the standard TinkerPop API with ArangoDB as the backend storage. It supports creating,
@@ -154,7 +154,7 @@ gremlin> g.V().hasLabel("person").values("name")
 ==>marko
 ```
 
-You can find the reference documentation [here](https://tinkerpop.apache.org/docs/3.7.3/reference/#_configuring_2).
+You can find the reference documentation [here](https://tinkerpop.apache.org/docs/3.7.4/reference/#_configuring_2).
 
 
 ## Quick Start
@@ -265,7 +265,7 @@ graph.close();
 ## Configuration
 
 The graph can be created using the methods from `org.apache.tinkerpop.gremlin.structure.util.GraphFactory.open(...)`(
-see [javadoc](https://tinkerpop.apache.org/javadocs/3.7.3/full/org/apache/tinkerpop/gremlin/structure/util/GraphFactory.html)).
+see [javadoc](https://tinkerpop.apache.org/javadocs/3.7.4/full/org/apache/tinkerpop/gremlin/structure/util/GraphFactory.html)).
 These methods accept a configuration file (e.g., YAML or properties file), a Java Map, or an Apache Commons
 Configuration object.
 
@@ -741,7 +741,7 @@ log level for the logger `com.arangodb.internal.net.Communication`.
 The [demo](./demo) project contains comprehensive usage examples of this library.
 
 For additional examples, check
-the [Gremlin tutorial](https://tinkerpop.apache.org/docs/3.7.3/tutorials/getting-started/).
+the [Gremlin tutorial](https://tinkerpop.apache.org/docs/3.7.4/tutorials/getting-started/).
 
 ## Acknowledgments
 
