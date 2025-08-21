@@ -435,7 +435,7 @@ Using a `SIMPLE` graph configured as in the example above and creating a new ele
 
 [//]: <> (@formatter:off)
 ```java
-graph.addVertex("person", T.id, "foo");
+graph.addVertex(T.label, "person", T.id, "foo");
 ```
 [//]: <> (@formatter:on)
 
@@ -480,7 +480,7 @@ Using a `COMPLEX` graph configured as in the example above and creating a new el
 
 [//]: <> (@formatter:off)
 ```java
-graph.addVertex("person", T.id, "foo");
+graph.addVertex(T.label, "person", T.id, "person/foo");
 ```
 [//]: <> (@formatter:on)
 
