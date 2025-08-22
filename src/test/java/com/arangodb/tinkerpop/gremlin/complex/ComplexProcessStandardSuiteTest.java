@@ -25,7 +25,7 @@ import static com.arangodb.tinkerpop.gremlin.TestUtils.skipProcessStandardSuite;
 import static org.junit.Assume.assumeTrue;
 
 @RunWith(ProcessStandardSuite.class)
-@GraphProviderClass(provider = ComplexGraphProvider.class, graph = ComplexTestGraph.class)
+@GraphProviderClass(provider = ComplexGraphWithoutIdPrefixProvider.class, graph = ComplexTestGraphWithoutIdPrefix.class)
 public class ComplexProcessStandardSuiteTest {
 
     @BeforeClass

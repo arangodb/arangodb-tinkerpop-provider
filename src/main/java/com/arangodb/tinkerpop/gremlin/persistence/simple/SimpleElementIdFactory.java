@@ -50,7 +50,7 @@ public class SimpleElementIdFactory extends ElementIdFactory {
     }
 
     @Override
-    protected void validateId(String id) {
+    protected void validateId(String id, String label) {
         if (id.contains("_")) {
             throw new IllegalArgumentException(String.format("id (%s) contains invalid character '_'", id));
         }

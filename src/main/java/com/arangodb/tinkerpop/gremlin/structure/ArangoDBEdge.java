@@ -27,12 +27,7 @@ import java.util.*;
 
 public class ArangoDBEdge extends ArangoDBSimpleElement<EdgeData> implements Edge, ArangoDBPersistentElement {
 
-    static ArangoDBEdge of(String label, ElementId id, ElementId outVertexId, ElementId inVertexId, ArangoDBGraph graph) {
-        String inferredLabel = label != null ? label : Optional.ofNullable(id.getLabel()).orElse(Edge.DEFAULT_LABEL);
-        return new ArangoDBEdge(graph, new EdgeData(inferredLabel, id, outVertexId, inVertexId));
-    }
-
-    public ArangoDBEdge(ArangoDBGraph graph, EdgeData data) {
+    ArangoDBEdge(ArangoDBGraph graph, EdgeData data) {
         super(graph, data);
     }
 
