@@ -36,10 +36,6 @@ public class ComplexPersistenceTest extends AbstractGremlinTest {
         return new TestGraphClient(graph.configuration());
     }
 
-    private String graphName() {
-        return ((ArangoDBGraph) graph).name();
-    }
-
     @Test
     @SuppressWarnings("unchecked")
     public void vertices() {
@@ -47,13 +43,12 @@ public class ComplexPersistenceTest extends AbstractGremlinTest {
         v
                 .property("key", "value")
                 .property("meta", "metaValue");
-        String colName = graphName() + "_" + Vertex.DEFAULT_LABEL;
-        ArangoCollection col = client().database().collection(colName);
+        ArangoCollection col = client().database().collection(Vertex.DEFAULT_LABEL);
         Map<String, Object> doc = (Map<String, Object>) col.getDocument(((ArangoDBGraph) graph).elementId(v).getKey(), Map.class);
         assertThat(doc)
                 .hasSize(5)
                 .containsEntry(Fields.KEY, "foo")
-                .containsEntry(Fields.ID, colName + "/foo")
+                .containsEntry(Fields.ID, Vertex.DEFAULT_LABEL + "/foo")
                 .containsKey(Fields.REV)
                 .doesNotContainKey(Fields.LABEL)
                 .containsEntry("key", "value");
@@ -75,17 +70,15 @@ public class ComplexPersistenceTest extends AbstractGremlinTest {
         Vertex b = graph.addVertex(T.id, Vertex.DEFAULT_LABEL + "/b");
         Edge e = a.addEdge(Edge.DEFAULT_LABEL, b, T.id, Edge.DEFAULT_LABEL + "/e", "key", "value");
 
-        String vertexColName = graphName() + "_" + Vertex.DEFAULT_LABEL;
-        String edgeColName = graphName() + "_" + Edge.DEFAULT_LABEL;
-        ArangoCollection col = client().database().collection(edgeColName);
+        ArangoCollection col = client().database().collection(Edge.DEFAULT_LABEL);
         Map<String, Object> doc = (Map<String, Object>) col.getDocument(((ArangoDBGraph) graph).elementId(e).getKey(), Map.class);
         assertThat(doc)
                 .hasSize(6)
                 .containsEntry(Fields.KEY, "e")
-                .containsEntry(Fields.ID, edgeColName + "/e")
+                .containsEntry(Fields.ID, Edge.DEFAULT_LABEL + "/e")
                 .containsKey(Fields.REV)
-                .containsEntry(Fields.FROM, vertexColName + "/a")
-                .containsEntry(Fields.TO, vertexColName + "/b")
+                .containsEntry(Fields.FROM, Vertex.DEFAULT_LABEL + "/a")
+                .containsEntry(Fields.TO, Vertex.DEFAULT_LABEL + "/b")
                 .doesNotContainKey(Fields.LABEL)
                 .containsEntry("key", "value");
     }

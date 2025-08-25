@@ -38,7 +38,7 @@ public class ComplexGraphProvider extends TestGraphProvider {
         // add default vertex and edge cols
         builder.edgeDefinitions(EdgeDef.of("edge").from("vertex").to("vertex"));
         if (test == ComplexElementIdTest.class) {
-            builder.orphanCollections("foo");
+            builder.orphanCollections("foo", "foo_bar");
         }
     }
 }

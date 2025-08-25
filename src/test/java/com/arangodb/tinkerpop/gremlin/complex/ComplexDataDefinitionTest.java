@@ -54,7 +54,7 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
         assertThat(graphInfo).isNotNull();
         assertThat(graphInfo.getOrphanCollections())
                 .hasSize(1)
-                .contains("foo_v");
+                .contains("v");
         assertThat(graphInfo.getEdgeDefinitions()).isEmpty();
     }
 
@@ -71,13 +71,13 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
         assertThat(graphInfo.getEdgeDefinitions())
                 .hasSize(1)
                 .allSatisfy(ed -> {
-                    assertThat(ed.getCollection()).isEqualTo(name + "_e");
+                    assertThat(ed.getCollection()).isEqualTo("e");
                     assertThat(ed.getFrom())
                             .hasSize(1)
-                            .contains(name + "_v");
+                            .contains("v");
                     assertThat(ed.getTo())
                             .hasSize(1)
-                            .contains(name + "_v");
+                            .contains("v");
                 });
     }
 
@@ -93,17 +93,17 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
         assertThat(graphInfo).isNotNull();
         assertThat(graphInfo.getOrphanCollections())
                 .hasSize(1)
-                .contains(name + "_a");
+                .contains("a");
         assertThat(graphInfo.getEdgeDefinitions())
                 .hasSize(1)
                 .allSatisfy(ed -> {
-                    assertThat(ed.getCollection()).isEqualTo(name + "_e");
+                    assertThat(ed.getCollection()).isEqualTo("e");
                     assertThat(ed.getFrom())
                             .hasSize(1)
-                            .contains(name + "_v");
+                            .contains("v");
                     assertThat(ed.getTo())
                             .hasSize(1)
-                            .contains(name + "_v");
+                            .contains("v");
                 });
     }
 
@@ -120,15 +120,15 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
         assertThat(graphInfo.getEdgeDefinitions())
                 .hasSize(1)
                 .allSatisfy(ed -> {
-                    assertThat(ed.getCollection()).isEqualTo(name + "_e");
+                    assertThat(ed.getCollection()).isEqualTo("e");
                     assertThat(ed.getFrom())
                             .hasSize(2)
-                            .contains(name + "_a")
-                            .contains(name + "_v");
+                            .contains("a")
+                            .contains("v");
                     assertThat(ed.getTo())
                             .hasSize(2)
-                            .contains(name + "_a")
-                            .contains(name + "_v");
+                            .contains("a")
+                            .contains("v");
                 });
     }
 
@@ -146,15 +146,15 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
         assertThat(graphInfo.getEdgeDefinitions())
                 .hasSize(1)
                 .allSatisfy(ed -> {
-                    assertThat(ed.getCollection()).isEqualTo(name + "_e");
+                    assertThat(ed.getCollection()).isEqualTo("e");
                     assertThat(ed.getFrom())
                             .hasSize(2)
-                            .contains(name + "_a")
-                            .contains(name + "_v");
+                            .contains("a")
+                            .contains("v");
                     assertThat(ed.getTo())
                             .hasSize(2)
-                            .contains(name + "_a")
-                            .contains(name + "_v");
+                            .contains("a")
+                            .contains("v");
                 });
     }
 
@@ -177,64 +177,16 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
         assertThat(graphInfo.getEdgeDefinitions())
                 .hasSize(1)
                 .allSatisfy(ed -> {
-                    assertThat(ed.getCollection()).isEqualTo(name + "_e");
+                    assertThat(ed.getCollection()).isEqualTo("e");
                     assertThat(ed.getFrom())
                             .hasSize(2)
-                            .contains(name + "_a")
-                            .contains(name + "_v");
+                            .contains("a")
+                            .contains("v");
                     assertThat(ed.getTo())
                             .hasSize(2)
-                            .contains(name + "_a")
-                            .contains(name + "_v");
+                            .contains("a")
+                            .contains("v");
                 });
-    }
-
-    @Test
-    public void complexGraphWithInvalidName() {
-        Configuration conf = confBuilder()
-                .name("foo_bar")
-                .edgeDefinitions(EdgeDef.of("edge").from("vertex").to("vertex"))
-                .build();
-        Throwable thrown = catchThrowable(() -> graphInfo(conf));
-        assertThat(thrown)
-                .isInstanceOf(RuntimeException.class)
-                .cause()
-                .isInstanceOf(InvocationTargetException.class);
-        assertThat(((InvocationTargetException) thrown.getCause()).getTargetException())
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("name cannot contain '_'");
-    }
-
-    @Test
-    public void complexGraphWithInvalidVertexName() {
-        Configuration conf = confBuilder()
-                .name("foo")
-                .edgeDefinitions(EdgeDef.of("edge").from("foo_ver_tex").to("foo_vertex"))
-                .build();
-        Throwable thrown = catchThrowable(() -> graphInfo(conf));
-        assertThat(thrown)
-                .isInstanceOf(RuntimeException.class)
-                .cause()
-                .isInstanceOf(InvocationTargetException.class);
-        assertThat(((InvocationTargetException) thrown.getCause()).getTargetException())
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("name cannot contain '_'");
-    }
-
-    @Test
-    public void complexGraphWithInvalidEdgeName() {
-        Configuration conf = confBuilder()
-                .name("foo")
-                .edgeDefinitions(EdgeDef.of("foo_ed_ge").from("vertex").to("vertex"))
-                .build();
-        Throwable thrown = catchThrowable(() -> graphInfo(conf));
-        assertThat(thrown)
-                .isInstanceOf(RuntimeException.class)
-                .cause()
-                .isInstanceOf(InvocationTargetException.class);
-        assertThat(((InvocationTargetException) thrown.getCause()).getTargetException())
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("name cannot contain '_'");
     }
 
     @Test
@@ -251,13 +203,13 @@ public class ComplexDataDefinitionTest extends DataDefinitionTest {
         assertThat(graphInfo.getEdgeDefinitions())
                 .hasSize(1)
                 .allSatisfy(ed -> {
-                    assertThat(ed.getCollection()).isEqualTo(name + "_e");
+                    assertThat(ed.getCollection()).isEqualTo("e");
                     assertThat(ed.getFrom())
                             .hasSize(1)
-                            .contains(name + "_v");
+                            .contains("v");
                     assertThat(ed.getTo())
                             .hasSize(1)
-                            .contains(name + "_v");
+                            .contains("v");
                 });
     }
 

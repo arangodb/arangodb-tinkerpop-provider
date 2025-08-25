@@ -53,7 +53,6 @@ public class ArangoDBGraphConfig {
     public final Configuration configuration;
     public final String dbName;
     public final String graphName;
-    public final String prefix;
     public final GraphType graphType;
     public final Set<String> orphanCollections;
     public final Set<EdgeDef> edgeDefinitions;
@@ -67,7 +66,6 @@ public class ArangoDBGraphConfig {
         Configuration conf = configuration.subset(KEY_PREFIX);
         dbName = conf.getString(KEY_DB_NAME, DEFAULT_DB_NAME);
         graphName = conf.getString(KEY_GRAPH_NAME, DEFAULT_GRAPH_NAME);
-        prefix = graphName + "_";
         graphType = conf.getEnum(KEY_GRAPH_TYPE, GraphType.class, DEFAULT_GRAPH_TYPE);
         orphanCollections = computeOrphanCollections(conf.getList(String.class, KEY_GRAPH_ORPHAN_COLLECTIONS, Collections.emptyList()));
         edgeDefinitions = computeEdgeDefinitions(conf.getList(String.class, KEY_GRAPH_EDGE_DEFINITIONS, Collections.emptyList()));
@@ -79,9 +77,9 @@ public class ArangoDBGraphConfig {
     }
 
     private void validate() {
-        validateGraphName(graphName);
-        vertices.forEach(this::validateCollectionName);
-        edges.forEach(this::validateCollectionName);
+        validateName(graphName);
+        vertices.forEach(this::validateName);
+        edges.forEach(this::validateName);
         if (graphType == GraphType.SIMPLE) {
             if (vertices.size() > 1) {
                 throw new IllegalArgumentException("Simple graph allows only 1 vertex collection");
@@ -93,9 +91,7 @@ public class ArangoDBGraphConfig {
     }
 
     private Set<String> computeOrphanCollections(List<String> orphanCollections) {
-        return orphanCollections.stream()
-                .map(this::prefix)
-                .collect(Collectors.toSet());
+        return new HashSet<>(orphanCollections);
     }
 
     private Set<EdgeDef> computeEdgeDefinitions(List<String> edges) {
@@ -112,9 +108,9 @@ public class ArangoDBGraphConfig {
                 })
                 .collect(Collectors.toSet());
         if (graphType == GraphType.SIMPLE && res.isEmpty()) {
-            res.add(new EdgeDef(prefix(Edge.DEFAULT_LABEL))
-                    .from(prefix(Vertex.DEFAULT_LABEL))
-                    .to(prefix(Vertex.DEFAULT_LABEL)));
+            res.add(new EdgeDef(Edge.DEFAULT_LABEL)
+                    .from(Vertex.DEFAULT_LABEL)
+                    .to(Vertex.DEFAULT_LABEL));
         }
         return res;
     }
@@ -128,13 +124,9 @@ public class ArangoDBGraphConfig {
             throw new IllegalArgumentException("Invalid edge definition: " + edge);
         }
 
-        String collection = prefix(m.group(1));
-        String[] from = Stream.of(m.group(2).split(","))
-                .map(this::prefix)
-                .toArray(String[]::new);
-        String[] to = Stream.of(m.group(3).split(","))
-                .map(this::prefix)
-                .toArray(String[]::new);
+        String collection = m.group(1);
+        String[] from = Stream.of(m.group(2).split(",")).toArray(String[]::new);
+        String[] to = Stream.of(m.group(3).split(",")).toArray(String[]::new);
         return new EdgeDef(collection)
                 .from(from)
                 .to(to);
@@ -146,30 +138,6 @@ public class ArangoDBGraphConfig {
                 .collect(Collectors.toSet());
         res.addAll(orphanCollections);
         return res;
-    }
-
-    private String prefix(String collectionName) {
-        if (collectionName.startsWith(prefix)) {
-            return collectionName;
-        }
-        return prefix + collectionName;
-    }
-
-    private void validateGraphName(String name) {
-        validateName(name);
-        if (name.contains("_")) {
-            throw new IllegalArgumentException("graph name cannot contain '_': " + name);
-        }
-    }
-
-    private void validateCollectionName(String name) {
-        validateName(name);
-        if (!name.startsWith(prefix)) {
-            throw new IllegalArgumentException("name must start with prefix: " + name);
-        }
-        if (name.replaceFirst(prefix, "").contains("_")) {
-            throw new IllegalArgumentException("name cannot contain '_' after prefix: " + name);
-        }
     }
 
     private void validateName(String name) {

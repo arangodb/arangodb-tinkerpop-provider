@@ -154,7 +154,6 @@ public class ArangoDBVertex extends ArangoDBElement<VertexPropertyData, VertexDa
             return graph.edgeCollections();
         }
         return Arrays.stream(edgeLabels)
-                .map(graph::getPrefixedCollectionName)
                 .filter(graph.edgeCollections()::contains)
                 .collect(Collectors.toSet());
     }

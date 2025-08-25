@@ -24,6 +24,8 @@ import org.apache.tinkerpop.gremlin.LoadGraphWith;
 import org.apache.tinkerpop.gremlin.algorithm.generator.CommunityGeneratorTest;
 import org.apache.tinkerpop.gremlin.algorithm.generator.DistributionGeneratorTest;
 import org.apache.tinkerpop.gremlin.structure.VertexTest;
+import org.apache.tinkerpop.gremlin.structure.io.IoGraphTest;
+import org.apache.tinkerpop.gremlin.structure.io.IoTest;
 
 public class ComplexGraphWithoutIdPrefixProvider extends TestGraphProvider {
 
@@ -297,6 +299,26 @@ public class ComplexGraphWithoutIdPrefixProvider extends TestGraphProvider {
                         builder.edgeDefinitions(EdgeDef.of("self").from("testV").to("testV"));
                         break;
                 }
+            }
+        }
+        if (CommunityGeneratorTest.class.equals(test.getEnclosingClass()) ||
+                DistributionGeneratorTest.class.equals(test.getEnclosingClass()) ||
+                IoTest.class.equals(test.getEnclosingClass()) ||
+                IoGraphTest.class.equals(test)) {
+            String name = builder.getConfig().getString("gremlin.arangodb.conf.graph.name");
+            switch (name) {
+                case "readGraph":
+                    builder.db("ComplexGraphWithoutIdPrefixProvider-readGraph");
+                    break;
+                case "target":
+                    builder.db("ComplexGraphWithoutIdPrefixProvider-target");
+                    break;
+                case "g1":
+                    builder.db("ComplexGraphWithoutIdPrefixProvider-g1");
+                    break;
+                case "g2":
+                    builder.db("ComplexGraphWithoutIdPrefixProvider-g2");
+                    break;
             }
         }
     }

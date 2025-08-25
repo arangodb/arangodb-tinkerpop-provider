@@ -55,7 +55,7 @@ public abstract class ElementIdFactory {
 
     protected abstract void validateId(String id, String label);
 
-    protected abstract ElementId doCreate(String prefix, String collection, String key);
+    protected abstract ElementId doCreate(String collection, String key);
 
     private String extractKey(final String id) {
         String[] parts = id.split("/");
@@ -63,7 +63,7 @@ public abstract class ElementIdFactory {
     }
 
     private String extractCollection(final String id) {
-        String[] parts = id.replaceFirst("^" + config.prefix, "").split("/");
+        String[] parts = id.split("/");
         if (parts.length > 2) {
             throw new IllegalArgumentException(String.format("key (%s) contains invalid character '/'", id));
         }
@@ -113,18 +113,18 @@ public abstract class ElementIdFactory {
     public ElementId parseId(String id) {
         String collection = extractCollection(id);
         String key = extractKey(id);
-        return of(config.graphName, collection, key);
+        return of(collection, key);
     }
 
     private ElementId parseWithDefaultCollection(String id, String defaultCollection) {
         String collection = inferCollection(extractCollection(id), null, defaultCollection);
         String key = extractKey(id);
-        return of(config.graphName, collection, key);
+        return of(collection, key);
     }
 
     private ElementId createId(String label, Object nullableId, String defaultCollection) {
         if (nullableId == null) {
-            return of(config.graphName, inferCollection(null, label, defaultCollection), null);
+            return of(inferCollection(null, label, defaultCollection), null);
         }
 
         if (!(nullableId instanceof String)) {
@@ -133,13 +133,12 @@ public abstract class ElementIdFactory {
 
         String id = (String) nullableId;
         validateId(id, label);
-        return of(config.graphName, inferCollection(extractCollection(id), label, defaultCollection), extractKey(id));
+        return of(inferCollection(extractCollection(id), label, defaultCollection), extractKey(id));
     }
 
-    private ElementId of(String graphName, String collection, String key) {
-        Objects.requireNonNull(graphName);
+    private ElementId of(String collection, String key) {
         Objects.requireNonNull(collection);
-        ElementId.validateIdParts(graphName, collection, key);
-        return doCreate(graphName, collection, key);
+        ElementId.validateIdParts(collection, key);
+        return doCreate(collection, key);
     }
 }

@@ -39,10 +39,6 @@ public class SimpleElementIdTest extends AbstractGremlinTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("foo/bar")
                 .hasMessageContaining("invalid character '/'");
-        assertThat(catchThrowable(() -> graph.addVertex(T.id, "foo_bar")))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("foo_bar")
-                .hasMessageContaining("invalid character '_'");
     }
 
     @Test

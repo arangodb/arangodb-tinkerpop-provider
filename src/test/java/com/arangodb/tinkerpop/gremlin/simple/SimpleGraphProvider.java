@@ -19,6 +19,11 @@ package com.arangodb.tinkerpop.gremlin.simple;
 import com.arangodb.tinkerpop.gremlin.TestGraphProvider;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
 import com.arangodb.tinkerpop.gremlin.utils.ArangoDBConfigurationBuilder;
+import org.apache.tinkerpop.gremlin.LoadGraphWith;
+import org.apache.tinkerpop.gremlin.algorithm.generator.CommunityGeneratorTest;
+import org.apache.tinkerpop.gremlin.algorithm.generator.DistributionGeneratorTest;
+import org.apache.tinkerpop.gremlin.structure.io.IoGraphTest;
+import org.apache.tinkerpop.gremlin.structure.io.IoTest;
 
 public class SimpleGraphProvider extends TestGraphProvider {
 
@@ -29,4 +34,27 @@ public class SimpleGraphProvider extends TestGraphProvider {
                 .graphClass(SimpleTestGraph.class);
     }
 
+    @Override
+    protected void configureDataDefinitions(ArangoDBConfigurationBuilder builder, Class<?> test, String testMethodName, LoadGraphWith.GraphData loadGraphWith) {
+        if (CommunityGeneratorTest.class.equals(test.getEnclosingClass()) ||
+                DistributionGeneratorTest.class.equals(test.getEnclosingClass()) ||
+                IoTest.class.equals(test.getEnclosingClass()) ||
+                IoGraphTest.class.equals(test)) {
+            String name = builder.getConfig().getString("gremlin.arangodb.conf.graph.name");
+            switch (name) {
+                case "readGraph":
+                    builder.db("SimpleGraphProvider-readGraph");
+                    break;
+                case "target":
+                    builder.db("SimpleGraphProvider-target");
+                    break;
+                case "g1":
+                    builder.db("SimpleGraphProvider-g1");
+                    break;
+                case "g2":
+                    builder.db("SimpleGraphProvider-g2");
+                    break;
+            }
+        }
+    }
 }

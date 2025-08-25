@@ -55,9 +55,6 @@ public class ComplexElementIdFactory extends ElementIdFactory {
 
     @Override
     protected void validateId(String id, String label) {
-        if (id.contains("_")) {
-            throw new IllegalArgumentException(String.format("id (%s) contains invalid character '_'", id));
-        }
         int idx = id.indexOf('/');
         if (idx <= 0) {
             String l = label != null ? label : "<label>";
@@ -72,8 +69,8 @@ public class ComplexElementIdFactory extends ElementIdFactory {
     }
 
     @Override
-    protected ElementId doCreate(String prefix, String collection, String key) {
-        return new ComplexId(prefix, collection, key);
+    protected ElementId doCreate(String collection, String key) {
+        return new ComplexId(collection, key);
     }
 
 }

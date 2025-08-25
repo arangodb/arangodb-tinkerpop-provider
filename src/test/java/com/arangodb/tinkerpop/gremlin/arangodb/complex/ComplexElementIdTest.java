@@ -16,7 +16,6 @@
 
 package com.arangodb.tinkerpop.gremlin.arangodb.complex;
 
-import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph;
 import org.apache.tinkerpop.gremlin.AbstractGremlinTest;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -39,7 +38,8 @@ public class ComplexElementIdTest extends AbstractGremlinTest {
                 .isInstanceOf(String.class)
                 .asString()
                 .startsWith(Vertex.DEFAULT_LABEL + "/");
-
+        assertThat(graph.addVertex(T.id, "foo_bar/foo_bar").id())
+                .isEqualTo("foo_bar/foo_bar");
         assertThat(catchThrowable(() -> graph.addVertex(T.id, "/c")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("must start with label prefix")
@@ -64,22 +64,6 @@ public class ComplexElementIdTest extends AbstractGremlinTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("bar/baz")
                 .hasMessageContaining("invalid character '/'");
-        assertThat(catchThrowable(() -> graph.addVertex(T.id, "foo_bar")))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("foo_bar")
-                .hasMessageContaining("invalid character '_'");
-        assertThat(catchThrowable(() -> graph.addVertex(T.id, "foo/bar_baz")))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("bar_baz")
-                .hasMessageContaining("invalid character '_'");
-        assertThat(catchThrowable(() -> graph.addVertex(T.id, "foo_bar/baz")))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("foo_bar")
-                .hasMessageContaining("invalid character '_'");
-        assertThat(catchThrowable(() -> graph.addVertex(T.id, "vertex_foo/bar")))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("vertex_foo")
-                .hasMessageContaining("invalid character '_'");
     }
 
     @Test
@@ -88,6 +72,7 @@ public class ComplexElementIdTest extends AbstractGremlinTest {
         assertThat(graph.addVertex(T.id, "foo/b", T.label, "foo").label()).isEqualTo("foo");
         assertThat(graph.addVertex(T.label, "foo").label()).isEqualTo("foo");
         assertThat(graph.addVertex().label()).isEqualTo(Vertex.DEFAULT_LABEL);
+        assertThat(graph.addVertex(T.label, "foo_bar").label()).isEqualTo("foo_bar");
 
         assertThat(catchThrowable(() -> graph.addVertex(T.id, "c", T.label, "foo")))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -101,22 +86,6 @@ public class ComplexElementIdTest extends AbstractGremlinTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("foo/bar")
                 .hasMessageContaining("invalid character '/'");
-        assertThat(catchThrowable(() -> graph.addVertex(T.label, "foo_bar")))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("foo_bar")
-                .hasMessageContaining("invalid character '_'");
     }
 
-    @Test
-    public void prefix() {
-        String prefix = ((ArangoDBGraph) graph).name() + "_";
-        assertThat(catchThrowable(() -> graph.addVertex(T.id, prefix + "foo/a")))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining(prefix + "foo/a")
-                .hasMessageContaining("invalid character '_'");
-        assertThat(catchThrowable(() -> graph.addVertex(T.id, prefix + "foo/b", T.label, "foo")))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining(prefix + "foo/b")
-                .hasMessageContaining("invalid character '_'");
-    }
 }
