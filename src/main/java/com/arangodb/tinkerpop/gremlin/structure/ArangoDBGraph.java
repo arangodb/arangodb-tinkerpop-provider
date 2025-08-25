@@ -21,9 +21,7 @@ import java.util.*;
 import com.arangodb.ArangoDatabase;
 import com.arangodb.model.AqlQueryOptions;
 import com.arangodb.tinkerpop.gremlin.PackageVersion;
-import com.arangodb.tinkerpop.gremlin.persistence.ElementId;
-import com.arangodb.tinkerpop.gremlin.persistence.ElementIdFactory;
-import com.arangodb.tinkerpop.gremlin.persistence.VariablesData;
+import com.arangodb.tinkerpop.gremlin.persistence.*;
 import com.arangodb.tinkerpop.gremlin.process.traversal.step.sideEffect.AQLStartStep;
 import com.arangodb.tinkerpop.gremlin.utils.ArangoDBUtil;
 import org.apache.commons.configuration2.Configuration;
@@ -109,16 +107,7 @@ public class ArangoDBGraph implements Graph {
 
     @Override
     public Vertex addVertex(Object... keyValues) {
-        ElementHelper.legalPropertyKeyValueArray(keyValues);
-        String label = ElementHelper.getLabelValue(keyValues).orElse(null);
-        Object id = ElementHelper.getIdValue(keyValues).orElse(null);
-        ElementId elementId = idFactory.createVertexId(label, id);
-        for (int i = 0; i < keyValues.length; i = i + 2) {
-            if (keyValues[i] instanceof String) {
-                ArangoDBUtil.validateProperty((String) keyValues[i], keyValues[i + 1]);
-            }
-        }
-        ArangoDBVertex vertex = ArangoDBVertex.of(label, elementId, this);
+        ArangoDBVertex vertex = createVertex(keyValues);
         if (!config.vertices.contains(vertex.collection())) {
             throw new IllegalArgumentException(String.format("Vertex collection (%s) not in graph (%s).", vertex.collection(), name()));
         }
@@ -170,10 +159,6 @@ public class ArangoDBGraph implements Graph {
 
     public ArangoDBGraphClient getClient() {
         return client;
-    }
-
-    ElementIdFactory getIdFactory() {
-        return idFactory;
     }
 
     /**
@@ -294,4 +279,37 @@ public class ArangoDBGraph implements Graph {
     public ArangoGraph getArangoGraph() {
         return client.getArangoGraph();
     }
+
+    public ArangoDBVertex createVertex(Object... keyValues) {
+        ElementHelper.legalPropertyKeyValueArray(keyValues);
+        String label = ElementHelper.getLabelValue(keyValues).orElse(null);
+        Object id = ElementHelper.getIdValue(keyValues).orElse(null);
+        ElementId elementId = idFactory.createVertexId(label, id);
+        for (int i = 0; i < keyValues.length; i = i + 2) {
+            if (keyValues[i] instanceof String) {
+                ArangoDBUtil.validateProperty((String) keyValues[i], keyValues[i + 1]);
+            }
+        }
+        String inferredLabel = label != null ? label : Optional.ofNullable(elementId.getLabel()).orElse(Vertex.DEFAULT_LABEL);
+        return createVertex(new VertexData(inferredLabel, elementId));
+    }
+
+    public ArangoDBVertex createVertex(VertexData data) {
+        return new ArangoDBVertex(this, data);
+    }
+
+    public ArangoDBEdge createEdge(String label, Vertex outVertex, Vertex inVertex, Object... keyValues) {
+        ElementHelper.legalPropertyKeyValueArray(keyValues);
+        ElementHelper.validateLabel(label);
+        Object id = ElementHelper.getIdValue(keyValues).orElse(null);
+        ElementId elementId = idFactory.createEdgeId(label, id);
+        ElementId outVertexId = idFactory.parseVertexId(outVertex.id());
+        ElementId inVertexId = idFactory.parseVertexId(inVertex.id());
+        return createEdge(new EdgeData(label, elementId, outVertexId, inVertexId));
+    }
+
+    public ArangoDBEdge createEdge(EdgeData data) {
+        return new ArangoDBEdge(this, data);
+    }
+
 }

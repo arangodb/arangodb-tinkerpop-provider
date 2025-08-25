@@ -43,7 +43,7 @@ public class ComplexPersistenceTest extends AbstractGremlinTest {
     @Test
     @SuppressWarnings("unchecked")
     public void vertices() {
-        Vertex v = graph.addVertex(T.id, "foo");
+        Vertex v = graph.addVertex(T.id, Vertex.DEFAULT_LABEL + "/foo");
         v
                 .property("key", "value")
                 .property("meta", "metaValue");
@@ -71,9 +71,9 @@ public class ComplexPersistenceTest extends AbstractGremlinTest {
     @Test
     @SuppressWarnings("unchecked")
     public void edges() {
-        Vertex a = graph.addVertex(T.id, "a");
-        Vertex b = graph.addVertex(T.id, "b");
-        Edge e = a.addEdge(Edge.DEFAULT_LABEL, b, T.id, "e", "key", "value");
+        Vertex a = graph.addVertex(T.id, Vertex.DEFAULT_LABEL + "/a");
+        Vertex b = graph.addVertex(T.id, Vertex.DEFAULT_LABEL + "/b");
+        Edge e = a.addEdge(Edge.DEFAULT_LABEL, b, T.id, Edge.DEFAULT_LABEL + "/e", "key", "value");
 
         String vertexColName = graphName() + "_" + Vertex.DEFAULT_LABEL;
         String edgeColName = graphName() + "_" + Edge.DEFAULT_LABEL;

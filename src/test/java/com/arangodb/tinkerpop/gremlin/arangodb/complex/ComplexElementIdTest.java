@@ -31,8 +31,6 @@ public class ComplexElementIdTest extends AbstractGremlinTest {
     public void id() {
         assertThat(graph.addVertex(T.id, "foo/a").id()).isEqualTo("foo/a");
         assertThat(graph.addVertex(T.id, "foo/b", T.label, "foo").id()).isEqualTo("foo/b");
-        assertThat(graph.addVertex(T.id, "c", T.label, "foo").id()).isEqualTo("foo/c");
-        assertThat(graph.addVertex(T.id, "d").id()).isEqualTo(Vertex.DEFAULT_LABEL + "/d");
         assertThat(graph.addVertex(T.label, "foo").id())
                 .isInstanceOf(String.class)
                 .asString()
@@ -42,9 +40,26 @@ public class ComplexElementIdTest extends AbstractGremlinTest {
                 .asString()
                 .startsWith(Vertex.DEFAULT_LABEL + "/");
 
+        assertThat(catchThrowable(() -> graph.addVertex(T.id, "/c")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("must start with label prefix")
+                .hasMessageContaining("<label>/");
+        assertThat(catchThrowable(() -> graph.addVertex(T.id, "c/")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("must have format")
+                .hasMessageContaining("<label>/<key>");
+        assertThat(catchThrowable(() -> graph.addVertex(T.id, "c", T.label, "foo")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("must start with label prefix")
+                .hasMessageContaining("foo/");
+        assertThat(catchThrowable(() -> graph.addVertex(T.id, "d")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("must start with label prefix")
+                .hasMessageContaining("<label>/");
         assertThat(catchThrowable(() -> graph.addVertex(T.id, "foo/bar", T.label, "baz")))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Mismatching label");
+                .hasMessageContaining("must start with label prefix")
+                .hasMessageContaining("baz/");
         assertThat(catchThrowable(() -> graph.addVertex(T.id, "foo/bar/baz")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("bar/baz")
@@ -71,11 +86,17 @@ public class ComplexElementIdTest extends AbstractGremlinTest {
     public void label() {
         assertThat(graph.addVertex(T.id, "foo/a").label()).isEqualTo("foo");
         assertThat(graph.addVertex(T.id, "foo/b", T.label, "foo").label()).isEqualTo("foo");
-        assertThat(graph.addVertex(T.id, "c", T.label, "foo").label()).isEqualTo("foo");
-        assertThat(graph.addVertex(T.id, "d").label()).isEqualTo(Vertex.DEFAULT_LABEL);
         assertThat(graph.addVertex(T.label, "foo").label()).isEqualTo("foo");
         assertThat(graph.addVertex().label()).isEqualTo(Vertex.DEFAULT_LABEL);
 
+        assertThat(catchThrowable(() -> graph.addVertex(T.id, "c", T.label, "foo")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("must start with label prefix")
+                .hasMessageContaining("foo/");
+        assertThat(catchThrowable(() -> graph.addVertex(T.id, "d")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("must start with label prefix")
+                .hasMessageContaining("<label>/");
         assertThat(catchThrowable(() -> graph.addVertex(T.label, "foo/bar")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("foo/bar")
@@ -89,7 +110,13 @@ public class ComplexElementIdTest extends AbstractGremlinTest {
     @Test
     public void prefix() {
         String prefix = ((ArangoDBGraph) graph).name() + "_";
-        assertThat(graph.addVertex(T.id, prefix + "foo/a").id()).isEqualTo("foo/a");
-        assertThat(graph.addVertex(T.id, prefix + "foo/b", T.label, "foo").id()).isEqualTo("foo/b");
+        assertThat(catchThrowable(() -> graph.addVertex(T.id, prefix + "foo/a")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining(prefix + "foo/a")
+                .hasMessageContaining("invalid character '_'");
+        assertThat(catchThrowable(() -> graph.addVertex(T.id, prefix + "foo/b", T.label, "foo")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining(prefix + "foo/b")
+                .hasMessageContaining("invalid character '_'");
     }
 }

@@ -21,7 +21,7 @@ import org.apache.tinkerpop.gremlin.structure.StructureStandardSuite;
 import org.junit.runner.RunWith;
 
 @RunWith(StructureStandardSuite.class)
-@GraphProviderClass(provider = ComplexGraphProvider.class, graph = ComplexTestGraph.class)
+@GraphProviderClass(provider = ComplexGraphWithoutIdPrefixProvider.class, graph = ComplexTestGraphWithoutIdPrefix.class)
 public class ComplexStructureStandardSuiteTest {
 
 }

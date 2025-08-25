@@ -16,7 +16,6 @@
 
 package com.arangodb.tinkerpop.gremlin.structure;
 
-import com.arangodb.tinkerpop.gremlin.persistence.ElementId;
 import com.arangodb.tinkerpop.gremlin.persistence.VertexData;
 import com.arangodb.tinkerpop.gremlin.persistence.VertexPropertyData;
 import org.apache.tinkerpop.gremlin.structure.*;
@@ -31,12 +30,7 @@ import static com.arangodb.tinkerpop.gremlin.structure.ArangoDBElement.Exception
 
 public class ArangoDBVertex extends ArangoDBElement<VertexPropertyData, VertexData> implements Vertex, ArangoDBPersistentElement {
 
-    static ArangoDBVertex of(String label, ElementId id, ArangoDBGraph graph) {
-        String inferredLabel = label != null ? label : Optional.ofNullable(id.getLabel()).orElse(Vertex.DEFAULT_LABEL);
-        return new ArangoDBVertex(graph, new VertexData(inferredLabel, id));
-    }
-
-    public ArangoDBVertex(ArangoDBGraph graph, VertexData data) {
+    ArangoDBVertex(ArangoDBGraph graph, VertexData data) {
         super(graph, data);
     }
 
@@ -74,14 +68,7 @@ public class ArangoDBVertex extends ArangoDBElement<VertexPropertyData, VertexDa
     public Edge addEdge(String label, Vertex vertex, Object... keyValues) {
         if (null == vertex) throw Graph.Exceptions.argumentCanNotBeNull("vertex");
         if (removed() || ((ArangoDBVertex) vertex).removed()) throw elementAlreadyRemoved(id());
-
-        ElementHelper.legalPropertyKeyValueArray(keyValues);
-        ElementHelper.validateLabel(label);
-        Object id = ElementHelper.getIdValue(keyValues).orElse(null);
-        ElementId elementId = graph.getIdFactory().createEdgeId(label, id);
-        ElementId outVertexId = graph.getIdFactory().parseVertexId(id());
-        ElementId inVertexId = graph.getIdFactory().parseVertexId(vertex.id());
-        ArangoDBEdge edge = ArangoDBEdge.of(label, elementId, outVertexId, inVertexId, graph);
+        ArangoDBEdge edge = graph.createEdge(label, this, vertex, keyValues);
         if (!graph.edgeCollections().contains(edge.collection())) {
             throw new IllegalArgumentException(String.format("Edge collection (%s) not in graph (%s).", edge.collection(), graph.name()));
         }

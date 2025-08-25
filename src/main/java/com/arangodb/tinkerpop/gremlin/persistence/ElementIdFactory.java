@@ -53,7 +53,7 @@ public abstract class ElementIdFactory {
 
     protected abstract String inferCollection(final String collection, final String label, final String defaultCollection);
 
-    protected abstract void validateId(String id);
+    protected abstract void validateId(String id, String label);
 
     protected abstract ElementId doCreate(String prefix, String collection, String key);
 
@@ -132,7 +132,7 @@ public abstract class ElementIdFactory {
         }
 
         String id = (String) nullableId;
-        validateId(id);
+        validateId(id, label);
         return of(config.graphName, inferCollection(extractCollection(id), label, defaultCollection), extractKey(id));
     }
 

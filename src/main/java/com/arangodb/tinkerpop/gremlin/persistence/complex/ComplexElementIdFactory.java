@@ -54,9 +54,20 @@ public class ComplexElementIdFactory extends ElementIdFactory {
     }
 
     @Override
-    protected void validateId(String id) {
-        if (id.replaceFirst("^" + config.prefix, "").contains("_")) {
+    protected void validateId(String id, String label) {
+        if (id.contains("_")) {
             throw new IllegalArgumentException(String.format("id (%s) contains invalid character '_'", id));
+        }
+        int idx = id.indexOf('/');
+        if (idx <= 0) {
+            String l = label != null ? label : "<label>";
+            throw new IllegalArgumentException(String.format("id (%s) must start with label prefix (%s/)", id, l));
+        }
+        if (idx >= id.length() - 1) {
+            throw new IllegalArgumentException(String.format("id (%s) must have format (<label>/<key>)", id));
+        }
+        if (label != null && !id.substring(0, idx).equals(label)) {
+            throw new IllegalArgumentException(String.format("id (%s) must start with label prefix (%s/)", id, label));
         }
     }
 

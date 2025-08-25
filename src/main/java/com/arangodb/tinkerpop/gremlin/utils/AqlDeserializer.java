@@ -18,9 +18,7 @@ package com.arangodb.tinkerpop.gremlin.utils;
 
 import com.arangodb.tinkerpop.gremlin.persistence.EdgeData;
 import com.arangodb.tinkerpop.gremlin.persistence.VertexData;
-import com.arangodb.tinkerpop.gremlin.structure.ArangoDBEdge;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph;
-import com.arangodb.tinkerpop.gremlin.structure.ArangoDBVertex;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils;
@@ -52,10 +50,10 @@ public class AqlDeserializer {
             return null;
         } else if (isEdge(node)) {
             EdgeData data = mapper.readerFor(EdgeData.class).readValue(node);
-            return new ArangoDBEdge(graph, data);
+            return graph.createEdge(data);
         } else if (isVertex(node)) {
             VertexData data = mapper.readerFor(VertexData.class).readValue(node);
-            return new ArangoDBVertex(graph, data);
+            return graph.createVertex(data);
         } else if (node.isArray()) {
             ArrayList<Object> out = new ArrayList<>();
             for (JsonNode e : IteratorUtils.list(node.elements())) {
