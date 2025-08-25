@@ -48,6 +48,10 @@ import org.apache.tinkerpop.gremlin.structure.util.ElementHelper;
         method = "shouldAddEdgeWithUserSuppliedStringId",
         reason = "tested with simple graph only")
 @Graph.OptOut(
+        test = "org.apache.tinkerpop.gremlin.process.traversal.step.map.MergeEdgeTest$Traversals",
+        method = "*",
+        reason = "tested with simple graph only")
+@Graph.OptOut(
         test = "org.apache.tinkerpop.gremlin.process.traversal.step.OrderabilityTest$Traversals",
         method = "g_V_properties_order",
         reason = "requires numeric ids support")
