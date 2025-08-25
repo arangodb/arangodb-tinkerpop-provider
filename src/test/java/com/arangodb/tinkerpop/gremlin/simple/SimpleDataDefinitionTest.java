@@ -61,46 +61,14 @@ public class SimpleDataDefinitionTest extends DataDefinitionTest {
         assertThat(graphInfo.getEdgeDefinitions())
                 .hasSize(1)
                 .allSatisfy(ed -> {
-                    assertThat(ed.getCollection()).isEqualTo("foo_edges");
+                    assertThat(ed.getCollection()).isEqualTo("edges");
                     assertThat(ed.getFrom())
                             .hasSize(1)
-                            .contains("foo_vertexes");
+                            .contains("vertexes");
                     assertThat(ed.getTo())
                             .hasSize(1)
-                            .contains("foo_vertexes");
+                            .contains("vertexes");
                 });
-    }
-
-    @Test
-    public void simpleGraphWithInvalidVertexName() {
-        Configuration conf = confBuilder()
-                .name("foo")
-                .edgeDefinitions(EdgeDef.of("edge").from("foo_ver_tex").to("foo_vertex"))
-                .build();
-        Throwable thrown = catchThrowable(() -> graphInfo(conf));
-        assertThat(thrown)
-                .isInstanceOf(RuntimeException.class)
-                .cause()
-                .isInstanceOf(InvocationTargetException.class);
-        assertThat(((InvocationTargetException) thrown.getCause()).getTargetException())
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("name cannot contain '_'");
-    }
-
-    @Test
-    public void simpleGraphWithInvalidEdgeName() {
-        Configuration conf = confBuilder()
-                .name("foo")
-                .edgeDefinitions(EdgeDef.of("foo_ed_ge").from("vertex").to("vertex"))
-                .build();
-        Throwable thrown = catchThrowable(() -> graphInfo(conf));
-        assertThat(thrown)
-                .isInstanceOf(RuntimeException.class)
-                .cause()
-                .isInstanceOf(InvocationTargetException.class);
-        assertThat(((InvocationTargetException) thrown.getCause()).getTargetException())
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("name cannot contain '_'");
     }
 
     @Test
@@ -117,13 +85,13 @@ public class SimpleDataDefinitionTest extends DataDefinitionTest {
         assertThat(graphInfo.getEdgeDefinitions())
                 .hasSize(1)
                 .allSatisfy(ed -> {
-                    assertThat(ed.getCollection()).isEqualTo(name + "_e");
+                    assertThat(ed.getCollection()).isEqualTo("e");
                     assertThat(ed.getFrom())
                             .hasSize(1)
-                            .contains(name + "_v");
+                            .contains("v");
                     assertThat(ed.getTo())
                             .hasSize(1)
-                            .contains(name + "_v");
+                            .contains("v");
                 });
     }
 
@@ -217,20 +185,19 @@ public class SimpleDataDefinitionTest extends DataDefinitionTest {
     }
 
     private void checkDefaultSimpleGraph(Configuration conf) {
-        String name = getName(conf);
         GraphEntity graphInfo = graphInfo(conf);
         assertThat(graphInfo).isNotNull();
         assertThat(graphInfo.getOrphanCollections()).isEmpty();
         assertThat(graphInfo.getEdgeDefinitions())
                 .hasSize(1)
                 .allSatisfy(ed -> {
-                    assertThat(ed.getCollection()).isEqualTo(name + "_edge");
+                    assertThat(ed.getCollection()).isEqualTo("edge");
                     assertThat(ed.getFrom())
                             .hasSize(1)
-                            .contains(name + "_vertex");
+                            .contains("vertex");
                     assertThat(ed.getTo())
                             .hasSize(1)
-                            .contains(name + "_vertex");
+                            .contains("vertex");
                 });
     }
 

@@ -226,6 +226,15 @@ public class ArangoDBConfigurationBuilder {
     }
 
     /**
+     * Retrieves the current BaseConfiguration instance.
+     *
+     * @return the current BaseConfiguration instance being used.
+     */
+    public BaseConfiguration getConfig() {
+        return config;
+    }
+
+    /**
      * Build the configuration.
      *
      * @return a configuration that can be used to instantiate a new {@link ArangoDBGraph}.

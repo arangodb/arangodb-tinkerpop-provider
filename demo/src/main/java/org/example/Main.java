@@ -136,7 +136,7 @@ public class Main {
 
             System.out.println("Find \"marko\" in the graph using AQL");
             String query = """
-                    FOR d IN tinkerpop_vertex
+                    FOR d IN vertex
                     FILTER d.name == @name
                     RETURN d
                     """;
@@ -247,13 +247,13 @@ public class Main {
 
             String shortestPathQuery = """
                     LET start = FIRST(
-                      FOR d IN tinkerpop_vertex
+                      FOR d IN vertex
                       FILTER d.code == @start
                       RETURN d
                     )
                     
                     LET target = FIRST(
-                      FOR d IN tinkerpop_vertex
+                      FOR d IN vertex
                       FILTER d.code == @target
                       RETURN d
                     )
@@ -278,7 +278,7 @@ public class Main {
 
             String traversalQuery = """
                     LET start = FIRST(
-                      FOR d IN tinkerpop_vertex
+                      FOR d IN vertex
                       FILTER d.code == @start
                       RETURN d
                     )

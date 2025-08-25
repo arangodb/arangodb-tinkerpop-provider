@@ -246,13 +246,6 @@ public class ArangoDBGraph implements Graph {
         return traversal;
     }
 
-    String getPrefixedCollectionName(String collectionName) {
-        if (collectionName.startsWith(config.graphName + "_")) {
-            return collectionName;
-        }
-        return config.graphName + "_" + collectionName;
-    }
-
     /**
      * Get the underlying ArangoDB driver instance.
      *

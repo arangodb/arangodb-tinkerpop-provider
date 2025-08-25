@@ -20,8 +20,8 @@ import com.arangodb.tinkerpop.gremlin.persistence.ElementId;
 
 public class ComplexId extends ElementId {
 
-    public ComplexId(String prefix, String collection, String key) {
-        super(prefix, collection, key);
+    public ComplexId(String collection, String key) {
+        super(collection, key);
     }
 
     @Override

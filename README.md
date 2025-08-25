@@ -55,7 +55,7 @@ implementation 'com.arangodb:arangodb-tinkerpop-provider:x.y.z'
 To use the provider in the Gremlin Console, first you need to install it:
 
 ```text
-:install com.arangodb arangodb-tinkerpop-provider 3.0.1
+:install com.arangodb arangodb-tinkerpop-provider 3.1.0-SNAPSHOT
 ```
 
 Then, after restarting the console, you can use it:
@@ -90,7 +90,7 @@ gremlin> g.V().hasLabel("person").values("name")
 To use the provider as Gremlin Server plugin, first you need to install it:
 
 ```text
-./bin/gremlin-server.sh install com.arangodb arangodb-tinkerpop-provider 3.0.1
+./bin/gremlin-server.sh install com.arangodb arangodb-tinkerpop-provider 3.1.0-SNAPSHOT
 ```
 
 Then, you need to create the graph configuration, e.g. in the file 

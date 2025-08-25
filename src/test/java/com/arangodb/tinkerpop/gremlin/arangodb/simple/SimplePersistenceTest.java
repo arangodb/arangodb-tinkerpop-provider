@@ -67,13 +67,12 @@ public class SimplePersistenceTest extends AbstractGremlinTest {
         v
                 .property("key", "value")
                 .property("meta", "metaValue");
-        String colName = graphName() + "_" + Vertex.DEFAULT_LABEL;
-        ArangoCollection col = client().database().collection(colName);
+        ArangoCollection col = client().database().collection(Vertex.DEFAULT_LABEL);
         Map<String, Object> doc = (Map<String, Object>) col.getDocument((String) v.id(), Map.class);
         assertThat(doc)
                 .hasSize(6)
                 .containsEntry(Fields.KEY, "foo")
-                .containsEntry(Fields.ID, colName + "/foo")
+                .containsEntry(Fields.ID, Vertex.DEFAULT_LABEL + "/foo")
                 .containsKey(Fields.REV)
                 .containsEntry(Fields.LABEL, "bar")
                 .containsEntry("key", "value");
@@ -95,17 +94,15 @@ public class SimplePersistenceTest extends AbstractGremlinTest {
         Vertex b = graph.addVertex(T.id, "b");
         Edge e = a.addEdge("foo", b, T.id, "e", "key", "value");
 
-        String vertexColName = graphName() + "_" + Vertex.DEFAULT_LABEL;
-        String edgeColName = graphName() + "_" + Edge.DEFAULT_LABEL;
-        ArangoCollection col = client().database().collection(edgeColName);
+        ArangoCollection col = client().database().collection(Edge.DEFAULT_LABEL);
         Map<String, Object> doc = (Map<String, Object>) col.getDocument((String) e.id(), Map.class);
         assertThat(doc)
                 .hasSize(7)
                 .containsEntry(Fields.KEY, "e")
-                .containsEntry(Fields.ID, edgeColName + "/e")
+                .containsEntry(Fields.ID, Edge.DEFAULT_LABEL + "/e")
                 .containsKey(Fields.REV)
-                .containsEntry(Fields.FROM, vertexColName + "/a")
-                .containsEntry(Fields.TO, vertexColName + "/b")
+                .containsEntry(Fields.FROM, Vertex.DEFAULT_LABEL + "/a")
+                .containsEntry(Fields.TO, Vertex.DEFAULT_LABEL + "/b")
                 .containsEntry(Fields.LABEL, "foo")
                 .containsEntry("key", "value");
     }

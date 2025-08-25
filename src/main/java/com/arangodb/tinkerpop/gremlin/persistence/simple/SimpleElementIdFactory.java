@@ -28,10 +28,8 @@ public class SimpleElementIdFactory extends ElementIdFactory {
 
     public SimpleElementIdFactory(ArangoDBGraphConfig config) {
         super(config);
-        defaultVertexCollection = config.vertices.iterator().next()
-                .replaceFirst(config.prefix, "");
-        defaultEdgeCollection = config.edges.iterator().next()
-                .replaceFirst(config.prefix, "");
+        defaultVertexCollection = config.vertices.iterator().next();
+        defaultEdgeCollection = config.edges.iterator().next();
     }
 
     @Override
@@ -51,16 +49,13 @@ public class SimpleElementIdFactory extends ElementIdFactory {
 
     @Override
     protected void validateId(String id, String label) {
-        if (id.contains("_")) {
-            throw new IllegalArgumentException(String.format("id (%s) contains invalid character '_'", id));
-        }
         if (id.contains("/")) {
             throw new IllegalArgumentException(String.format("id (%s) contains invalid character '/'", id));
         }
     }
 
     @Override
-    protected ElementId doCreate(String prefix, String collection, String key) {
-        return new SimpleId(prefix, collection, key);
+    protected ElementId doCreate(String collection, String key) {
+        return new SimpleId(collection, key);
     }
 }

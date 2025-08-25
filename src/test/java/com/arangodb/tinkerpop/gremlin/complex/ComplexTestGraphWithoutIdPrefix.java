@@ -117,10 +117,9 @@ public class ComplexTestGraphWithoutIdPrefix extends ArangoDBGraph {
             Object key = keyValues[i];
             Object value = keyValues[i + 1];
             if (key.equals(T.id) && value instanceof String) {
-                String prefix = label + "/";
                 String id = (String) value;
-                if (!id.startsWith(prefix)) {
-                    value = prefix + id;
+                if (!id.contains("/")) {
+                    value = label + "/" + id;
                 }
             }
             newKeyValues[i] = key;

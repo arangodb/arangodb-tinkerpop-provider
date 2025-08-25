@@ -20,7 +20,6 @@ import java.util.Objects;
 
 public abstract class ElementId {
 
-    protected final String prefix;
     protected final String collection;
     protected String key;
 
@@ -28,17 +27,13 @@ public abstract class ElementId {
         for (String name : names) {
             if (name == null)
                 continue;
-            if (name.contains("_")) {
-                throw new IllegalArgumentException(String.format("id part (%s) contains invalid character '_'", name));
-            }
             if (name.contains("/")) {
                 throw new IllegalArgumentException(String.format("id part (%s) contains invalid character '/'", name));
             }
         }
     }
 
-    protected ElementId(String prefix, String collection, String key) {
-        this.prefix = prefix;
+    protected ElementId(String collection, String key) {
         this.collection = collection;
         this.key = key;
     }
@@ -46,7 +41,7 @@ public abstract class ElementId {
     public abstract String getLabel();
 
     public String getCollection() {
-        return prefix + "_" + collection;
+        return collection;
     }
 
     public abstract String getId();
@@ -64,7 +59,7 @@ public abstract class ElementId {
         if (key == null) {
             return null;
         } else {
-            return prefix + "_" + collection + "/" + key;
+            return collection + "/" + key;
         }
     }
 
@@ -77,12 +72,12 @@ public abstract class ElementId {
     public boolean equals(Object o) {
         if (!(o instanceof ElementId)) return false;
         ElementId elementId = (ElementId) o;
-        return Objects.equals(prefix, elementId.prefix) && Objects.equals(collection, elementId.collection) && Objects.equals(key, elementId.key);
+        return Objects.equals(collection, elementId.collection) && Objects.equals(key, elementId.key);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(prefix, collection, key);
+        return Objects.hash(collection, key);
     }
 
 }

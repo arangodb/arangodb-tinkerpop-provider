@@ -36,22 +36,21 @@ public class ArangoDBGraphConfigTest extends AbstractTest {
         ArangoDBGraphConfig conf = new ArangoDBGraphConfig(g.configuration());
         assertThat(conf.dbName).isEqualTo(dbName);
         assertThat(conf.graphName).isEqualTo("g");
-        assertThat(conf.prefix).isEqualTo("g_");
         assertThat(conf.graphType).isEqualTo(ArangoDBGraphConfig.GraphType.COMPLEX);
-        assertThat(conf.orphanCollections).containsExactlyInAnyOrder("g_x", "g_y", "g_z");
+        assertThat(conf.orphanCollections).containsExactlyInAnyOrder("x", "y", "z");
         assertThat(conf.edgeDefinitions).hasSize(2)
                 .anySatisfy(e -> {
-                    assertThat(e.getCollection()).isEqualTo("g_e1");
-                    assertThat(e.getFrom()).containsExactlyInAnyOrder("g_a");
-                    assertThat(e.getTo()).containsExactlyInAnyOrder("g_b", "g_c");
+                    assertThat(e.getCollection()).isEqualTo("e1");
+                    assertThat(e.getFrom()).containsExactlyInAnyOrder("a");
+                    assertThat(e.getTo()).containsExactlyInAnyOrder("b", "c");
                 })
                 .anySatisfy(e -> {
-                    assertThat(e.getCollection()).isEqualTo("g_e2");
-                    assertThat(e.getFrom()).containsExactlyInAnyOrder("g_a", "g_b");
-                    assertThat(e.getTo()).containsExactlyInAnyOrder("g_c", "g_d");
+                    assertThat(e.getCollection()).isEqualTo("e2");
+                    assertThat(e.getFrom()).containsExactlyInAnyOrder("a", "b");
+                    assertThat(e.getTo()).containsExactlyInAnyOrder("c", "d");
                 });
-        assertThat(conf.vertices).containsExactlyInAnyOrder("g_a", "g_b", "g_c", "g_d", "g_x", "g_y", "g_z");
-        assertThat(conf.edges).containsExactlyInAnyOrder("g_e1", "g_e2");
+        assertThat(conf.vertices).containsExactlyInAnyOrder("a", "b", "c", "d", "x", "y", "z");
+        assertThat(conf.edges).containsExactlyInAnyOrder("e1", "e2");
         assertThat(conf.driverConfig.getHosts()).isPresent()
                 .get(as(InstanceOfAssertFactories.list(HostDescription.class)))
                 .hasSize(1)
