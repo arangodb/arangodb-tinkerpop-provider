@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.0] - 2025-08-26
+
 - removed the restriction of prefixing collection names with graph name (#18, DE-1069)
 - fixed id prefix check in graphs of type `COMPLEX` (#17, DE-1068)
 - removed `_label` field from document structure in graphs of type `COMPLEX` (#15)

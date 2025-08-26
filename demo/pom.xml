@@ -6,7 +6,7 @@
 
     <groupId>org.example</groupId>
     <artifactId>arango-tinkerpop-demo</artifactId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>3.1.0</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -18,7 +18,7 @@
         <dependency>
             <groupId>com.arangodb</groupId>
             <artifactId>arangodb-tinkerpop-provider</artifactId>
-            <version>3.1.0-SNAPSHOT</version>
+            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
