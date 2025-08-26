@@ -55,7 +55,7 @@ implementation 'com.arangodb:arangodb-tinkerpop-provider:x.y.z'
 To use the provider in the Gremlin Console, first you need to install it:
 
 ```text
-:install com.arangodb arangodb-tinkerpop-provider 3.1.0-SNAPSHOT
+:install com.arangodb arangodb-tinkerpop-provider x.y.z
 ```
 
 Then, after restarting the console, you can use it:
@@ -73,10 +73,10 @@ gremlin> conf = [
 ==>gremlin.arangodb.conf.driver.password=test
 
 gremlin> graph = GraphFactory.open(conf)
-==>arangodbgraph[ArangoDBGraphConfig{dbName='_system', graphName='tinkerpop', graphType=SIMPLE, vertices=[tinkerpop_vertex], edges=[tinkerpop_edge], edgeDefinitions=[tinkerpop_edge:[tinkerpop_vertex]->[tinkerpop_vertex]], orphanCollections=[], driverConfig=ArangoConfigPropertiesImpl{prefix='', properties={password=test, hosts=172.28.0.1:8529}}}]
+==>arangodbgraph[ArangoDBGraphConfig{dbName='_system', graphName='tinkerpop', graphType=SIMPLE, vertices=[vertex], edges=[edge], edgeDefinitions=[edge:[vertex]->[vertex]], orphanCollections=[], driverConfig=ArangoConfigPropertiesImpl{properties={password=test, hosts=172.28.0.1:8529}}}]
 
 gremlin> g = graph.traversal()
-==>graphtraversalsource[arangodbgraph[ArangoDBGraphConfig{dbName='_system', graphName='tinkerpop', graphType=SIMPLE, vertices=[tinkerpop_vertex], edges=[tinkerpop_edge], edgeDefinitions=[tinkerpop_edge:[tinkerpop_vertex]->[tinkerpop_vertex]], orphanCollections=[], driverConfig=ArangoConfigPropertiesImpl{prefix='', properties={password=test, hosts=172.28.0.1:8529}}}], standard]
+==>graphtraversalsource[arangodbgraph[ArangoDBGraphConfig{dbName='_system', graphName='tinkerpop', graphType=SIMPLE, vertices=[vertex], edges=[edge], edgeDefinitions=[edge:[vertex]->[vertex]], orphanCollections=[], driverConfig=ArangoConfigPropertiesImpl{properties={password=test, hosts=172.28.0.1:8529}}}], standard]
 
 gremlin> g.addV("person").property("name", "marko")
 ==>v[4586117]
@@ -90,7 +90,7 @@ gremlin> g.V().hasLabel("person").values("name")
 To use the provider as Gremlin Server plugin, first you need to install it:
 
 ```text
-./bin/gremlin-server.sh install com.arangodb arangodb-tinkerpop-provider 3.1.0-SNAPSHOT
+./bin/gremlin-server.sh install com.arangodb arangodb-tinkerpop-provider x.y.z
 ```
 
 Then, you need to create the graph configuration, e.g. in the file 
@@ -385,8 +385,6 @@ definitions, set `gremlin.arangodb.conf.graph.enableDataDefinition` to `true`. T
 
 Existing graphs are never modified automatically.
 
-Collection names (vertex and edge collections) will be prefixed with the graph name if they aren't already.
-
 ## Graph Types
 
 The ArangoDB TinkerPop Provider supports two graph types, which can be configured with the property
@@ -439,8 +437,8 @@ graph.addVertex(T.label, "person", T.id, "foo");
 ```
 [//]: <> (@formatter:on)
 
-would result in creating a document in the vertex collection `myGraph_v` with `_key` equals to `foo` (and `_id` equals 
-to `myGraph_v/foo`).
+would result in creating a document in the vertex collection `v` with `_key` equals to `foo` (and `_id` equals 
+to `v/foo`).
 
 ### COMPLEX Graph Type
 
@@ -451,7 +449,7 @@ edge definitions. It has the following advantages:
 - It allows multiple vertex collections and multiple edge collections
 - It partitions the data in a finer way
 - It allows indexing and sharding collections independently
-- It can match pre-existing database graph structures
+- It is more flexible to match pre-existing database graph structures
 
 But on the other side has the following constraints:
 
@@ -484,18 +482,12 @@ graph.addVertex(T.label, "person", T.id, "person/foo");
 ```
 [//]: <> (@formatter:on)
 
-would result in creating a document in the vertex collection `myGraph_person` with `_key` equals to `foo` (and `_id` 
-equals to `myGraph_person/foo`).
+would result in creating a document in the vertex collection `person` with `_key` equals to `foo` (and `_id` 
+equals to `person/foo`).
 
 ## Naming Constraints
 
-When using the ArangoDB TinkerPop Provider, be aware of these naming constraints:
-
-- Element IDs must be strings
-- The underscore character (`_`) is used as a separator for collection names (e.g., `myGraph_myCol`). Therefore, it
-  cannot be used in:
-  - Graph name (`gremlin.arangodb.conf.graph.name`)
-  - Labels
+When using the ArangoDB TinkerPop Provider, be aware that Element IDs must be strings.
 
 ## Persistent Structure
 
@@ -504,8 +496,8 @@ The ArangoDB TinkerPop Provider maps TinkerPop data structures to ArangoDB data 
 ### Vertices
 
 Vertices are stored as documents in vertex collections. In a `SIMPLE` graph, all vertices are stored in a single
-collection, by default named `<graphName>_vertex`. In a `COMPLEX` graph, vertices are stored in collections named
-`<graphName>_<label>`.
+collection, by default named `vertex`. In a `COMPLEX` graph, vertices are stored in collections named
+`<label>`.
 
 Each vertex document contains:
 
@@ -530,7 +522,7 @@ creates a document like this:
 ```json
 {
   "_key": "4856",
-  "_id": "tinkerpop_vertex/4856",
+  "_id": "vertex/4856",
   "_rev": "_kFqmbXK---",
   "_label": "person",
   "name": "Freddie Mercury",
@@ -545,7 +537,7 @@ creates a document like this:
 ### Edges
 
 Edges are stored as documents in edge collections. In a `SIMPLE` graph, all edges are stored in a single collection, by
-default named `<graphName>_edge`. In a `COMPLEX` graph, edges are stored in collections named `<graphName>_<label>`.
+default named `edge`. In a `COMPLEX` graph, edges are stored in collections named `<label>`.
 
 Each edge document contains:
 
@@ -568,9 +560,9 @@ creates a document like this:
 ```json
 {
   "_key": "5338",
-  "_id": "tinkerpop_edge/5338",
-  "_from": "tinkerpop_vertex/5335",
-  "_to": "tinkerpop_vertex/5335",
+  "_id": "edge/5338",
+  "_from": "vertex/5335",
+  "_to": "vertex/5335",
   "_rev": "_kFq20-u---",
   "_label": "knows",
   "since": 1970
@@ -598,7 +590,7 @@ For complex queries or performance-critical operations, you can use ArangoDB's n
 [//]: <> (@formatter:off)
 ```java
 List<Vertex> alice = graph
-        .<Vertex>aql("FOR v IN graph_vertex FILTER v.name == @name RETURN v", Map.of("name", "Alice"))
+        .<Vertex>aql("FOR v IN vertex FILTER v.name == @name RETURN v", Map.of("name", "Alice"))
         .toList();
 
 // Query using document ID

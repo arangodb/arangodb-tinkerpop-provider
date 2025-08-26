@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- removed the restriction of prefixing collection names with graph name (#18, DE-1069)
+- fixed id prefix check in graphs of type `COMPLEX` (#17, DE-1068)
+- removed `_label` field from document structure in graphs of type `COMPLEX` (#15)
+- updated tinkerpop version to 3.7.4 (#16)
+
 ## [3.0.1] - 2025-08-06
 
 - fixed deserialization of `null` values in AQL results
