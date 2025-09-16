@@ -17,6 +17,7 @@
 package com.arangodb.tinkerpop.gremlin.utils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,7 +30,10 @@ public class Fields {
     public static final String META = "_meta";
     public static final String VERSION = "_version";
 
-    public static final Set<String> ALL_STATIC = new HashSet<>(Arrays.asList(
+    public static final Set<String> ALL_STATIC = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             ID, KEY, REV, FROM, TO, META, VERSION
-    ));
+    )));
+
+    private Fields() {
+    }
 }
