@@ -17,7 +17,7 @@
 package com.arangodb.tinkerpop.gremlin.persistence.serde;
 
 import com.arangodb.tinkerpop.gremlin.persistence.VariablesData;
-import com.arangodb.tinkerpop.gremlin.utils.Fields;
+import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -31,6 +31,12 @@ import java.util.Map;
 import static com.arangodb.tinkerpop.gremlin.utils.Fields.*;
 
 public class VariablesDataDeserializer extends JsonDeserializer<VariablesData> {
+    private final ArangoDBGraphConfig config;
+
+    public VariablesDataDeserializer(ArangoDBGraphConfig config) {
+        this.config = config;
+    }
+
     @Override
     public VariablesData deserialize(JsonParser p, DeserializationContext ctx) throws IOException {
         ObjectCodec c = p.getCodec();
@@ -40,7 +46,7 @@ public class VariablesDataDeserializer extends JsonDeserializer<VariablesData> {
         VariablesData data = new VariablesData(key, version);
 
         for (Map.Entry<String, JsonNode> prop : root.properties()) {
-            if (!Fields.isReserved(prop.getKey())) {
+            if (!config.isReservedField(prop.getKey())) {
                 data.put(prop.getKey(), c.treeToValue(prop.getValue(), Object.class));
             }
         }

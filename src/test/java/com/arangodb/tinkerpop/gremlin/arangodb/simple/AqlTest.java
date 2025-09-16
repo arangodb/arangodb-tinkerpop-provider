@@ -232,9 +232,9 @@ public class AqlTest extends AbstractGremlinTest {
                         graph().aql("" +
                                         "FOR start IN vertex" +
                                         "    FOR b, e1 IN 1..1 INBOUND start GRAPH standard" +
-                                        "        FILTER e1._label == 'sungBy'" +
+                                        "        FILTER e1." + graph().config.labelField + " == 'sungBy'" +
                                         "        FOR a, e2 IN 1..1 OUTBOUND b GRAPH standard" +
-                                        "            FILTER e2._label == 'writtenBy'" +
+                                        "            FILTER e2." + graph().config.labelField + " == 'writtenBy'" +
                                         "            FILTER a == start" +
                                         "            RETURN {a, b}")
                                 .select("a", "b").by("name")
@@ -244,9 +244,9 @@ public class AqlTest extends AbstractGremlinTest {
                         sungAndWrittenBySame,
                         graph().aql("" +
                                         "FOR e1 IN edge" +
-                                        "    FILTER e1._label == \"sungBy\"" +
+                                        "    FILTER e1." + graph().config.labelField + " == \"sungBy\"" +
                                         "    FOR e2 IN edge" +
-                                        "        FILTER e2._label == \"writtenBy\"" +
+                                        "        FILTER e2." + graph().config.labelField + " == \"writtenBy\"" +
                                         "        FILTER e1._from == e2._from" +
                                         "        FILTER e1._to == e2._to" +
                                         "        RETURN {a: DOCUMENT(e1._to), b: DOCUMENT(e1._from)}")
@@ -258,8 +258,8 @@ public class AqlTest extends AbstractGremlinTest {
                         graph().aql("" +
                                         "FOR start IN vertex" +
                                         "    FOR a, e, p IN 2..2 OUTBOUND start GRAPH standard" +
-                                        "        FILTER p.edges[0]._label == 'followedBy'" +
-                                        "        FILTER p.edges[1]._label == 'followedBy'" +
+                                        "        FILTER p.edges[0]." + graph().config.labelField + " == 'followedBy'" +
+                                        "        FILTER p.edges[1]." + graph().config.labelField + " == 'followedBy'" +
                                         "        FILTER a == start" +
                                         "        RETURN {a: p.vertices[0], b: p.vertices[1]}")
                                 .select("a", "b").by("name")
@@ -269,9 +269,9 @@ public class AqlTest extends AbstractGremlinTest {
                         followEachOther,
                         graph().aql("" +
                                         "FOR e1 IN edge" +
-                                        "    FILTER e1._label == 'followedBy'" +
+                                        "    FILTER e1." + graph().config.labelField + " == 'followedBy'" +
                                         "    FOR e2 IN edge" +
-                                        "        FILTER e2._label == 'followedBy'" +
+                                        "        FILTER e2." + graph().config.labelField + " == 'followedBy'" +
                                         "        FILTER e1._to == e2._from" +
                                         "        FILTER e1._from == e2._to" +
                                         "        RETURN {a: DOCUMENT(e1._from), b: DOCUMENT(e1._to)}")
@@ -284,14 +284,14 @@ public class AqlTest extends AbstractGremlinTest {
                                         "FOR start IN vertex" +
                                         "  LET outCount = (" +
                                         "    FOR a, e IN 1..1 OUTBOUND start GRAPH standard" +
-                                        "      FILTER e._label == 'followedBy'" +
+                                        "      FILTER e." + graph().config.labelField + " == 'followedBy'" +
                                         "      COLLECT WITH COUNT INTO c" +
                                         "      RETURN c" +
                                         "  )[0]" +
                                         "  FILTER outCount > 10" +
                                         "  LET inCount = (" +
                                         "    FOR a, e IN 1..1 INBOUND start GRAPH standard" +
-                                        "      FILTER e._label == 'followedBy'" +
+                                        "      FILTER e." + graph().config.labelField + " == 'followedBy'" +
                                         "      COLLECT WITH COUNT INTO c" +
                                         "      RETURN c" +
                                         "  )[0]" +
@@ -307,7 +307,7 @@ public class AqlTest extends AbstractGremlinTest {
                                         "FOR start IN vertex" +
                                         "  LET outCount = (" +
                                         "    FOR e IN edge" +
-                                        "      FILTER e._label == 'followedBy'" +
+                                        "      FILTER e." + graph().config.labelField + " == 'followedBy'" +
                                         "      FILTER e._from == start._id" +
                                         "      COLLECT WITH COUNT INTO c" +
                                         "      RETURN c" +
@@ -315,7 +315,7 @@ public class AqlTest extends AbstractGremlinTest {
                                         "  FILTER outCount > 10" +
                                         "  LET inCount = (" +
                                         "    FOR e IN edge" +
-                                        "      FILTER e._label == 'followedBy'" +
+                                        "      FILTER e." + graph().config.labelField + " == 'followedBy'" +
                                         "      FILTER e._to == start._id      " +
                                         "      COLLECT WITH COUNT INTO c" +
                                         "      RETURN c" +

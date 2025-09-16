@@ -19,6 +19,7 @@ package com.arangodb.tinkerpop.gremlin.arangodb.complex;
 import com.arangodb.ArangoCollection;
 import com.arangodb.tinkerpop.gremlin.TestGraphClient;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph;
+import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
 import com.arangodb.tinkerpop.gremlin.utils.Fields;
 import org.apache.tinkerpop.gremlin.AbstractGremlinTest;
 import org.apache.tinkerpop.gremlin.structure.Edge;
@@ -50,7 +51,7 @@ public class ComplexPersistenceTest extends AbstractGremlinTest {
                 .containsEntry(Fields.KEY, "foo")
                 .containsEntry(Fields.ID, Vertex.DEFAULT_LABEL + "/foo")
                 .containsKey(Fields.REV)
-                .doesNotContainKey(Fields.LABEL)
+                .doesNotContainKey(ArangoDBGraphConfig.DEFAULT_LABEL_FIELD)
                 .containsEntry("key", "value");
 
         Map<String, Map<String, Object>> meta = (Map<String, Map<String, Object>>) doc.get(Fields.META);
@@ -79,7 +80,7 @@ public class ComplexPersistenceTest extends AbstractGremlinTest {
                 .containsKey(Fields.REV)
                 .containsEntry(Fields.FROM, Vertex.DEFAULT_LABEL + "/a")
                 .containsEntry(Fields.TO, Vertex.DEFAULT_LABEL + "/b")
-                .doesNotContainKey(Fields.LABEL)
+                .doesNotContainKey(ArangoDBGraphConfig.DEFAULT_LABEL_FIELD)
                 .containsEntry("key", "value");
     }
 }

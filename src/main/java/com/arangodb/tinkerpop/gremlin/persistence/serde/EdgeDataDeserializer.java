@@ -19,7 +19,6 @@ package com.arangodb.tinkerpop.gremlin.persistence.serde;
 import com.arangodb.tinkerpop.gremlin.persistence.EdgeData;
 import com.arangodb.tinkerpop.gremlin.persistence.ElementId;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
-import com.arangodb.tinkerpop.gremlin.utils.Fields;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -34,10 +33,10 @@ import static com.arangodb.tinkerpop.gremlin.utils.Fields.*;
 
 public class EdgeDataDeserializer extends JsonDeserializer<EdgeData> {
 
-    private final ArangoDBGraphConfig.GraphType type;
+    private final ArangoDBGraphConfig config;
 
-    public EdgeDataDeserializer(ArangoDBGraphConfig.GraphType type) {
-        this.type = type;
+    public EdgeDataDeserializer(ArangoDBGraphConfig config) {
+        this.config = config;
     }
 
     @Override
@@ -46,8 +45,8 @@ public class EdgeDataDeserializer extends JsonDeserializer<EdgeData> {
         ObjectNode root = c.readTree(p);
         ElementId id = c.treeToValue(root.get(ID), ElementId.class);
         String label;
-        if (type == ArangoDBGraphConfig.GraphType.SIMPLE) {
-            label = root.get(LABEL).asText();
+        if (config.graphType == ArangoDBGraphConfig.GraphType.SIMPLE) {
+            label = root.get(config.labelField).asText();
         } else {
             label = id.getLabel();
         }
@@ -56,7 +55,7 @@ public class EdgeDataDeserializer extends JsonDeserializer<EdgeData> {
         EdgeData data = new EdgeData(label, id, from, to);
 
         for (Map.Entry<String, JsonNode> prop : root.properties()) {
-            if (!Fields.isReserved(prop.getKey())) {
+            if (!config.isReservedField(prop.getKey())) {
                 data.put(prop.getKey(), c.treeToValue(prop.getValue(), Object.class));
             }
         }

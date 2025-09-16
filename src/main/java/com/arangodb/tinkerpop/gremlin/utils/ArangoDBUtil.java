@@ -54,9 +54,9 @@ public class ArangoDBUtil {
         }
     }
 
-    public static void validateProperty(final String key, final Object value) {
+    public static void validateProperty(final String key, final Object value, ArangoDBGraphConfig config) {
         ElementHelper.validateProperty(key, value);
-        if (Fields.isReserved(key)) {
+        if (config.isReservedField(key)) {
             throw new IllegalArgumentException("Property key can not be a reserved key: " + key);
         }
         if (!supportsDataType(value)) {
@@ -64,9 +64,9 @@ public class ArangoDBUtil {
         }
     }
 
-    public static void validateVariable(String key, Object value) {
+    public static void validateVariable(String key, Object value, ArangoDBGraphConfig config) {
         GraphVariableHelper.validateVariable(key, value);
-        if (Fields.isReserved(key)) {
+        if (config.isReservedField(key)) {
             throw new IllegalArgumentException("Graph variable key can not be a reserved key: " + key);
         }
         if (!supportsDataType(value)) {

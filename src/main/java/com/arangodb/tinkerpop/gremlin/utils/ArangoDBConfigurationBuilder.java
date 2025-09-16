@@ -226,6 +226,18 @@ public class ArangoDBConfigurationBuilder {
     }
 
     /**
+     * Sets the field name used to store element labels in ArangoDB documents, when using {@code GraphType.SIMPLE}
+     * graph type.
+     * Default: {@code "_label"}
+     *
+     * @param labelField the name of the document field to store labels in
+     * @return this
+     */
+    public ArangoDBConfigurationBuilder labelField(String labelField) {
+        return setProperty(KEY_LABEL_FIELD, labelField);
+    }
+
+    /**
      * Retrieves the current BaseConfiguration instance.
      *
      * @return the current BaseConfiguration instance being used.

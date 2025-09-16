@@ -54,7 +54,7 @@ public class ArangoDBGraphClient {
                 .orElse(ArangoDefaults.DEFAULT_PROTOCOL);
         ObjectMapper mapper = JacksonMapperProvider
                 .of(ContentTypeFactory.of(protocol))
-                .registerModule(new SerdeModule(idFactory, config.graphType));
+                .registerModule(new SerdeModule(idFactory, config));
         aqlDeserializer = new AqlDeserializer(graph, mapper);
         db = new ArangoDB.Builder()
                 .loadProperties(config.driverConfig)
@@ -305,7 +305,7 @@ public class ArangoDBGraphClient {
 
     public Iterator<VertexData> getVertexNeighbors(ElementId vertexId, Set<String> edgeCollections, Direction direction, String[] labels) {
         logger.debug("Get vertex {}:{} Neighbors, in {}, from collections {}", vertexId, direction, config.graphName, edgeCollections);
-        String query = ArangoDBQueryBuilder.readVertexNeighbors(config.graphName, direction, config.graphType, labels);
+        String query = ArangoDBQueryBuilder.readVertexNeighbors(config.graphName, direction, config, labels);
         Map<String, Object> params = new HashMap<>();
         params.put("vertexId", vertexId);
         params.put("edgeCollections", edgeCollections);
@@ -317,7 +317,7 @@ public class ArangoDBGraphClient {
 
     public Iterator<EdgeData> getVertexEdges(ElementId vertexId, Set<String> edgeCollections, Direction direction, String[] labels) {
         logger.debug("Get vertex {}:{} Edges, in {}, from collections {}", vertexId, direction, config.graphName, edgeCollections);
-        String query = ArangoDBQueryBuilder.readVertexEdges(config.graphName, direction, config.graphType, labels);
+        String query = ArangoDBQueryBuilder.readVertexEdges(config.graphName, direction, config, labels);
         Map<String, Object> params = new HashMap<>();
         params.put("vertexId", vertexId);
         params.put("edgeCollections", edgeCollections);

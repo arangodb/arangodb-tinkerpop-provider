@@ -63,7 +63,7 @@ public class ArangoDBGraphVariables implements Graph.Variables {
 
     @Override
     public void set(String key, Object value) {
-        ArangoDBUtil.validateVariable(key, value);
+        ArangoDBUtil.validateVariable(key, value, graph.config);
         data.put(key, value);
         update();
     }

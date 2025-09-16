@@ -46,7 +46,7 @@ public class ArangoDBGraph implements Graph {
 
     private final ArangoDBGraphClient client;
     private final ElementIdFactory idFactory;
-    private final ArangoDBGraphConfig config;
+    public final ArangoDBGraphConfig config;
 
     /**
      * Open a new {@code ArangoDBGraph} instance.
@@ -280,7 +280,7 @@ public class ArangoDBGraph implements Graph {
         ElementId elementId = idFactory.createVertexId(label, id);
         for (int i = 0; i < keyValues.length; i = i + 2) {
             if (keyValues[i] instanceof String) {
-                ArangoDBUtil.validateProperty((String) keyValues[i], keyValues[i + 1]);
+                ArangoDBUtil.validateProperty((String) keyValues[i], keyValues[i + 1], config);
             }
         }
         String inferredLabel = label != null ? label : Optional.ofNullable(elementId.getLabel()).orElse(Vertex.DEFAULT_LABEL);

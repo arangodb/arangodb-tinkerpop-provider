@@ -24,27 +24,27 @@ import com.fasterxml.jackson.databind.module.SimpleSerializers;
 
 public class SerdeModule extends SimpleModule {
     private final ElementIdFactory idFactory;
-    private final ArangoDBGraphConfig.GraphType graphType;
+    private final ArangoDBGraphConfig config;
 
-    public SerdeModule(ElementIdFactory idFactory, ArangoDBGraphConfig.GraphType graphType) {
+    public SerdeModule(ElementIdFactory idFactory, ArangoDBGraphConfig config) {
         this.idFactory = idFactory;
-        this.graphType = graphType;
+        this.config = config;
     }
 
     @Override
     public void setupModule(SetupContext context) {
         SimpleSerializers serializers = new SimpleSerializers();
         serializers.addSerializer(ElementId.class, new ElementIdSerializer());
-        serializers.addSerializer(VertexData.class, new VertexDataSerializer(graphType));
-        serializers.addSerializer(EdgeData.class, new EdgeDataSerializer(graphType));
+        serializers.addSerializer(VertexData.class, new VertexDataSerializer(config));
+        serializers.addSerializer(EdgeData.class, new EdgeDataSerializer(config));
         serializers.addSerializer(VariablesData.class, new VariablesDataSerializer());
         context.addSerializers(serializers);
 
         SimpleDeserializers deserializers = new SimpleDeserializers();
         deserializers.addDeserializer(ElementId.class, new ElementIdDeserializer(idFactory));
-        deserializers.addDeserializer(VertexData.class, new VertexDataDeserializer(graphType));
-        deserializers.addDeserializer(EdgeData.class, new EdgeDataDeserializer(graphType));
-        deserializers.addDeserializer(VariablesData.class, new VariablesDataDeserializer());
+        deserializers.addDeserializer(VertexData.class, new VertexDataDeserializer(config));
+        deserializers.addDeserializer(EdgeData.class, new EdgeDataDeserializer(config));
+        deserializers.addDeserializer(VariablesData.class, new VariablesDataDeserializer(config));
         context.addDeserializers(deserializers);
     }
 }

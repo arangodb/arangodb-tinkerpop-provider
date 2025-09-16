@@ -32,6 +32,7 @@ import java.util.Map;
 import static com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph.GRAPH_VARIABLES_COLLECTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SuppressWarnings("resource")
 public class SimplePersistenceTest extends AbstractGremlinTest {
 
     private TestGraphClient client() {
@@ -40,6 +41,10 @@ public class SimplePersistenceTest extends AbstractGremlinTest {
 
     private String graphName() {
         return ((ArangoDBGraph) graph).name();
+    }
+
+    private ArangoDBGraph graph() {
+        return (ArangoDBGraph) this.graph;
     }
 
     @Test
@@ -74,7 +79,7 @@ public class SimplePersistenceTest extends AbstractGremlinTest {
                 .containsEntry(Fields.KEY, "foo")
                 .containsEntry(Fields.ID, Vertex.DEFAULT_LABEL + "/foo")
                 .containsKey(Fields.REV)
-                .containsEntry(Fields.LABEL, "bar")
+                .containsEntry(graph().config.labelField, "bar")
                 .containsEntry("key", "value");
 
         Map<String, Map<String, Object>> meta = (Map<String, Map<String, Object>>) doc.get(Fields.META);
@@ -103,7 +108,7 @@ public class SimplePersistenceTest extends AbstractGremlinTest {
                 .containsKey(Fields.REV)
                 .containsEntry(Fields.FROM, Vertex.DEFAULT_LABEL + "/a")
                 .containsEntry(Fields.TO, Vertex.DEFAULT_LABEL + "/b")
-                .containsEntry(Fields.LABEL, "foo")
+                .containsEntry(graph().config.labelField, "foo")
                 .containsEntry("key", "value");
     }
 }

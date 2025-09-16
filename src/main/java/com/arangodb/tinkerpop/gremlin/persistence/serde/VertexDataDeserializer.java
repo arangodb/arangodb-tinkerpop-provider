@@ -20,7 +20,6 @@ import com.arangodb.tinkerpop.gremlin.persistence.ElementId;
 import com.arangodb.tinkerpop.gremlin.persistence.VertexData;
 import com.arangodb.tinkerpop.gremlin.persistence.VertexPropertyData;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
-import com.arangodb.tinkerpop.gremlin.utils.Fields;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -36,10 +35,10 @@ import static com.arangodb.tinkerpop.gremlin.utils.Fields.*;
 
 class VertexDataDeserializer extends JsonDeserializer<VertexData> {
 
-    private final ArangoDBGraphConfig.GraphType type;
+    private final ArangoDBGraphConfig config;
 
-    VertexDataDeserializer(ArangoDBGraphConfig.GraphType type) {
-        this.type = type;
+    VertexDataDeserializer(ArangoDBGraphConfig config) {
+        this.config = config;
     }
 
     @Override
@@ -48,8 +47,8 @@ class VertexDataDeserializer extends JsonDeserializer<VertexData> {
         ObjectNode root = c.readTree(p);
         ElementId id = c.treeToValue(root.get(ID), ElementId.class);
         String label;
-        if (type == ArangoDBGraphConfig.GraphType.SIMPLE) {
-            label = root.get(LABEL).asText();
+        if (config.graphType == ArangoDBGraphConfig.GraphType.SIMPLE) {
+            label = root.get(config.labelField).asText();
         } else {
             label = id.getLabel();
         }
@@ -60,7 +59,7 @@ class VertexDataDeserializer extends JsonDeserializer<VertexData> {
                 : Collections.emptyMap();
 
         for (Map.Entry<String, JsonNode> prop : root.properties()) {
-            if (!Fields.isReserved(prop.getKey())) {
+            if (!config.isReservedField(prop.getKey())) {
                 VertexPropertyData pd = new VertexPropertyData(c.treeToValue(prop.getValue(), Object.class));
                 String key = prop.getKey();
                 pd.putAll(meta.get(key));

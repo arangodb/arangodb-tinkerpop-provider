@@ -30,4 +30,9 @@
         <Bug pattern="SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR"/>
     </Match>
 
+    <Match>
+        <Class name="com.arangodb.tinkerpop.gremlin.persistence.serde.SerdeModule"/>
+        <Bug pattern="SE_BAD_FIELD"/>
+    </Match>
+
 </FindBugsFilter>
