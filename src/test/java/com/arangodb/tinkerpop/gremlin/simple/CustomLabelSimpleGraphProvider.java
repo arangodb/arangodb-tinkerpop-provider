@@ -16,12 +16,13 @@
 
 package com.arangodb.tinkerpop.gremlin.simple;
 
-import com.arangodb.tinkerpop.gremlin.arangodb.simple.SimpleArangoDBSuite;
-import org.apache.tinkerpop.gremlin.GraphProviderClass;
-import org.junit.runner.RunWith;
+import com.arangodb.tinkerpop.gremlin.utils.ArangoDBConfigurationBuilder;
 
-@RunWith(SimpleArangoDBSuite.class)
-@GraphProviderClass(provider = CustomLabelSimpleGraphProvider.class, graph = SimpleTestGraph.class)
-public class SimpleArangoDBSuiteTest {
+public class CustomLabelSimpleGraphProvider extends SimpleGraphProvider {
 
+    @Override
+    protected void customizeBuilder(ArangoDBConfigurationBuilder builder) {
+        super.customizeBuilder(builder);
+        builder.labelField("type");
+    }
 }

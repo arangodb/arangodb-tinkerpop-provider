@@ -18,6 +18,7 @@ package com.arangodb.tinkerpop.gremlin.structure;
 
 import com.arangodb.config.ArangoConfigProperties;
 import com.arangodb.entity.EdgeDefinition;
+import com.arangodb.tinkerpop.gremlin.utils.Fields;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.ConfigurationConverter;
 import org.apache.commons.lang3.StringUtils;
@@ -43,12 +44,14 @@ public class ArangoDBGraphConfig {
     public static final String KEY_GRAPH_ORPHAN_COLLECTIONS = "graph.orphanCollections";
     public static final String KEY_GRAPH_EDGE_DEFINITIONS = "graph.edgeDefinitions";
     public static final String KEY_ENABLE_DATA_DEFINITION = "graph.enableDataDefinition";
+    public static final String KEY_LABEL_FIELD = "graph.labelField";
 
     // default values
     public static final String DEFAULT_DB_NAME = "_system";
     public static final String DEFAULT_GRAPH_NAME = "tinkerpop";
     public static final GraphType DEFAULT_GRAPH_TYPE = GraphType.SIMPLE;
     public static final boolean DEFAULT_ENABLE_DATA_DEFINITION = false;
+    public static final String DEFAULT_LABEL_FIELD = "_label";
 
     public final Configuration configuration;
     public final String dbName;
@@ -60,6 +63,7 @@ public class ArangoDBGraphConfig {
     public final Set<String> edges;
     public final ArangoConfigProperties driverConfig;
     public final boolean enableDataDefinition;
+    public final String labelField;
 
     public ArangoDBGraphConfig(Configuration configuration) {
         this.configuration = configuration;
@@ -73,7 +77,12 @@ public class ArangoDBGraphConfig {
         edges = edgeDefinitions.stream().map(EdgeDef::getCollection).collect(Collectors.toSet());
         driverConfig = ArangoConfigProperties.fromProperties(ConfigurationConverter.getProperties(conf.subset(KEY_DRIVER_PREFIX)), null);
         enableDataDefinition = conf.getBoolean(KEY_ENABLE_DATA_DEFINITION, DEFAULT_ENABLE_DATA_DEFINITION);
+        labelField = conf.getString(KEY_LABEL_FIELD, DEFAULT_LABEL_FIELD);
         validate();
+    }
+
+    public boolean isReservedField(String key) {
+        return labelField.equals(key) || Fields.ALL_STATIC.contains(key);
     }
 
     private void validate() {
@@ -87,6 +96,10 @@ public class ArangoDBGraphConfig {
             if (edges.size() > 1) {
                 throw new IllegalArgumentException("Simple graph allows only 1 edge collection");
             }
+        }
+        Objects.requireNonNull(labelField, "Label field must not be null");
+        if (labelField.isEmpty()) {
+            throw new IllegalArgumentException("Label field must not be empty");
         }
     }
 

@@ -38,7 +38,7 @@ public class DriverTest extends AbstractGremlinTest {
     @Test
     public void shouldGetDatabaseInfo() {
         assertThat(graph().getArangoDatabase().getInfo().getName())
-                .isEqualTo("SimpleGraphProvider");
+                .isEqualTo("CustomLabelSimpleGraphProvider");
     }
 
     @Test

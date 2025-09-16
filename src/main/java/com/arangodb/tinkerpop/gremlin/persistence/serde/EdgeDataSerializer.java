@@ -30,10 +30,10 @@ import static com.arangodb.tinkerpop.gremlin.utils.Fields.*;
 
 public class EdgeDataSerializer extends JsonSerializer<EdgeData> {
 
-    private final ArangoDBGraphConfig.GraphType type;
+    private final ArangoDBGraphConfig config;
 
-    public EdgeDataSerializer(ArangoDBGraphConfig.GraphType type) {
-        this.type = type;
+    public EdgeDataSerializer(ArangoDBGraphConfig config) {
+        this.config = config;
     }
 
     @Override
@@ -42,8 +42,8 @@ public class EdgeDataSerializer extends JsonSerializer<EdgeData> {
         if (data.getKey() != null) {
             gen.writeStringField(Fields.KEY, data.getKey());
         }
-        if (type == ArangoDBGraphConfig.GraphType.SIMPLE) {
-            gen.writeStringField(LABEL, data.getLabel());
+        if (config.graphType == ArangoDBGraphConfig.GraphType.SIMPLE) {
+            gen.writeStringField(config.labelField, data.getLabel());
         }
         gen.writeObjectField(FROM, data.getFrom());
         gen.writeObjectField(TO, data.getTo());

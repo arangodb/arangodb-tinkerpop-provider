@@ -34,7 +34,7 @@ public abstract class ArangoDBSimpleElement<D extends PropertiesContainer<Object
     @Override
     public <V> Property<V> property(String key, V value) {
         if (removed()) throw Exceptions.elementAlreadyRemoved(id());
-        ArangoDBUtil.validateProperty(key, value);
+        ArangoDBUtil.validateProperty(key, value, graph.config);
         data().put(key, value);
         doUpdate();
         return createProperty(key, value);

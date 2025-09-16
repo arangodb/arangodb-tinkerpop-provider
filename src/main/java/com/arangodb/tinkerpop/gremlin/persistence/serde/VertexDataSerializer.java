@@ -28,14 +28,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.arangodb.tinkerpop.gremlin.utils.Fields.LABEL;
-
 class VertexDataSerializer extends JsonSerializer<VertexData> {
 
-    private final ArangoDBGraphConfig.GraphType type;
+    private final ArangoDBGraphConfig config;
 
-    VertexDataSerializer(ArangoDBGraphConfig.GraphType type) {
-        this.type = type;
+    VertexDataSerializer(ArangoDBGraphConfig config) {
+        this.config = config;
     }
 
     @Override
@@ -44,8 +42,8 @@ class VertexDataSerializer extends JsonSerializer<VertexData> {
         if (data.getKey() != null) {
             gen.writeStringField(Fields.KEY, data.getKey());
         }
-        if (type == ArangoDBGraphConfig.GraphType.SIMPLE) {
-            gen.writeStringField(LABEL, data.getLabel());
+        if (config.graphType == ArangoDBGraphConfig.GraphType.SIMPLE) {
+            gen.writeStringField(config.labelField, data.getLabel());
         }
 
         Map<String, Map<String, Object>> meta = new HashMap<>();
