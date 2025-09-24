@@ -17,10 +17,12 @@
 package com.arangodb.tinkerpop.gremlin.utils;
 
 import com.arangodb.entity.GraphEntity;
+import com.arangodb.shaded.fasterxml.jackson.databind.ObjectMapper;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
 import com.arangodb.tinkerpop.gremlin.PackageVersion;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +35,7 @@ import org.apache.tinkerpop.gremlin.structure.util.ElementHelper;
 import org.apache.tinkerpop.gremlin.structure.util.GraphVariableHelper;
 
 public class ArangoDBUtil {
+    public static final ObjectMapper MAPPER = new ObjectMapper();
 
     private ArangoDBUtil() {
     }
@@ -74,7 +77,7 @@ public class ArangoDBUtil {
         }
     }
 
-    private static boolean supportsDataType(Object value) {
+    public static boolean supportsDataType(Object value) {
         return value == null ||
                 value instanceof Boolean || value instanceof boolean[] ||
                 value instanceof Double || value instanceof double[] ||
@@ -129,6 +132,24 @@ public class ArangoDBUtil {
             }
 
             return Integer.compare(aPatch, bPatch);
+        }
+    }
+
+    public static List<?> arrayToList(Object value) {
+        int length = Array.getLength(value);
+        List<Object> list = new ArrayList<>(length);
+        for (int i = 0; i < length; i++) {
+            list.add(Array.get(value, i));
+        }
+        return list;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T normalizeValue(Object value) {
+        if (value != null && value.getClass().isArray()) {
+            return (T) ArangoDBUtil.arrayToList(value);
+        } else {
+            return (T) value;
         }
     }
 

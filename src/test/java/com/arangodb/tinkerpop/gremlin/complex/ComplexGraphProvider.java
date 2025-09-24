@@ -18,7 +18,6 @@ package com.arangodb.tinkerpop.gremlin.complex;
 
 import com.arangodb.tinkerpop.gremlin.TestGraphProvider;
 
-import com.arangodb.tinkerpop.gremlin.arangodb.complex.ComplexElementIdTest;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig.EdgeDef;
 import com.arangodb.tinkerpop.gremlin.utils.ArangoDBConfigurationBuilder;
@@ -36,9 +35,8 @@ public class ComplexGraphProvider extends TestGraphProvider {
     @Override
     protected void configureDataDefinitions(ArangoDBConfigurationBuilder builder, Class<?> test, String testMethodName, LoadGraphWith.GraphData loadGraphWith) {
         // add default vertex and edge cols
-        builder.edgeDefinitions(EdgeDef.of("edge").from("vertex").to("vertex"));
-        if (test == ComplexElementIdTest.class) {
-            builder.orphanCollections("foo", "foo_bar");
-        }
+        builder
+                .edgeDefinitions(EdgeDef.of("edge").from("vertex").to("vertex"))
+                .orphanCollections("foo", "foo_bar");
     }
 }

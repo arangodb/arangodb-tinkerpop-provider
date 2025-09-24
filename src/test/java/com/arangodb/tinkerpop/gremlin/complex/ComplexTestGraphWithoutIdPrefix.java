@@ -16,10 +16,12 @@
 
 package com.arangodb.tinkerpop.gremlin.complex;
 
+import com.arangodb.tinkerpop.gremlin.process.traversal.strategy.optimization.ArangoStepStrategy;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBEdge;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBVertex;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.tinkerpop.gremlin.process.traversal.TraversalStrategies;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -88,6 +90,11 @@ import org.apache.tinkerpop.gremlin.structure.util.ElementHelper;
         method = "g_V_withSideEffectXsgX_outEXknowsX_subgraphXsgX_name_capXsgX",
         reason = "requires VertexProperty user supplied identifiers")
 public class ComplexTestGraphWithoutIdPrefix extends ArangoDBGraph {
+
+    static {
+        TraversalStrategies.GlobalCache.registerStrategies(ComplexTestGraphWithoutIdPrefix.class, TraversalStrategies.GlobalCache.getStrategies(Graph.class).clone()
+                .addStrategies(ArangoStepStrategy.INSTANCE));
+    }
 
     @SuppressWarnings("unused")
     public static ComplexTestGraphWithoutIdPrefix open(Configuration configuration) {

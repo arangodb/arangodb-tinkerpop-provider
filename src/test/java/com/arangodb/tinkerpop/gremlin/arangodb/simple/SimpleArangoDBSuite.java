@@ -16,6 +16,7 @@
 
 package com.arangodb.tinkerpop.gremlin.arangodb.simple;
 
+import com.arangodb.tinkerpop.gremlin.arangodb.process.filter.*;
 import org.apache.tinkerpop.gremlin.AbstractGremlinSuite;
 import org.apache.tinkerpop.gremlin.process.traversal.TraversalEngine;
 import org.junit.runners.model.InitializationError;
@@ -28,7 +29,13 @@ public class SimpleArangoDBSuite extends AbstractGremlinSuite {
             DataTypesTest.class,
             SimplePersistenceTest.class,
             AqlTest.class,
-            DriverTest.class
+            DriverTest.class,
+            CompareEqFilterTest.class,
+            NotFilterTest.class,
+            OrFilterTest.class,
+            WithinFilterTest.class,
+            AndFilterTest.class,
+            TextFiltersTest.class
     };
 
     public SimpleArangoDBSuite(final Class<?> klass, final RunnerBuilder builder) throws InitializationError {
