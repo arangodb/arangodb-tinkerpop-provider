@@ -42,7 +42,7 @@ public interface Value {
 
     static Value of(Object value) {
         if (value == null) {
-            return NullValue.INSTANCE;
+            return NullValue.instance();
         } else if (value instanceof Boolean) {
             return new BooleanValue((Boolean) value);
         } else if (value instanceof Integer) {

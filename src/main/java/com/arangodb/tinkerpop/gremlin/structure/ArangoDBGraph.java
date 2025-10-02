@@ -22,7 +22,7 @@ import com.arangodb.ArangoDatabase;
 import com.arangodb.model.AqlQueryOptions;
 import com.arangodb.tinkerpop.gremlin.PackageVersion;
 import com.arangodb.tinkerpop.gremlin.persistence.*;
-import com.arangodb.tinkerpop.gremlin.process.traversal.step.sideEffect.AQLStartStep;
+import com.arangodb.tinkerpop.gremlin.process.traversal.step.AQLStartStep;
 import com.arangodb.tinkerpop.gremlin.process.traversal.strategy.optimization.ArangoStepStrategy;
 import com.arangodb.tinkerpop.gremlin.utils.ArangoDBUtil;
 import org.apache.commons.configuration2.Configuration;
@@ -45,7 +45,7 @@ public class ArangoDBGraph implements Graph {
 
     static {
         TraversalStrategies.GlobalCache.registerStrategies(ArangoDBGraph.class, TraversalStrategies.GlobalCache.getStrategies(Graph.class).clone()
-                .addStrategies(ArangoStepStrategy.INSTANCE));
+                .addStrategies(ArangoStepStrategy.instance()));
     }
 
     public static final String GRAPH_VARIABLES_COLLECTION = "TINKERPOP-GRAPH-VARIABLES";
@@ -53,7 +53,7 @@ public class ArangoDBGraph implements Graph {
     private static final Features FEATURES = new ArangoDBGraphFeatures();
 
     private final ArangoDBGraphClient client;
-    public final ElementIdFactory idFactory;
+    private final ElementIdFactory idFactory;
     public final ArangoDBGraphConfig config;
 
     /**
@@ -144,6 +144,10 @@ public class ArangoDBGraph implements Graph {
     @Override
     public Configuration configuration() {
         return config.configuration;
+    }
+
+    public ElementIdFactory getIdFactory() {
+        return idFactory;
     }
 
     @Override

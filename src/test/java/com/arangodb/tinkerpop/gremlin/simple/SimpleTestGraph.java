@@ -79,7 +79,7 @@ public class SimpleTestGraph extends ArangoDBGraph {
 
     static {
         TraversalStrategies.GlobalCache.registerStrategies(SimpleTestGraph.class, TraversalStrategies.GlobalCache.getStrategies(Graph.class).clone()
-                .addStrategies(ArangoStepStrategy.INSTANCE));
+                .addStrategies(ArangoStepStrategy.instance()));
     }
 
     @SuppressWarnings("unused")

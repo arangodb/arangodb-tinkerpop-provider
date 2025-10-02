@@ -17,7 +17,11 @@
 package com.arangodb.tinkerpop.gremlin.process.filter;
 
 public class EmptyFilter implements ArangoFilter {
-    public static final EmptyFilter INSTANCE = new EmptyFilter();
+    private static final EmptyFilter INSTANCE = new EmptyFilter();
+
+    public static EmptyFilter instance() {
+        return INSTANCE;
+    }
 
     private EmptyFilter() {
     }

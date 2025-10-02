@@ -16,7 +16,7 @@
 
 package com.arangodb.tinkerpop.gremlin.process.traversal.strategy.optimization;
 
-import com.arangodb.tinkerpop.gremlin.process.traversal.step.sideEffect.ArangoStep;
+import com.arangodb.tinkerpop.gremlin.process.traversal.step.ArangoStep;
 import org.apache.tinkerpop.gremlin.process.traversal.Step;
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
 import org.apache.tinkerpop.gremlin.process.traversal.TraversalStrategy;
@@ -30,7 +30,16 @@ import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalHelper;
 
 public final class ArangoStepStrategy extends AbstractTraversalStrategy<TraversalStrategy.ProviderOptimizationStrategy> implements TraversalStrategy.ProviderOptimizationStrategy {
 
-    public static final ArangoStepStrategy INSTANCE = new ArangoStepStrategy();
+    private static final ArangoStepStrategy INSTANCE = new ArangoStepStrategy();
+
+    public static ArangoStepStrategy instance() {
+        return INSTANCE;
+    }
+
+    // Ensure the singleton property is maintained during deserialization
+    private Object readResolve() {
+        return INSTANCE;
+    }
 
     private ArangoStepStrategy() {
     }

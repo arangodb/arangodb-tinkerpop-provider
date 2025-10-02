@@ -19,7 +19,11 @@ package com.arangodb.tinkerpop.gremlin.process.value;
 import com.arangodb.tinkerpop.gremlin.process.filter.FilterSupport;
 
 public class NullValue implements Value {
-    public static final NullValue INSTANCE = new NullValue();
+    private static final NullValue INSTANCE = new NullValue();
+
+    public static NullValue instance() {
+        return INSTANCE;
+    }
 
     private NullValue() {
     }

@@ -131,7 +131,7 @@ public class ArangoDBGraphClient {
      */
     public Stream<VertexData> getGraphVertices(final List<ElementId> ids) {
         logger.debug("Get all {} graph vertices, filtered by ids: {}", config.graphName, ids);
-        return getGraphDocuments(ids, EmptyFilter.INSTANCE, config.vertices, VertexData.class);
+        return getGraphDocuments(ids, EmptyFilter.instance(), config.vertices, VertexData.class);
     }
 
     /**
@@ -142,7 +142,7 @@ public class ArangoDBGraphClient {
      */
     public Stream<EdgeData> getGraphEdges(List<ElementId> ids) {
         logger.debug("Get all {} graph edges, filtered by ids: {}", config.graphName, ids);
-        return getGraphDocuments(ids, EmptyFilter.INSTANCE, config.edges, EdgeData.class);
+        return getGraphDocuments(ids, EmptyFilter.instance(), config.edges, EdgeData.class);
     }
 
     private <V> Stream<V> getGraphDocuments(List<ElementId> ids, ArangoFilter filter, Set<String> colNames, Class<V> clazz) {

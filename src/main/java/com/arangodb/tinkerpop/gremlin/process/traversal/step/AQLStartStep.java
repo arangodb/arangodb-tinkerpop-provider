@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.arangodb.tinkerpop.gremlin.process.traversal.step.sideEffect;
+package com.arangodb.tinkerpop.gremlin.process.traversal.step;
 
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.StartStep;

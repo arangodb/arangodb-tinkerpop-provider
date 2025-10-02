@@ -27,7 +27,7 @@ public class ComplexTestGraph extends ArangoDBGraph {
 
     static {
         TraversalStrategies.GlobalCache.registerStrategies(ComplexTestGraph.class, TraversalStrategies.GlobalCache.getStrategies(Graph.class).clone()
-                .addStrategies(ArangoStepStrategy.INSTANCE));
+                .addStrategies(ArangoStepStrategy.instance()));
     }
 
     @SuppressWarnings("unused")

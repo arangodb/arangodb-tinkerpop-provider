@@ -93,7 +93,7 @@ public class ComplexTestGraphWithoutIdPrefix extends ArangoDBGraph {
 
     static {
         TraversalStrategies.GlobalCache.registerStrategies(ComplexTestGraphWithoutIdPrefix.class, TraversalStrategies.GlobalCache.getStrategies(Graph.class).clone()
-                .addStrategies(ArangoStepStrategy.INSTANCE));
+                .addStrategies(ArangoStepStrategy.instance()));
     }
 
     @SuppressWarnings("unused")

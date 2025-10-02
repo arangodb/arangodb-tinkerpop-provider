@@ -32,7 +32,7 @@ public class AndFilterTest extends AbstractGremlinTest {
     public void testEmpty() {
         ArangoFilter filter = AndFilter.of(Arrays.asList(
                 new CompareEqFilter("a", "str"),
-                EmptyFilter.INSTANCE
+                EmptyFilter.instance()
         ));
         assertThat(filter.getSupport()).isEqualTo(FilterSupport.FULL);
         assertThat(filter.toAql("d")).isEqualTo("`d`.`a` == \"str\"");

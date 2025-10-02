@@ -28,7 +28,7 @@ public class AndFilter implements ArangoFilter {
                 .filter(it -> it.getSupport() != FilterSupport.NONE)
                 .collect(Collectors.toList());
         if (supportedFilters.isEmpty()) {
-            return EmptyFilter.INSTANCE;
+            return EmptyFilter.instance();
         } else if (supportedFilters.size() == 1) {
             return supportedFilters.get(0);
         } else {

@@ -21,7 +21,7 @@ public class NotFilter implements ArangoFilter {
 
     public static ArangoFilter of(ArangoFilter filter) {
         if (filter.getSupport() != FilterSupport.FULL) {
-            return EmptyFilter.INSTANCE;
+            return EmptyFilter.instance();
         }
         return new NotFilter(filter);
     }

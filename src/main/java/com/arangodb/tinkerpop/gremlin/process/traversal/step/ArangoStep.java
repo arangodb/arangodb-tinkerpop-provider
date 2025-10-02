@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.arangodb.tinkerpop.gremlin.process.traversal.step.sideEffect;
+package com.arangodb.tinkerpop.gremlin.process.traversal.step;
 
 import com.arangodb.tinkerpop.gremlin.process.filter.*;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBEdge;
@@ -72,6 +72,14 @@ public final class ArangoStep<S, E extends Element> extends GraphStep<S, E> impl
     @Override
     public int hashCode() {
         return super.hashCode() ^ hasContainers.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ArangoStep<?, ?> that = (ArangoStep<?, ?>) o;
+        return Objects.equals(hasContainers, that.hasContainers);
     }
 
     private void normalizePredicate(P<?> p) {
@@ -135,15 +143,16 @@ public final class ArangoStep<S, E extends Element> extends GraphStep<S, E> impl
         if (null == ids)
             return Collections.emptyIterator();
 
-        ArangoDBGraph graph = (ArangoDBGraph) getTraversal().getGraph().get();
+        @SuppressWarnings("resource")
+        ArangoDBGraph graph = (ArangoDBGraph) getTraversal().getGraph().orElseThrow(IllegalStateException::new);
         ArangoDBGraphConfig config = graph.config;
         convertElementsToIds();
         Stream<E> res;
         if (Vertex.class.isAssignableFrom(returnClass)) {
-            res = graph.getClient().getGraphVertices(graph.idFactory.parseVertexIds(ids), getArangoFilter(config), getCollections(config))
+            res = graph.getClient().getGraphVertices(graph.getIdFactory().parseVertexIds(ids), getArangoFilter(config), getCollections(config))
                     .map(it -> (E) new ArangoDBVertex(graph, it));
         } else if (Edge.class.isAssignableFrom(returnClass)) {
-            res = graph.getClient().getGraphEdges(graph.idFactory.parseEdgeIds(ids), getArangoFilter(config), getCollections(config))
+            res = graph.getClient().getGraphEdges(graph.getIdFactory().parseEdgeIds(ids), getArangoFilter(config), getCollections(config))
                     .map(it -> (E) new ArangoDBEdge(graph, it));
         } else {
             throw new UnsupportedOperationException("Unsupported return type: " + returnClass);

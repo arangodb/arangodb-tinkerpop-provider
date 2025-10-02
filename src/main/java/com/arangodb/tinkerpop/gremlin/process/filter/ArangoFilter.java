@@ -22,6 +22,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.util.OrP;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public interface ArangoFilter {
@@ -49,9 +50,9 @@ public interface ArangoFilter {
             case "notContaining":
                 return NotFilter.of(new TextContainingFilter(key, (String) p.getValue()));
             case "endingWith":
-                return new TextRegexFilter(key, p.getValue() + "$");
+                return new TextRegexFilter(key, Pattern.quote((String) p.getValue()) + "$");
             case "notEndingWith":
-                return NotFilter.of(new TextRegexFilter(key, p.getValue() + "$"));
+                return NotFilter.of(new TextRegexFilter(key, Pattern.quote((String) p.getValue()) + "$"));
             case "startingWith":
                 return new TextStartingWithFilter(key, (String) p.getValue());
             case "notStartingWith":
