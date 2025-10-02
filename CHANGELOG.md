@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.0] - 2025-10-02
+
+- `HasStep` filters pushdown (#20, DE-1071)
+- configurable label field name (#19, DE-1070)
+
 ## [3.1.0] - 2025-08-26
 
 - removed the restriction of prefixing collection names with graph name (#18, DE-1069)
