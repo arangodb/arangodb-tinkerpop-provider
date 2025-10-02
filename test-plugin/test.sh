@@ -26,7 +26,7 @@ docker run -d \
   --name gremlin-server \
   --expose 8182 \
   -p 172.28.0.1:8182:8182 \
-  docker.io/tinkerpop/gremlin-server@sha256:83a5682ed9f66f65d37facf8c2da09d54ada56452934e3ea3eeb9d8c6d8d12ff
+  docker.io/tinkerpop/gremlin-server:3.7.4
 
 while ! nc -z 172.28.0.1 8182; do
   printf '.'
@@ -40,7 +40,7 @@ docker run \
   --volumes-from tinkerpop-data \
   --name gremlin-console \
   --add-host=gremlin-server:172.28.0.1 \
-  docker.io/tinkerpop/gremlin-console@sha256:1e0525d16f3cd4281fc562c4f124928273ef52e86f98fc5d905997872850eda1 \
+  docker.io/tinkerpop/gremlin-console:3.7.4 \
   -e /arangodb/test.groovy
 
 ## test from java
