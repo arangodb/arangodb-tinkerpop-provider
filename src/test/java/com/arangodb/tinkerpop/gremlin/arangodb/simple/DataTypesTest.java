@@ -27,18 +27,35 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
+import static com.arangodb.tinkerpop.gremlin.utils.ArangoDBUtil.normalizeValue;
+import static com.arangodb.tinkerpop.gremlin.utils.ArangoDBUtil.supportsDataType;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
 public class DataTypesTest extends AbstractGremlinTest {
 
     private final List<?> data = Arrays.asList(
-            true,
-            11,
-            5_000_000_000L,
+            null,
+            Boolean.TRUE,
+            Boolean.FALSE,
+            new boolean[]{true, false, true},
             12.12d,
+            new double[]{1.1d, 2.2d, 3.3d},
+            11,
+            new int[]{1, 2, 3, 4, 5},
+            5_000_000_000L,
+            new long[]{5_000_000_000L, 6_000_000_000L, 7_000_000_000L},
             "hello",
-            null
+            new String[]{"hello", "world", "test"},
+            Arrays.asList(null, true, 2.2d, 22, 5_000_000_000L, "hello"),
+            new HashMap<String, Object>() {{
+                put("k1", null);
+                put("k2", true);
+                put("k3", 2.2d);
+                put("k4", 22);
+                put("k5", 5_000_000_000L);
+                put("k6", "hello");
+            }}
     );
 
     private final List<?> unsupportedData = Arrays.asList(
@@ -57,6 +74,15 @@ public class DataTypesTest extends AbstractGremlinTest {
     );
 
     @Test
+    public void checkTestDataSupported() {
+        for (Object value : data) {
+            if (!supportsDataType(value)) {
+                throw Property.Exceptions.dataTypeOfPropertyValueNotSupported(value);
+            }
+        }
+    }
+
+    @Test
     public void variables() {
         data.forEach(this::testVariables);
         unsupportedData.forEach(this::testUnsupportedVariables);
@@ -66,7 +92,7 @@ public class DataTypesTest extends AbstractGremlinTest {
         if (value == null) return;
         graph.variables().set("value", value);
         Optional<Object> got = graph.variables().get("value");
-        assertThat(got).isPresent().get().isEqualTo(value);
+        assertThat(got).isPresent().get().isEqualTo(normalizeValue(value));
     }
 
     private void testUnsupportedVariables(Object value) {
@@ -89,10 +115,10 @@ public class DataTypesTest extends AbstractGremlinTest {
                 .property("value", value)  // set vertex property value
                 .property("meta", value);  // set meta property value
         VertexProperty<Object> p = graph.vertices(v.id()).next().property("value");
-        assertThat(p.value()).isEqualTo(value);
+        assertThat(p.value()).isEqualTo(normalizeValue(value));
         Property<Object> meta = p.property("meta");
         assertThat(meta.isPresent()).isTrue();
-        assertThat(meta.value()).isEqualTo(value);
+        assertThat(meta.value()).isEqualTo(normalizeValue(value));
     }
 
     private void testUnsupportedVertexProperties(Object value) {
@@ -122,7 +148,7 @@ public class DataTypesTest extends AbstractGremlinTest {
         Edge e = a.addEdge("edge", b, "value", value);
         Property<Object> p = graph.edges(e.id()).next().properties("value").next();
         assertThat(p.isPresent()).isTrue();
-        assertThat(p.value()).isEqualTo(value);
+        assertThat(p.value()).isEqualTo(normalizeValue(value));
     }
 
     private void testUnsupportedEdgeProperties(Object value) {

@@ -35,4 +35,9 @@
         <Bug pattern="SE_BAD_FIELD"/>
     </Match>
 
+    <Match>
+        <Class name="com.arangodb.tinkerpop.gremlin.process.traversal.strategy.optimization.ArangoStepStrategy"/>
+        <Bug pattern="SING_SINGLETON_IMPLEMENTS_SERIALIZABLE"/>
+    </Match>
+
 </FindBugsFilter>

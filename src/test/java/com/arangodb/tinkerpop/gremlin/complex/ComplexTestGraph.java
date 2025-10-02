@@ -16,12 +16,19 @@
 
 package com.arangodb.tinkerpop.gremlin.complex;
 
+import com.arangodb.tinkerpop.gremlin.process.traversal.strategy.optimization.ArangoStepStrategy;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.tinkerpop.gremlin.process.traversal.TraversalStrategies;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 
 @Graph.OptIn("com.arangodb.tinkerpop.gremlin.arangodb.complex.ComplexArangoDBSuite")
 public class ComplexTestGraph extends ArangoDBGraph {
+
+    static {
+        TraversalStrategies.GlobalCache.registerStrategies(ComplexTestGraph.class, TraversalStrategies.GlobalCache.getStrategies(Graph.class).clone()
+                .addStrategies(ArangoStepStrategy.instance()));
+    }
 
     @SuppressWarnings("unused")
     public static ComplexTestGraph open(Configuration configuration) {

@@ -27,7 +27,7 @@ import java.util.*;
 
 public class ArangoDBEdge extends ArangoDBSimpleElement<EdgeData> implements Edge, ArangoDBPersistentElement {
 
-    ArangoDBEdge(ArangoDBGraph graph, EdgeData data) {
+    public ArangoDBEdge(ArangoDBGraph graph, EdgeData data) {
         super(graph, data);
     }
 

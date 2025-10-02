@@ -19,6 +19,8 @@ package com.arangodb.tinkerpop.gremlin.client;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.arangodb.tinkerpop.gremlin.process.filter.ArangoFilter;
+import com.arangodb.tinkerpop.gremlin.process.filter.FilterSupport;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 
@@ -57,26 +59,33 @@ public class ArangoDBQueryBuilder {
         return query;
     }
 
-    public static String readAllDocuments(Set<String> collections) {
+    static String readAllDocuments(Set<String> collections, ArangoFilter filter) {
         if (collections.isEmpty()) {
             throw new IllegalArgumentException();
         } else if (collections.size() == 1) {
-            return readAllDocumentsFromSingleCollection(collections.iterator().next());
+            return readAllDocumentsFromSingleCollection(collections.iterator().next(), filter);
         } else {
-            return readAllDocumentsFromMultipleCollections(collections);
+            return readAllDocumentsFromMultipleCollections(collections, filter);
         }
     }
 
-    private static String readAllDocumentsFromMultipleCollections(Set<String> collections) {
+    private static String readAllDocumentsFromMultipleCollections(Set<String> collections, ArangoFilter filter) {
         String inner = collections.stream()
-                .map(ArangoDBQueryBuilder::readAllDocumentsFromSingleCollection)
+                .map(it -> ArangoDBQueryBuilder.readAllDocumentsFromSingleCollection(it, filter))
                 .map(it -> "(" + it + ")")
                 .collect(Collectors.joining(","));
         return String.format("FOR d in UNION(%s) RETURN d", inner);
     }
 
-    private static String readAllDocumentsFromSingleCollection(String collection) {
-        return String.format("FOR x IN %s RETURN x", escape(collection));
+    private static String readAllDocumentsFromSingleCollection(String collection, ArangoFilter filter) {
+        StringBuilder query = new StringBuilder()
+                .append("FOR x IN ")
+                .append(escape(collection));
+        if (filter.getSupport() != FilterSupport.NONE) {
+            query.append(" FILTER ").append(filter.toAql("x"));
+        }
+        query.append(" RETURN x");
+        return query.toString();
     }
 
     private static String escape(String collection) {

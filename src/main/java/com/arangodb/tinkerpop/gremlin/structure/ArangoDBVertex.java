@@ -30,7 +30,7 @@ import static com.arangodb.tinkerpop.gremlin.structure.ArangoDBElement.Exception
 
 public class ArangoDBVertex extends ArangoDBElement<VertexPropertyData, VertexData> implements Vertex, ArangoDBPersistentElement {
 
-    ArangoDBVertex(ArangoDBGraph graph, VertexData data) {
+    public ArangoDBVertex(ArangoDBGraph graph, VertexData data) {
         super(graph, data);
     }
 
@@ -102,8 +102,9 @@ public class ArangoDBVertex extends ArangoDBElement<VertexPropertyData, VertexDa
         if (edgeCollections.isEmpty()) {
             return Collections.emptyIterator();
         }
-        return IteratorUtils.map(graph.getClient().getVertexEdges(elementId(), edgeCollections, direction, edgeLabels),
-                it -> new ArangoDBEdge(graph, it));
+        return graph.getClient().getVertexEdges(elementId(), edgeCollections, direction, edgeLabels)
+                .map(it -> (Edge) new ArangoDBEdge(graph, it))
+                .iterator();
     }
 
     @Override
@@ -114,8 +115,9 @@ public class ArangoDBVertex extends ArangoDBElement<VertexPropertyData, VertexDa
         if (edgeCollections.isEmpty()) {
             return Collections.emptyIterator();
         }
-        return IteratorUtils.map(graph.getClient().getVertexNeighbors(elementId(), edgeCollections, direction, edgeLabels),
-                it -> new ArangoDBVertex(graph, it));
+        return graph.getClient().getVertexNeighbors(elementId(), edgeCollections, direction, edgeLabels)
+                .map(it -> (Vertex) new ArangoDBVertex(graph, it))
+                .iterator();
     }
 
     @Override

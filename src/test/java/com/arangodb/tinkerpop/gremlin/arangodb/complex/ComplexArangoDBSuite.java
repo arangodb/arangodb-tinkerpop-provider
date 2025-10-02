@@ -16,6 +16,8 @@
 
 package com.arangodb.tinkerpop.gremlin.arangodb.complex;
 
+import com.arangodb.tinkerpop.gremlin.arangodb.process.filter.*;
+import com.arangodb.tinkerpop.gremlin.arangodb.simple.DataTypesTest;
 import org.apache.tinkerpop.gremlin.AbstractGremlinSuite;
 import org.apache.tinkerpop.gremlin.process.traversal.TraversalEngine;
 import org.junit.runners.model.InitializationError;
@@ -25,7 +27,14 @@ public class ComplexArangoDBSuite extends AbstractGremlinSuite {
 
     private static final Class<?>[] allTests = new Class<?>[]{
             ComplexElementIdTest.class,
-            ComplexPersistenceTest.class
+            DataTypesTest.class,
+            ComplexPersistenceTest.class,
+            CompareEqFilterTest.class,
+            NotFilterTest.class,
+            OrFilterTest.class,
+            WithinFilterTest.class,
+            AndFilterTest.class,
+            TextFiltersTest.class
     };
 
     public ComplexArangoDBSuite(final Class<?> klass, final RunnerBuilder builder) throws InitializationError {

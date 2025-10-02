@@ -22,10 +22,12 @@ import com.arangodb.ArangoDatabase;
 import com.arangodb.model.AqlQueryOptions;
 import com.arangodb.tinkerpop.gremlin.PackageVersion;
 import com.arangodb.tinkerpop.gremlin.persistence.*;
-import com.arangodb.tinkerpop.gremlin.process.traversal.step.sideEffect.AQLStartStep;
+import com.arangodb.tinkerpop.gremlin.process.traversal.step.AQLStartStep;
+import com.arangodb.tinkerpop.gremlin.process.traversal.strategy.optimization.ArangoStepStrategy;
 import com.arangodb.tinkerpop.gremlin.utils.ArangoDBUtil;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer;
+import org.apache.tinkerpop.gremlin.process.traversal.TraversalStrategies;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.DefaultGraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.structure.*;
@@ -40,6 +42,12 @@ import com.arangodb.tinkerpop.gremlin.client.ArangoDBGraphClient;
 import com.arangodb.ArangoDB;
 
 public class ArangoDBGraph implements Graph {
+
+    static {
+        TraversalStrategies.GlobalCache.registerStrategies(ArangoDBGraph.class, TraversalStrategies.GlobalCache.getStrategies(Graph.class).clone()
+                .addStrategies(ArangoStepStrategy.instance()));
+    }
+
     public static final String GRAPH_VARIABLES_COLLECTION = "TINKERPOP-GRAPH-VARIABLES";
     private static final Logger LOGGER = LoggerFactory.getLogger(ArangoDBGraph.class);
     private static final Features FEATURES = new ArangoDBGraphFeatures();
@@ -138,16 +146,20 @@ public class ArangoDBGraph implements Graph {
         return config.configuration;
     }
 
+    public ElementIdFactory getIdFactory() {
+        return idFactory;
+    }
+
     @Override
     public Iterator<Edge> edges(Object... edgeIds) {
-        return getClient().getGraphEdges(idFactory.parseEdgeIds(edgeIds)).stream()
+        return getClient().getGraphEdges(idFactory.parseEdgeIds(edgeIds))
                 .map(it -> (Edge) new ArangoDBEdge(this, it))
                 .iterator();
     }
 
     @Override
     public Iterator<Vertex> vertices(Object... vertexIds) {
-        return getClient().getGraphVertices(idFactory.parseVertexIds(vertexIds)).stream()
+        return getClient().getGraphVertices(idFactory.parseVertexIds(vertexIds))
                 .map(it -> (Vertex) new ArangoDBVertex(this, it))
                 .iterator();
     }
@@ -242,7 +254,7 @@ public class ArangoDBGraph implements Graph {
      */
     public <E> GraphTraversal<?, E> aql(final String query, final Map<String, ?> parameters, final AqlQueryOptions options) {
         GraphTraversal.Admin<?, E> traversal = new DefaultGraphTraversal<>(this);
-        traversal.addStep(new AQLStartStep(traversal, query, client.query(query, parameters, options)));
+        traversal.addStep(new AQLStartStep(traversal, query, client.query(query, parameters, options).iterator()));
         return traversal;
     }
 
