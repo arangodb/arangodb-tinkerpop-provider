@@ -201,7 +201,6 @@ workflows:
           matrix:
             parameters:
               docker-img:
-                - 'docker.io/arangodb/arangodb:3.12'
                 - 'docker.io/arangodb/enterprise:3.12'
               topology:
                 - 'single'
@@ -213,7 +212,6 @@ workflows:
           matrix:
             parameters:
               docker-img:
-                - 'docker.io/arangodb/arangodb:3.12'
                 - 'docker.io/arangodb/enterprise:3.12'
               topology:
                 - 'cluster'
