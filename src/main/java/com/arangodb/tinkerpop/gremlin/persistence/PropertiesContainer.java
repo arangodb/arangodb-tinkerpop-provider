@@ -24,15 +24,15 @@ public abstract class PropertiesContainer<V> {
     private final Map<String, V> properties = new HashMap<>();
 
     public Map<String, V> getProperties() {
-        return properties;
+        return Collections.unmodifiableMap(properties);
     }
 
     public Set<String> keySet() {
-        return properties.keySet();
+        return Collections.unmodifiableSet(properties.keySet());
     }
 
     public Collection<V> values() {
-        return properties.values();
+        return Collections.unmodifiableCollection(properties.values());
     }
 
     public V get(String key) {
@@ -45,12 +45,6 @@ public abstract class PropertiesContainer<V> {
 
     public void put(String key, V value) {
         properties.put(key, value);
-    }
-
-    public void putAll(Map<String, V> map) {
-        if (map != null) {
-            properties.putAll(map);
-        }
     }
 
     public void remove(String key) {

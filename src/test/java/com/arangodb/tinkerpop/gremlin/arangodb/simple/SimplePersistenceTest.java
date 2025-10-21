@@ -31,6 +31,7 @@ import java.util.Map;
 
 import static com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph.GRAPH_VARIABLES_COLLECTION;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 @SuppressWarnings("resource")
 public class SimplePersistenceTest extends AbstractGremlinTest {
@@ -90,6 +91,45 @@ public class SimplePersistenceTest extends AbstractGremlinTest {
         Map<String, Object> fooMeta = meta.get("key");
         assertThat(fooMeta)
                 .containsEntry("meta", "metaValue");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void settingKeyAsPropertyShouldFail() {
+        Vertex v = graph.addVertex(
+                T.id, "foo",
+                T.label, "bar"
+        );
+        Throwable thrown = catchThrowable(() -> v.property("_key", "test"));
+        assertThat(thrown)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Property key can not be a reserved key");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void settingIdAsPropertyShouldFail() {
+        Vertex v = graph.addVertex(
+                T.id, "foo",
+                T.label, "bar"
+        );
+        Throwable thrown = catchThrowable(() -> v.property("_id", "test"));
+        assertThat(thrown)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Property key can not be a reserved key");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void settingLabelAsPropertyShouldFail() {
+        Vertex v = graph.addVertex(
+                T.id, "foo",
+                T.label, "bar"
+        );
+        Throwable thrown = catchThrowable(() -> v.property("type", "test"));
+        assertThat(thrown)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Property key can not be a reserved key");
     }
 
     @Test
