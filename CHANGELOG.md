@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.1] - 2025-10-21
+
+- fixed check of reserved property keys
+
 ## [3.2.0] - 2025-10-02
 
 - `HasStep` filters pushdown (#20, DE-1071)
