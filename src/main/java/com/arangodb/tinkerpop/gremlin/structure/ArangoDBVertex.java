@@ -18,6 +18,7 @@ package com.arangodb.tinkerpop.gremlin.structure;
 
 import com.arangodb.tinkerpop.gremlin.persistence.VertexData;
 import com.arangodb.tinkerpop.gremlin.persistence.VertexPropertyData;
+import com.arangodb.tinkerpop.gremlin.utils.ArangoDBUtil;
 import org.apache.tinkerpop.gremlin.structure.*;
 import org.apache.tinkerpop.gremlin.structure.util.ElementHelper;
 import org.apache.tinkerpop.gremlin.structure.util.StringFactory;
@@ -56,6 +57,7 @@ public class ArangoDBVertex extends ArangoDBElement<VertexPropertyData, VertexDa
         }
 
         VertexPropertyData prop = new VertexPropertyData(value);
+        ArangoDBUtil.validateProperty(key, value, graph.config);
         data.put(key, prop);
         doUpdate();
 

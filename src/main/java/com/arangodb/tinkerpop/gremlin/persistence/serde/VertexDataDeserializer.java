@@ -62,7 +62,7 @@ class VertexDataDeserializer extends JsonDeserializer<VertexData> {
             if (!config.isReservedField(prop.getKey())) {
                 VertexPropertyData pd = new VertexPropertyData(c.treeToValue(prop.getValue(), Object.class));
                 String key = prop.getKey();
-                pd.putAll(meta.get(key));
+                meta.getOrDefault(key, Collections.emptyMap()).forEach(pd::put);
                 data.put(key, pd);
             }
         }
