@@ -51,7 +51,7 @@ public abstract class AbstractTest {
     protected ArangoDBConfigurationBuilder confBuilder() {
         return new ArangoDBConfigurationBuilder()
                 .enableDataDefinition(true)
-                .hosts("172.28.0.1:8529")
+                .hosts(System.getProperty("arango.endpoints", "172.28.0.1:8529"))
                 .user("root")
                 .password("test")
                 .protocol(Protocol.HTTP2_VPACK)
