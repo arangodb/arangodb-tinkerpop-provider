@@ -35,6 +35,8 @@
         <sonar.organization>arangodb-1</sonar.organization>
         <sonar.java.spotbugs.reportPaths>target/spotbugsXml.xml</sonar.java.spotbugs.reportPaths>
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <allure.version>2.30.0</allure.version>
+        <aspectj.version>1.9.25</aspectj.version>
         <jpms.argLine/>
     </properties>
 
@@ -89,8 +91,7 @@
         </dependency>
         <dependency>
             <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-junit5</artifactId>
-            <version>2.30.0</version>
+            <artifactId>allure-junit4</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -103,6 +104,13 @@
                 <version>2.19.2</version>
                 <scope>import</scope>
                 <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-bom</artifactId>
+                <version>${allure.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -254,12 +262,35 @@
                 <version>3.5.3</version>
                 <configuration>
                     <!--suppress MavenModelInspection -->
-                    <argLine>${argLine} ${jpms.argLine}</argLine>
+                    <argLine>${argLine} ${jpms.argLine}
+                        -Dfile.encoding=${project.build.sourceEncoding}
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                    </argLine>
                     <trimStackTrace>false</trimStackTrace>
                     <includes>
                         <include>com.arangodb.tinkerpop.gremlin.${test.graph.type}.**</include>
                     </includes>
+                    <properties>
+                        <property>
+                            <name>listener</name>
+                            <value>io.qameta.allure.junit4.AllureJunit4</value>
+                        </property>
+                    </properties>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjweaver</artifactId>
+                        <version>${aspectj.version}</version>
+                        <scope>compile</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.qameta.allure</groupId>
+                        <artifactId>allure-junit4-aspect</artifactId>
+                        <version>${allure.version}</version>
+                        <scope>compile</scope>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>
