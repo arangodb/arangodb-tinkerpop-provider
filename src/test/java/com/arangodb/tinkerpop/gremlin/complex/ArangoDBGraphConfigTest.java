@@ -18,22 +18,28 @@ package com.arangodb.tinkerpop.gremlin.complex;
 
 import com.arangodb.config.HostDescription;
 import com.arangodb.tinkerpop.gremlin.AbstractTest;
-import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.ConfigurationUtils;
+import org.apache.commons.configuration2.FileBasedConfiguration;
+import org.apache.commons.configuration2.YAMLConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.Test;
+
+import java.io.File;
 
 import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SuppressWarnings("resource")
 public class ArangoDBGraphConfigTest extends AbstractTest {
 
     @Test
     public void loadConfigFromFile() {
-        client.clear("g");
-        ArangoDBGraph g = createGraph("src/test/resources/test.yaml");
-        ArangoDBGraphConfig conf = new ArangoDBGraphConfig(g.configuration());
+        ArangoDBGraphConfig conf = new ArangoDBGraphConfig(getConfiguration(new File("src/test/resources/test.yaml")));
         assertThat(conf.dbName).isEqualTo(dbName);
         assertThat(conf.graphName).isEqualTo("g");
         assertThat(conf.graphType).isEqualTo(ArangoDBGraphConfig.GraphType.COMPLEX);
@@ -59,5 +65,40 @@ public class ArangoDBGraphConfigTest extends AbstractTest {
                     assertThat(host.getPort()).isEqualTo(8529);
                 });
         assertThat(conf.driverConfig.getPassword()).isPresent().get().isEqualTo("test");
+    }
+
+    private static org.apache.commons.configuration2.Configuration getConfiguration(final File configurationFile) {
+        if (!configurationFile.isFile())
+            throw new IllegalArgumentException(String.format("The location configuration must resolve to a file and [%s] does not", configurationFile));
+
+        try {
+            final String fileName = configurationFile.getName();
+            final String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+
+            final Configuration conf;
+            final Configurations configs = new Configurations();
+
+            switch (fileExtension) {
+                case "yml":
+                case "yaml":
+                    final Parameters params = new Parameters();
+                    final FileBasedConfigurationBuilder<FileBasedConfiguration> builder =
+                            new FileBasedConfigurationBuilder<FileBasedConfiguration>(YAMLConfiguration.class).
+                                    configure(params.fileBased().setFile(configurationFile));
+
+                    final org.apache.commons.configuration2.Configuration copy = new org.apache.commons.configuration2.BaseConfiguration();
+                    ConfigurationUtils.copy(builder.configure(params.fileBased().setFile(configurationFile)).getConfiguration(), copy);
+                    conf = copy;
+                    break;
+                case "xml":
+                    conf = configs.xml(configurationFile);
+                    break;
+                default:
+                    conf = configs.properties(configurationFile);
+            }
+            return conf;
+        } catch (ConfigurationException e) {
+            throw new IllegalArgumentException(String.format("Could not load configuration at: %s", configurationFile), e);
+        }
     }
 }
