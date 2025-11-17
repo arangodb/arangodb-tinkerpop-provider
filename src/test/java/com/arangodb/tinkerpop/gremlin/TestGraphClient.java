@@ -19,6 +19,7 @@ package com.arangodb.tinkerpop.gremlin;
 import com.arangodb.ArangoCollection;
 import com.arangodb.ArangoDBException;
 import com.arangodb.ArangoDatabase;
+import com.arangodb.ArangoGraph;
 import com.arangodb.tinkerpop.gremlin.client.ArangoDBGraphClient;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraph;
 import com.arangodb.tinkerpop.gremlin.structure.ArangoDBGraphConfig;
@@ -51,12 +52,9 @@ public class TestGraphClient extends ArangoDBGraphClient {
             }
         }
 
-        try {
-            db.graph(name).drop(true);
-        } catch (ArangoDBException e) {
-            Integer errNum = e.getErrorNum();
-            if (errNum == null || errNum != 1924) // graph not found
-                throw e;
+        ArangoGraph g = db.graph(name);
+        if (g.exists()) {
+            g.drop(true);
         }
     }
 
