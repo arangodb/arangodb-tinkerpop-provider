@@ -281,7 +281,8 @@ workflows:
               only: /^v.*/
             branches:
               only:
-                - main
+                - "main"
+                - "release/v3"
 
   test-console:
     when:
