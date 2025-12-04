@@ -69,9 +69,9 @@ commands:
           command: mvn install -DskipTests
 
 executors:
-  j8:
+  j11:
     docker:
-      - image: 'cimg/openjdk:8.0'
+      - image: 'cimg/openjdk:11.0'
   j21:
     docker:
       - image: 'cimg/openjdk:21.0'
@@ -274,7 +274,7 @@ workflows:
                 - 'simple'
                 - 'complex'
               jdk:
-                - 'j8'
+                - 'j11'
                 - 'j21'
           filters:
             tags:
