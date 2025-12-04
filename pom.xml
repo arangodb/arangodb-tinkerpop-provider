@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.apache.tinkerpop</groupId>
         <artifactId>tinkerpop</artifactId>
-        <version>3.7.5</version>
+        <version>3.8.0</version>
     </parent>
 
     <groupId>com.arangodb</groupId>
@@ -369,7 +369,7 @@
                                 </requireJavaVersion>
                                 <enforceBytecodeVersion>
                                     <scopes>compile</scopes>
-                                    <maxJdkVersion>1.8</maxJdkVersion>
+                                    <maxJdkVersion>11</maxJdkVersion>
                                 </enforceBytecodeVersion>
                                 <requirePluginVersions/>
                                 <requireExplicitDependencyScope/>
