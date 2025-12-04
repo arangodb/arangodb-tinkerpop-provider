@@ -16,6 +16,7 @@
 
 package com.arangodb.tinkerpop.gremlin.process.filter;
 
+import org.apache.tinkerpop.gremlin.process.traversal.NotP;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.process.traversal.util.AndP;
 import org.apache.tinkerpop.gremlin.process.traversal.util.OrP;
@@ -61,6 +62,11 @@ public interface ArangoFilter {
                 return new TextRegexFilter(key, (String) p.getValue());
             case "notRegex":
                 return NotFilter.of(new TextRegexFilter(key, (String) p.getValue()));
+            case "not":
+                if (p instanceof NotP) {
+                    return NotFilter.of(of(key, ((NotP<?>) p).negate()));
+                }
+                throw new UnsupportedOperationException("Unsupported predicate: " + p);
             case "or":
                 if (p instanceof OrP) {
                     return OrFilter.of(((OrP<?>) p).getPredicates().stream()

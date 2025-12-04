@@ -38,7 +38,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public final class ArangoStep<S, E extends Element> extends GraphStep<S, E> implements HasContainerHolder {
+public final class ArangoStep<S, E extends Element> extends GraphStep<S, E> implements HasContainerHolder<S, E> {
 
     private final List<HasContainer> hasContainers = new ArrayList<>();
 

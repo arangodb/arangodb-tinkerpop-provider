@@ -20,5 +20,5 @@ docker cp "$LOCATION"/arangodb.yaml tinkerpop-data:/arangodb
 
 docker run \
   --volumes-from tinkerpop-data \
-  docker.io/tinkerpop/gremlin-console:3.7.5 \
+  docker.io/tinkerpop/gremlin-console:3.8.0 \
   -e /arangodb/test.groovy

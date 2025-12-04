@@ -28,6 +28,8 @@ import org.apache.tinkerpop.gremlin.process.traversal.step.util.HasContainer;
 import org.apache.tinkerpop.gremlin.process.traversal.strategy.AbstractTraversalStrategy;
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalHelper;
 
+import java.util.List;
+
 public final class ArangoStepStrategy extends AbstractTraversalStrategy<TraversalStrategy.ProviderOptimizationStrategy> implements TraversalStrategy.ProviderOptimizationStrategy {
 
     private static final ArangoStepStrategy INSTANCE = new ArangoStepStrategy();
@@ -53,7 +55,8 @@ public final class ArangoStepStrategy extends AbstractTraversalStrategy<Traversa
             Step<?, ?> currentStep = arangoStep.getNextStep();
             while (currentStep instanceof HasStep || currentStep instanceof NoOpBarrierStep) {
                 if (currentStep instanceof HasStep) {
-                    for (final HasContainer hasContainer : ((HasContainerHolder) currentStep).getHasContainers()) {
+                    List<HasContainer> hasContainers = ((HasContainerHolder) currentStep).getHasContainers();
+                    for (final HasContainer hasContainer : hasContainers) {
                         if (!GraphStep.processHasContainerIds(arangoStep, hasContainer))
                             arangoStep.addHasContainer(hasContainer);
                     }
