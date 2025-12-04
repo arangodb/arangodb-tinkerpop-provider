@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0] - 2025-12-04
+
+- updated tinkerpop version to `3.8.0`
+
+## [3.3.0] - 2025-12-04
+
+- updated tinkerpop version to `3.7.5`
+
 ## [3.2.1] - 2025-10-21
 
 - fixed check of reserved property keys
