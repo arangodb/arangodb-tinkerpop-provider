@@ -205,6 +205,56 @@ public class ArangoDBConfigurationBuilder {
     }
 
     /**
+     * Sets the SSL Trust manager algorithm
+     *
+     * @param sslAlgorithm the name of the SSL Trust manager algorithm
+     * @return this
+     */
+    public ArangoDBConfigurationBuilder sslAlgorithm(final String sslAlgorithm) {
+        return setDriverProperty(KEY_SSL_ALGORITHM, sslAlgorithm);
+    }
+
+    /**
+     * Sets the SSLContext protocol, default: {@code TLS}
+     *
+     * @param sslProtocol the name of the SSLContext protocol
+     * @return this
+     */
+    public ArangoDBConfigurationBuilder sslProtocol(final String sslProtocol) {
+        return setDriverProperty(KEY_SSL_PROTOCOL, sslProtocol);
+    }
+
+    /**
+     * Sets the file path to the SSL trust store.
+     *
+     * @param sslTrustStorePath The file path to the SSL trust store.
+     * @return this
+     */
+    public ArangoDBConfigurationBuilder sslTrustStorePath(final String sslTrustStorePath) {
+        return setDriverProperty(KEY_SSL_TRUST_STORE_PATH, sslTrustStorePath);
+    }
+
+    /**
+     * Sets the password for the SSL trust store.
+     *
+     * @param sslTrustStorePassword the password to access the SSL trust store
+     * @return this
+     */
+    public ArangoDBConfigurationBuilder sslTrustStorePassword(final String sslTrustStorePassword) {
+        return setDriverProperty(KEY_SSL_TRUST_STORE_PASSWORD, sslTrustStorePassword);
+    }
+
+    /**
+     * Sets the type of the SSL trust store to be used.
+     *
+     * @param sslTrustStoreType the type of the SSL trust store (e.g., "JKS", "PKCS12").
+     * @return this
+     */
+    public ArangoDBConfigurationBuilder sslTrustStoreType(String sslTrustStoreType) {
+        return setDriverProperty(KEY_SSL_TRUST_STORE_TYPE, sslTrustStoreType);
+    }
+
+    /**
      * Set whether hostname verification is enabled
      *
      * @param verifyHost {@code true} if enabled
