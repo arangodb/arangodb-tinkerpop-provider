@@ -37,7 +37,6 @@ commands:
           environment:
             DOCKER_IMAGE: <<parameters.docker-img>>
             STARTER_MODE: <<parameters.topology>>
-            STARTER_DOCKER_IMAGE: 'docker.io/arangodb/arangodb-starter:0.18.5'
             SSL: <<parameters.ssl>>
   load_cache:
     steps:
@@ -204,6 +203,7 @@ workflows:
             parameters:
               docker-img:
                 - 'docker.io/arangodb/enterprise:3.12'
+                - 'docker.io/arangodb/enterprise-preview:4.0-nightly'
               topology:
                 - 'single'
               graphType:
@@ -215,6 +215,7 @@ workflows:
             parameters:
               docker-img:
                 - 'docker.io/arangodb/enterprise:3.12'
+                - 'docker.io/arangodb/enterprise-preview:4.0-nightly'
               topology:
                 - 'cluster'
               graphType:
