@@ -1,0 +1,4 @@
+interface:
+  display_name: "ArangoDB TinkerPop Provider Development"
+  short_description: "Maintain and test the ArangoDB TinkerPop provider"
+  default_prompt: "Use $tinkerpop-provider-development to implement and validate a change in this repository."
